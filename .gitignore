@@ -3,3 +3,6 @@ log.json
 
 # For Macs:
 .DS_Store
+
+# For WebStorm Users
+# .idea
