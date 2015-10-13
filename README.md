@@ -1,3 +1,56 @@
+
+Karl Arao	12:10 PM
+https://codementor-classes.slack.com/messages/idea2mvp-nutrition/details/
+here https://github.com/localtunnel/localtunnel/issues/60
+
+me	12:16 PM
+https://qmiurphilh.localtunnel.me
+
+Karl Arao	12:23 PM
+http://www.sitepoint.com/5-free-wireframe-applications/
+http://webdemo.balsamiq.com/
+https://app.pluralsight.com/library/courses/handlebars-javascript-templating/table-of-contents
+http://www.pluralsight.com/courses/handlebars-javascript-templating
+http://www.lynda.com/Backbonejs-tutorials/Up-Running-Backbonejs/163089-2.html
+
+
+
+All
+Get to know Public
+
+Margie
+DONE Set up collaboration
+List of foods
+
+Karl
+Familiarize with Backbone and Handlebars
+Handlebars demo - Pluralsight
+
+Wilson
+
+
+Foods
+
+
+
+Features
+
+- Hot or Not layout
+- Upload from phone photo album
+- Nutrition Facts
+- Analytics
+
+0 1
+```
+Broccoli ------------------|
+
+Chips |------------------
+
+____________|______
+
+```
+
+
 1. Run `npm install` to generate `package.json`
 2. Remove the packages from `package.json` that you won't use. Here is a list of what each does
     1. backbone: Backbone.js
