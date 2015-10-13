@@ -12,12 +12,12 @@ var containerTpl = require('./templates/container.hbs');
 var app = {
 	init: function () {
 		$('body').append(containerTpl({
-			site_name: 'Your Site Name',
+			site_name: 'Eat or Not',
 			routes: [{
 				url: '/',
 				name: 'Home'
 			}],
-			footer: '(c) 2015 Your Name'
+			footer: '(c) 2015 Eat or Not Team'
 		}));
 
 		this.router = new Router();

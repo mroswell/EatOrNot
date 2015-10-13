@@ -58,12 +58,12 @@
 	var app = {
 		init: function () {
 			$('body').append(containerTpl({
-				site_name: 'Your Site Name',
+				site_name: 'Eat Or Not',
 				routes: [{
 					url: '/',
 					name: 'Home'
 				}],
-				footer: '(c) 2015 Your Name'
+				footer: '(c) 2015 Eat Or Not'
 			}));
 
 			this.router = new Router();
