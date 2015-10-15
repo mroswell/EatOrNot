@@ -4,7 +4,7 @@ Related links
 - here https://github.com/localtunnel/localtunnel/issues/60
 - http://www.sitepoint.com/5-free-wireframe-applications/
 - http://webdemo.balsamiq.com/
-- https://app.pluralsight.com/library/courses/handlebars-javascript- templating/table-of-contents
+- https://app.pluralsight.com/library/courses/handlebars-javascript-templating/table-of-contents
 - http://www.pluralsight.com/courses/handlebars-javascript-templating
 - http://www.lynda.com/Backbonejs-tutorials/Up-Running-Backbonejs/163089-2.html
 
