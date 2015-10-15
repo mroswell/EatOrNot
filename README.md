@@ -1,38 +1,25 @@
-eatornot.mybalsamiq.com
-
-Karl Arao	12:10 PM
-https://codementor-classes.slack.com/messages/idea2mvp-nutrition/details/
-here https://github.com/localtunnel/localtunnel/issues/60
-
-me	12:16 PM
-https://qmiurphilh.localtunnel.me
-
-Karl Arao	12:23 PM
-http://www.sitepoint.com/5-free-wireframe-applications/
-http://webdemo.balsamiq.com/
-https://app.pluralsight.com/library/courses/handlebars-javascript-templating/table-of-contents
-http://www.pluralsight.com/courses/handlebars-javascript-templating
-http://www.lynda.com/Backbonejs-tutorials/Up-Running-Backbonejs/163089-2.html
+Related links
+- http://eatornot.mybalsamiq.com
+- https://codementor-classes.slack.com/messages/idea2mvp-nutrition/details/
+- here https://github.com/localtunnel/localtunnel/issues/60
+- http://www.sitepoint.com/5-free-wireframe-applications/
+- http://webdemo.balsamiq.com/
+- https://app.pluralsight.com/library/courses/handlebars-javascript- templating/table-of-contents
+- http://www.pluralsight.com/courses/handlebars-javascript-templating
+- http://www.lynda.com/Backbonejs-tutorials/Up-Running-Backbonejs/163089-2.html
 
 
-
-All
-Get to know Public
+Homework
+- Lesson 1 Get to know Public
+- Lesson 2 Get to know Backbone and Parse
 
 Margie
-DONE Set up collaboration
-List of foods
+- DONE Set up collaboration
+- List of foods
 
 Karl
-Familiarize with Backbone and Handlebars
-Handlebars demo - Pluralsight
-
-Wilson
-
-
-Foods
-
-
+- Familiarize with Backbone and Handlebars
+- Handlebars demo - Pluralsight
 
 Features
 
