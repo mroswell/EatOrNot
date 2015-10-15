@@ -1,0 +1,11 @@
+{{#if is_loading}}
+  Loading Cats
+{{/if}}
+
+{{#if is_loaded}}
+
+  <ul>
+    {{#each cats }}}
+      <li></li>
+    {{/each}}
+  </ul><button class="add-cat">Add a Cat</button>
