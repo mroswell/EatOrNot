@@ -29,7 +29,7 @@ var app = {
       // JS key
       'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
     );
-  },
+
 
 //    var Cats = Parse.Object.extend('Cats');
 //    (new Parse.Query(Cats))
@@ -46,39 +46,15 @@ var app = {
 //        self.cats = data.toJSON();
 //      });
 
-    render: function () {
-      var self = this;
 
-      if (!this.food) {
-        var food = Parse.Object.extend('food');
-        (new Parse.Query(food))
-          .find()
-          .then(function(data){
-            self.cats = _.invoke(data, 'toJSON');
-            console.log(self.food);
-            self.render();
-          });
-        return this;
-      }
-
-      var data = {
-        food: self.food
-      };
-
-      this.$el.html(
-        containerTpl(data)
-      );
-
-
-
-//    $('body').append(containerTpl({
-//			site_name: 'Eat or Not',
-//			routes: [{
-//				url: '/',
-//				name: 'Home'
-//			}],
-//			footer: '(c) 2015 Eat or Not Team'
-//		}));
+    $('body').append(containerTpl({
+			site_name: 'Eat or Not',
+			routes: [{
+				url: '/',
+				name: 'Home'
+			}],
+			footer: '(c) 2015 Eat or Not Team'
+		}));
 
 		this.router = new Router();
 		

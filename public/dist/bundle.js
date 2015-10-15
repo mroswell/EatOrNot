@@ -75,7 +75,7 @@
 	      // JS key
 	      'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
 	    );
-	  },
+
 
 	//    var Cats = Parse.Object.extend('Cats');
 	//    (new Parse.Query(Cats))
@@ -92,39 +92,15 @@
 	//        self.cats = data.toJSON();
 	//      });
 
-	    render: function () {
-	      var self = this;
 
-	      if (!this.food) {
-	        var food = Parse.Object.extend('food');
-	        (new Parse.Query(food))
-	          .find()
-	          .then(function(data){
-	            self.cats = _.invoke(data, 'toJSON');
-	            console.log(self.food);
-	            self.render();
-	          });
-	        return this;
-	      }
-
-	      var data = {
-	        food: self.food
-	      };
-
-	      this.$el.html(
-	        containerTpl(data)
-	      );
-
-
-
-	//    $('body').append(containerTpl({
-	//			site_name: 'Eat or Not',
-	//			routes: [{
-	//				url: '/',
-	//				name: 'Home'
-	//			}],
-	//			footer: '(c) 2015 Eat or Not Team'
-	//		}));
+	    $('body').append(containerTpl({
+				site_name: 'Eat or Not',
+				routes: [{
+					url: '/',
+					name: 'Home'
+				}],
+				footer: '(c) 2015 Eat or Not Team'
+			}));
 
 			this.router = new Router();
 			
@@ -23398,20 +23374,44 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var tpl = __webpack_require__(95);
+	var Parse = __webpack_require__(5).Parse;
+	var _ = __webpack_require__(4);
 
 	module.exports = Backbone.View.extend({
-		render: function (state) {
-			if (!state) state = 'loaded';
-
-			//put other possible states here
-
-			this.$el.html(tpl({
-				is_loaded: state === 'loaded'
-			}));
+	//	render: function (state) {
+	//		if (!state) state = 'loaded';
+	//
+	//		//put other possible states here
+	//
+	//		this.$el.html(tpl({
+	//			is_loaded: state === 'loaded'
+	//		}));
 
 			//jQuery stuff goes here
-			
-			return this;
+	    render: function () {
+	      var self = this;
+
+	      if (!this.food) {
+	        var food = Parse.Object.extend('food');
+	        (new Parse.Query(food))
+	          .find()
+	          .then(function(data){
+	            self.food = _.invoke(data, 'toJSON');
+	            console.log(self.food);
+	            self.render();
+	          });
+	        return this;
+	      }
+
+	      var data = {
+	        food: self.food
+	      };
+
+	      this.$el.html(
+	        tpl(data)
+	      );
+
+	      return this;
 		}
 	});
 
