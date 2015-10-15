@@ -46,25 +46,85 @@
 
 	var $ = __webpack_require__(1);
 	var _ = __webpack_require__(4);
+	var Parse = __webpack_require__(5).Parse;
 
-	__webpack_require__(5);
-	__webpack_require__(6);
 
-	var config = __webpack_require__(15);
-	var Router = __webpack_require__(16);
+	//// Put on top of every file that uses Parse
+	//var Parse = require('parse').Parse;
+	//Parse.initialize(
+	//  //app ID
+	//  'APPIDGOES HERE',
+	//  // JS Key
+	//  'JS KEY GOES HERE'
+	//);
 
-	var containerTpl = __webpack_require__(38);
+	__webpack_require__(81);
+	__webpack_require__(82);
+	__webpack_require__(91);
+
+	//var config = require('./config');
+	var Router = __webpack_require__(93);
+
+	var containerTpl = __webpack_require__(115);
 
 	var app = {
 		init: function () {
-			$('body').append(containerTpl({
-				site_name: 'Eat Or Not',
-				routes: [{
-					url: '/',
-					name: 'Home'
-				}],
-				footer: '(c) 2015 Eat Or Not'
-			}));
+	    Parse.initialize(
+	      // app ID
+	      'kXSE7zWgHs4CyTSEF2jZma0wasi9KO2ahLxxrZCm',
+	      // JS key
+	      'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
+	    );
+	  },
+
+	//    var Cats = Parse.Object.extend('Cats');
+	//    (new Parse.Query(Cats))
+	//      .get('ZCXIAG78d4')
+	//      .then(_.bind(function(data){
+	//        console.log(data.toJSON());
+	//      }));
+
+	//    var food = Parse.Object.extend('food');
+	//    (new Parse.Query(food))
+	//      .get('ZCXIAG78d4')
+	//      .then(function(data){
+	//        console.log(data.toJSON());
+	//        self.cats = data.toJSON();
+	//      });
+
+	    render: function () {
+	      var self = this;
+
+	      if (!this.food) {
+	        var food = Parse.Object.extend('food');
+	        (new Parse.Query(food))
+	          .find()
+	          .then(function(data){
+	            self.cats = _.invoke(data, 'toJSON');
+	            console.log(self.food);
+	            self.render();
+	          });
+	        return this;
+	      }
+
+	      var data = {
+	        food: self.food
+	      };
+
+	      this.$el.html(
+	        containerTpl(data)
+	      );
+
+
+
+	//    $('body').append(containerTpl({
+	//			site_name: 'Eat or Not',
+	//			routes: [{
+	//				url: '/',
+	//				name: 'Home'
+	//			}],
+	//			footer: '(c) 2015 Eat or Not Team'
+	//		}));
 
 			this.router = new Router();
 			
@@ -10866,6 +10926,10165 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(6);
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _interopRequireWildcard = __webpack_require__(8)['default'];
+
+	var _decode = __webpack_require__(9);
+
+	var _decode2 = _interopRequireDefault(_decode);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _InstallationController = __webpack_require__(73);
+
+	var _InstallationController2 = _interopRequireDefault(_InstallationController);
+
+	var _ParseOp = __webpack_require__(56);
+
+	var ParseOp = _interopRequireWildcard(_ParseOp);
+
+	var _RESTController = __webpack_require__(74);
+
+	var _RESTController2 = _interopRequireDefault(_RESTController);
+
+	/**
+	 * Contains all Parse API classes and functions.
+	 * @class Parse
+	 * @static
+	 */
+	var Parse = {
+	  /**
+	   * Call this method first to set up your authentication tokens for Parse.
+	   * You can get your keys from the Data Browser on parse.com.
+	   * @method initialize
+	   * @param {String} applicationId Your Parse Application ID.
+	   * @param {String} javaScriptKey Your Parse JavaScript Key.
+	   * @param {String} masterKey (optional) Your Parse Master Key. (Node.js only!)
+	   * @static
+	   */
+	  initialize: function initialize(applicationId, javaScriptKey) {
+	    if ('browser' === 'browser' && _CoreManager2['default'].get('IS_NODE')) {
+	      console.log('It looks like you\'re using the browser version of the SDK in a ' + 'node.js environment. You should require(\'parse/node\') instead.');
+	    }
+	    Parse._initialize(applicationId, javaScriptKey);
+	  },
+
+	  _initialize: function _initialize(applicationId, javaScriptKey, masterKey) {
+	    _CoreManager2['default'].set('APPLICATION_ID', applicationId);
+	    _CoreManager2['default'].set('JAVASCRIPT_KEY', javaScriptKey);
+	    _CoreManager2['default'].set('MASTER_KEY', masterKey);
+	    _CoreManager2['default'].set('USE_MASTER_KEY', false);
+	  }
+	};
+
+	/** These legacy setters may eventually be deprecated **/
+	Object.defineProperty(Parse, 'applicationId', {
+	  get: function get() {
+	    return _CoreManager2['default'].get('APPLICATION_ID');
+	  },
+	  set: function set(value) {
+	    _CoreManager2['default'].set('APPLICATION_ID', value);
+	  }
+	});
+	Object.defineProperty(Parse, 'javaScriptKey', {
+	  get: function get() {
+	    return _CoreManager2['default'].get('JAVASCRIPT_KEY');
+	  },
+	  set: function set(value) {
+	    _CoreManager2['default'].set('JAVASCRIPT_KEY', value);
+	  }
+	});
+	Object.defineProperty(Parse, 'masterKey', {
+	  get: function get() {
+	    return _CoreManager2['default'].get('MASTER_KEY');
+	  },
+	  set: function set(value) {
+	    _CoreManager2['default'].set('MASTER_KEY', value);
+	  }
+	});
+	Object.defineProperty(Parse, 'serverURL', {
+	  get: function get() {
+	    return _CoreManager2['default'].get('SERVER_URL');
+	  },
+	  set: function set(value) {
+	    _CoreManager2['default'].set('SERVER_URL', value);
+	  }
+	});
+	/** End setters **/
+
+	Parse.ACL = __webpack_require__(10);
+	Parse.Analytics = __webpack_require__(75);
+	Parse.Cloud = __webpack_require__(76);
+	Parse.CoreManager = __webpack_require__(50);
+	Parse.Config = __webpack_require__(77);
+	Parse.Error = __webpack_require__(45);
+	Parse.FacebookUtils = __webpack_require__(78);
+	Parse.File = __webpack_require__(53);
+	Parse.GeoPoint = __webpack_require__(59);
+	Parse.Installation = __webpack_require__(79);
+	Parse.Object = __webpack_require__(46);
+	Parse.Op = {
+	  Set: ParseOp.SetOp,
+	  Unset: ParseOp.UnsetOp,
+	  Increment: ParseOp.IncrementOp,
+	  Add: ParseOp.AddOp,
+	  Remove: ParseOp.RemoveOp,
+	  AddUnique: ParseOp.AddUniqueOp,
+	  Relation: ParseOp.RelationOp
+	};
+	Parse.Promise = __webpack_require__(54);
+	Parse.Push = __webpack_require__(80);
+	Parse.Query = __webpack_require__(61);
+	Parse.Relation = __webpack_require__(55);
+	Parse.Role = __webpack_require__(26);
+	Parse.Session = __webpack_require__(70);
+	Parse.Storage = __webpack_require__(71);
+	Parse.User = __webpack_require__(68);
+
+	Parse._request = function () {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+
+	  return _CoreManager2['default'].getRESTController().request.apply(null, args);
+	};
+	Parse._ajax = function () {
+	  for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	    args[_key2] = arguments[_key2];
+	  }
+
+	  return _CoreManager2['default'].getRESTController().ajax.apply(null, args);
+	};
+	// We attempt to match the signatures of the legacy versions of these methods
+	Parse._decode = function (_, value) {
+	  return (0, _decode2['default'])(value);
+	};
+	Parse._encode = function (value, _, disallowObjects) {
+	  return (0, _encode2['default'])(value, disallowObjects);
+	};
+	Parse._getInstallationId = function () {
+	  return _CoreManager2['default'].getInstallationController().currentInstallationId();
+	};
+
+	_CoreManager2['default'].setInstallationController(_InstallationController2['default']);
+	_CoreManager2['default'].setRESTController(_RESTController2['default']);
+
+	// For legacy requires, of the form `var Parse = require('parse').Parse`
+	Parse.Parse = Parse;
+
+	module.exports = Parse;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports["default"] = function (obj) {
+	  return obj && obj.__esModule ? obj : {
+	    "default": obj
+	  };
+	};
+
+	exports.__esModule = true;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports["default"] = function (obj) {
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};
+
+	    if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }
+
+	    newObj["default"] = obj;
+	    return newObj;
+	  }
+	};
+
+	exports.__esModule = true;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = decode;
+
+	var _ParseACL = __webpack_require__(10);
+
+	var _ParseACL2 = _interopRequireDefault(_ParseACL);
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseGeoPoint = __webpack_require__(59);
+
+	var _ParseGeoPoint2 = _interopRequireDefault(_ParseGeoPoint);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseOp = __webpack_require__(56);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	function decode(value) {
+	  if (value === null || typeof value !== 'object') {
+	    return value;
+	  }
+	  if (Array.isArray(value)) {
+	    var dup = [];
+	    value.forEach(function (v, i) {
+	      dup[i] = decode(v);
+	    });
+	    return dup;
+	  }
+	  if (typeof value.__op === 'string') {
+	    return (0, _ParseOp.opFromJSON)(value);
+	  }
+	  if (value.__type === 'Pointer' && value.className) {
+	    return _ParseObject2['default'].fromJSON(value);
+	  }
+	  if (value.__type === 'Object' && value.className) {
+	    return _ParseObject2['default'].fromJSON(value);
+	  }
+	  if (value.__type === 'Relation') {
+	    // The parent and key fields will be populated by the parent
+	    var relation = new _ParseRelation2['default'](null, null);
+	    relation.targetClassName = value.className;
+	    return relation;
+	  }
+	  if (value.__type === 'Date') {
+	    return new Date(value.iso);
+	  }
+	  if (value.__type === 'File') {
+	    return _ParseFile2['default'].fromJSON(value);
+	  }
+	  if (value.__type === 'GeoPoint') {
+	    return new _ParseGeoPoint2['default']({
+	      latitude: value.latitude,
+	      longitude: value.longitude
+	    });
+	  }
+	  var copy = {};
+	  for (var k in value) {
+	    copy[k] = decode(value[k]);
+	  }
+	  return copy;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _Object$keys = __webpack_require__(16)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParseRole = __webpack_require__(26);
+
+	var _ParseRole2 = _interopRequireDefault(_ParseRole);
+
+	var _ParseUser = __webpack_require__(68);
+
+	var _ParseUser2 = _interopRequireDefault(_ParseUser);
+
+	var PUBLIC_KEY = '*';
+
+	/**
+	 * Creates a new ACL.
+	 * If no argument is given, the ACL has no permissions for anyone.
+	 * If the argument is a Parse.User, the ACL will have read and write
+	 *   permission for only that user.
+	 * If the argument is any other JSON object, that object will be interpretted
+	 *   as a serialized ACL created with toJSON().
+	 * @class Parse.ACL
+	 * @constructor
+	 *
+	 * <p>An ACL, or Access Control List can be added to any
+	 * <code>Parse.Object</code> to restrict access to only a subset of users
+	 * of your application.</p>
+	 */
+
+	var ParseACL = (function () {
+	  function ParseACL(arg1) {
+	    _classCallCheck(this, ParseACL);
+
+	    this.permissionsById = {};
+	    if (arg1 && typeof arg1 === 'object') {
+	      if (arg1 instanceof _ParseUser2['default']) {
+	        this.setReadAccess(arg1, true);
+	        this.setWriteAccess(arg1, true);
+	      } else {
+	        for (var userId in arg1) {
+	          var accessList = arg1[userId];
+	          if (typeof userId !== 'string') {
+	            throw new TypeError('Tried to create an ACL with an invalid user id.');
+	          }
+	          this.permissionsById[userId] = {};
+	          for (var permission in accessList) {
+	            var allowed = accessList[permission];
+	            if (permission !== 'read' && permission !== 'write') {
+	              throw new TypeError('Tried to create an ACL with an invalid permission type.');
+	            }
+	            if (typeof allowed !== 'boolean') {
+	              throw new TypeError('Tried to create an ACL with an invalid permission value.');
+	            }
+	            this.permissionsById[userId][permission] = allowed;
+	          }
+	        }
+	      }
+	    } else if (typeof arg1 === 'function') {
+	      throw new TypeError('ParseACL constructed with a function. Did you forget ()?');
+	    }
+	  }
+
+	  /**
+	   * Returns a JSON-encoded version of the ACL.
+	   * @method toJSON
+	   * @return {Object}
+	   */
+
+	  _createClass(ParseACL, [{
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      var permissions = {};
+	      for (var p in this.permissionsById) {
+	        permissions[p] = this.permissionsById[p];
+	      }
+	      return permissions;
+	    }
+
+	    /**
+	     * Returns whether this ACL is equal to another object
+	     * @method equals
+	     * @param other The other object to compare to
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'equals',
+	    value: function equals(other) {
+	      if (!(other instanceof ParseACL)) {
+	        return false;
+	      }
+	      var users = _Object$keys(this.permissionsById);
+	      var otherUsers = _Object$keys(other.permissionsById);
+	      if (users.length !== otherUsers.length) {
+	        return false;
+	      }
+	      for (var u in this.permissionsById) {
+	        if (!other.permissionsById[u]) {
+	          return false;
+	        }
+	        if (this.permissionsById[u].read !== other.permissionsById[u].read) {
+	          return false;
+	        }
+	        if (this.permissionsById[u].write !== other.permissionsById[u].write) {
+	          return false;
+	        }
+	      }
+	      return true;
+	    }
+	  }, {
+	    key: '_setAccess',
+	    value: function _setAccess(accessType, userId, allowed) {
+	      if (userId instanceof _ParseUser2['default']) {
+	        userId = userId.id;
+	      } else if (userId instanceof _ParseRole2['default']) {
+	        userId = 'role:' + userId.getName();
+	      }
+	      if (typeof userId !== 'string') {
+	        throw new TypeError('userId must be a string.');
+	      }
+	      if (typeof allowed !== 'boolean') {
+	        throw new TypeError('allowed must be either true or false.');
+	      }
+	      var permissions = this.permissionsById[userId];
+	      if (!permissions) {
+	        if (!allowed) {
+	          // The user already doesn't have this permission, so no action is needed
+	          return;
+	        } else {
+	          permissions = {};
+	          this.permissionsById[userId] = permissions;
+	        }
+	      }
+
+	      if (allowed) {
+	        this.permissionsById[userId][accessType] = true;
+	      } else {
+	        delete permissions[accessType];
+	        if (_Object$keys(permissions).length === 0) {
+	          delete this.permissionsById[userId];
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_getAccess',
+	    value: function _getAccess(accessType, userId) {
+	      if (userId instanceof _ParseUser2['default']) {
+	        userId = userId.id;
+	      } else if (userId instanceof _ParseRole2['default']) {
+	        userId = 'role:' + userId.getName();
+	      }
+	      var permissions = this.permissionsById[userId];
+	      if (!permissions) {
+	        return false;
+	      }
+	      return !!permissions[accessType];
+	    }
+
+	    /**
+	     * Sets whether the given user is allowed to read this object.
+	     * @method setReadAccess
+	     * @param userId An instance of Parse.User or its objectId.
+	     * @param {Boolean} allowed Whether that user should have read access.
+	     */
+	  }, {
+	    key: 'setReadAccess',
+	    value: function setReadAccess(userId, allowed) {
+	      this._setAccess('read', userId, allowed);
+	    }
+
+	    /**
+	     * Get whether the given user id is *explicitly* allowed to read this object.
+	     * Even if this returns false, the user may still be able to access it if
+	     * getPublicReadAccess returns true or a role that the user belongs to has
+	     * write access.
+	     * @method getReadAccess
+	     * @param userId An instance of Parse.User or its objectId, or a Parse.Role.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'getReadAccess',
+	    value: function getReadAccess(userId) {
+	      return this._getAccess('read', userId);
+	    }
+
+	    /**
+	     * Sets whether the given user id is allowed to write this object.
+	     * @method setWriteAccess
+	     * @param userId An instance of Parse.User or its objectId, or a Parse.Role..
+	     * @param {Boolean} allowed Whether that user should have write access.
+	     */
+	  }, {
+	    key: 'setWriteAccess',
+	    value: function setWriteAccess(userId, allowed) {
+	      this._setAccess('write', userId, allowed);
+	    }
+
+	    /**
+	     * Gets whether the given user id is *explicitly* allowed to write this object.
+	     * Even if this returns false, the user may still be able to write it if
+	     * getPublicWriteAccess returns true or a role that the user belongs to has
+	     * write access.
+	     * @method getWriteAccess
+	     * @param userId An instance of Parse.User or its objectId, or a Parse.Role.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'getWriteAccess',
+	    value: function getWriteAccess(userId) {
+	      return this._getAccess('write', userId);
+	    }
+
+	    /**
+	     * Sets whether the public is allowed to read this object.
+	     * @method setPublicReadAccess
+	     * @param {Boolean} allowed
+	     */
+	  }, {
+	    key: 'setPublicReadAccess',
+	    value: function setPublicReadAccess(allowed) {
+	      this.setReadAccess(PUBLIC_KEY, allowed);
+	    }
+
+	    /**
+	     * Gets whether the public is allowed to read this object.
+	     * @method getPublicReadAccess
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'getPublicReadAccess',
+	    value: function getPublicReadAccess() {
+	      return this.getReadAccess(PUBLIC_KEY);
+	    }
+
+	    /**
+	     * Sets whether the public is allowed to write this object.
+	     * @method setPublicWriteAccess
+	     * @param {Boolean} allowed
+	     */
+	  }, {
+	    key: 'setPublicWriteAccess',
+	    value: function setPublicWriteAccess(allowed) {
+	      this.setWriteAccess(PUBLIC_KEY, allowed);
+	    }
+
+	    /**
+	     * Gets whether the public is allowed to write this object.
+	     * @method getPublicWriteAccess
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'getPublicWriteAccess',
+	    value: function getPublicWriteAccess() {
+	      return this.getWriteAccess(PUBLIC_KEY);
+	    }
+
+	    /**
+	     * Gets whether users belonging to the given role are allowed
+	     * to read this object. Even if this returns false, the role may
+	     * still be able to write it if a parent role has read access.
+	     *
+	     * @method getRoleReadAccess
+	     * @param role The name of the role, or a Parse.Role object.
+	     * @return {Boolean} true if the role has read access. false otherwise.
+	     * @throws {TypeError} If role is neither a Parse.Role nor a String.
+	     */
+	  }, {
+	    key: 'getRoleReadAccess',
+	    value: function getRoleReadAccess(role) {
+	      if (role instanceof _ParseRole2['default']) {
+	        // Normalize to the String name
+	        role = role.getName();
+	      }
+	      if (typeof role !== 'string') {
+	        throw new TypeError('role must be a ParseRole or a String');
+	      }
+	      return this.getReadAccess('role:' + role);
+	    }
+
+	    /**
+	     * Gets whether users belonging to the given role are allowed
+	     * to write this object. Even if this returns false, the role may
+	     * still be able to write it if a parent role has write access.
+	     *
+	     * @method getRoleWriteAccess
+	     * @param role The name of the role, or a Parse.Role object.
+	     * @return {Boolean} true if the role has write access. false otherwise.
+	     * @throws {TypeError} If role is neither a Parse.Role nor a String.
+	     */
+	  }, {
+	    key: 'getRoleWriteAccess',
+	    value: function getRoleWriteAccess(role) {
+	      if (role instanceof _ParseRole2['default']) {
+	        // Normalize to the String name
+	        role = role.getName();
+	      }
+	      if (typeof role !== 'string') {
+	        throw new TypeError('role must be a ParseRole or a String');
+	      }
+	      return this.getWriteAccess('role:' + role);
+	    }
+
+	    /**
+	     * Sets whether users belonging to the given role are allowed
+	     * to read this object.
+	     *
+	     * @method setRoleReadAccess
+	     * @param role The name of the role, or a Parse.Role object.
+	     * @param {Boolean} allowed Whether the given role can read this object.
+	     * @throws {TypeError} If role is neither a Parse.Role nor a String.
+	     */
+	  }, {
+	    key: 'setRoleReadAccess',
+	    value: function setRoleReadAccess(role, allowed) {
+	      if (role instanceof _ParseRole2['default']) {
+	        // Normalize to the String name
+	        role = role.getName();
+	      }
+	      if (typeof role !== 'string') {
+	        throw new TypeError('role must be a ParseRole or a String');
+	      }
+	      this.setReadAccess('role:' + role, allowed);
+	    }
+
+	    /**
+	     * Sets whether users belonging to the given role are allowed
+	     * to write this object.
+	     *
+	     * @method setRoleWriteAccess
+	     * @param role The name of the role, or a Parse.Role object.
+	     * @param {Boolean} allowed Whether the given role can write this object.
+	     * @throws {TypeError} If role is neither a Parse.Role nor a String.
+	     */
+	  }, {
+	    key: 'setRoleWriteAccess',
+	    value: function setRoleWriteAccess(role, allowed) {
+	      if (role instanceof _ParseRole2['default']) {
+	        // Normalize to the String name
+	        role = role.getName();
+	      }
+	      if (typeof role !== 'string') {
+	        throw new TypeError('role must be a ParseRole or a String');
+	      }
+	      this.setWriteAccess('role:' + role, allowed);
+	    }
+	  }]);
+
+	  return ParseACL;
+	})();
+
+	exports['default'] = ParseACL;
+	module.exports = exports['default'];
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _Object$defineProperty = __webpack_require__(12)["default"];
+
+	exports["default"] = (function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];
+	      descriptor.enumerable = descriptor.enumerable || false;
+	      descriptor.configurable = true;
+	      if ("value" in descriptor) descriptor.writable = true;
+
+	      _Object$defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }
+
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	})();
+
+	exports.__esModule = true;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(13), __esModule: true };
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(14);
+	module.exports = function defineProperty(it, key, desc){
+	  return $.setDesc(it, key, desc);
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	var $Object = Object;
+	module.exports = {
+	  create:     $Object.create,
+	  getProto:   $Object.getPrototypeOf,
+	  isEnum:     {}.propertyIsEnumerable,
+	  getDesc:    $Object.getOwnPropertyDescriptor,
+	  setDesc:    $Object.defineProperty,
+	  setDescs:   $Object.defineProperties,
+	  getKeys:    $Object.keys,
+	  getNames:   $Object.getOwnPropertyNames,
+	  getSymbols: $Object.getOwnPropertySymbols,
+	  each:       [].forEach
+	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports["default"] = function (instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+
+	exports.__esModule = true;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(17), __esModule: true };
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(18);
+	module.exports = __webpack_require__(24).Object.keys;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.14 Object.keys(O)
+	var toObject = __webpack_require__(19);
+
+	__webpack_require__(21)('keys', function($keys){
+	  return function keys(it){
+	    return $keys(toObject(it));
+	  };
+	});
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 7.1.13 ToObject(argument)
+	var defined = __webpack_require__(20);
+	module.exports = function(it){
+	  return Object(defined(it));
+	};
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	// 7.2.1 RequireObjectCoercible(argument)
+	module.exports = function(it){
+	  if(it == undefined)throw TypeError("Can't call method on  " + it);
+	  return it;
+	};
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// most Object methods by ES6 should accept primitives
+	module.exports = function(KEY, exec){
+	  var $def = __webpack_require__(22)
+	    , fn   = (__webpack_require__(24).Object || {})[KEY] || Object[KEY]
+	    , exp  = {};
+	  exp[KEY] = exec(fn);
+	  $def($def.S + $def.F * __webpack_require__(25)(function(){ fn(1); }), 'Object', exp);
+	};
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global    = __webpack_require__(23)
+	  , core      = __webpack_require__(24)
+	  , PROTOTYPE = 'prototype';
+	var ctx = function(fn, that){
+	  return function(){
+	    return fn.apply(that, arguments);
+	  };
+	};
+	var $def = function(type, name, source){
+	  var key, own, out, exp
+	    , isGlobal = type & $def.G
+	    , isProto  = type & $def.P
+	    , target   = isGlobal ? global : type & $def.S
+	        ? global[name] : (global[name] || {})[PROTOTYPE]
+	    , exports  = isGlobal ? core : core[name] || (core[name] = {});
+	  if(isGlobal)source = name;
+	  for(key in source){
+	    // contains in native
+	    own = !(type & $def.F) && target && key in target;
+	    if(own && key in exports)continue;
+	    // export native or passed
+	    out = own ? target[key] : source[key];
+	    // prevent global pollution for namespaces
+	    if(isGlobal && typeof target[key] != 'function')exp = source[key];
+	    // bind timers to global for call from export context
+	    else if(type & $def.B && own)exp = ctx(out, global);
+	    // wrap global constructors for prevent change them in library
+	    else if(type & $def.W && target[key] == out)!function(C){
+	      exp = function(param){
+	        return this instanceof C ? new C(param) : C(param);
+	      };
+	      exp[PROTOTYPE] = C[PROTOTYPE];
+	    }(out);
+	    else exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
+	    // export
+	    exports[key] = exp;
+	    if(isProto)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+	  }
+	};
+	// type bitmap
+	$def.F = 1;  // forced
+	$def.G = 2;  // global
+	$def.S = 4;  // static
+	$def.P = 8;  // proto
+	$def.B = 16; // bind
+	$def.W = 32; // wrap
+	module.exports = $def;
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+	var UNDEFINED = 'undefined';
+	var global = module.exports = typeof window != UNDEFINED && window.Math == Math
+	  ? window : typeof self != UNDEFINED && self.Math == Math ? self : Function('return this')();
+	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	var core = module.exports = {version: '1.2.1'};
+	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+
+/***/ },
+/* 25 */
+/***/ function(module, exports) {
+
+	module.exports = function(exec){
+	  try {
+	    return !!exec();
+	  } catch(e){
+	    return true;
+	  }
+	};
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	/**
+	 * Represents a Role on the Parse server. Roles represent groupings of
+	 * Users for the purposes of granting permissions (e.g. specifying an ACL
+	 * for an Object). Roles are specified by their sets of child users and
+	 * child roles, all of which are granted any permissions that the parent
+	 * role has.
+	 *
+	 * <p>Roles must have a name (which cannot be changed after creation of the
+	 * role), and must specify an ACL.</p>
+	 * @class Parse.Role
+	 * @constructor
+	 * @param {String} name The name of the Role to create.
+	 * @param {Parse.ACL} acl The ACL for this role. Roles must have an ACL.
+	 * A Parse.Role is a local representation of a role persisted to the Parse
+	 * cloud.
+	 */
+	'use strict';
+
+	var _get = __webpack_require__(27)['default'];
+
+	var _inherits = __webpack_require__(34)['default'];
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParseACL = __webpack_require__(10);
+
+	var _ParseACL2 = _interopRequireDefault(_ParseACL);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParseObject2 = __webpack_require__(46);
+
+	var _ParseObject3 = _interopRequireDefault(_ParseObject2);
+
+	var ParseRole = (function (_ParseObject) {
+	  _inherits(ParseRole, _ParseObject);
+
+	  function ParseRole(name, acl) {
+	    _classCallCheck(this, ParseRole);
+
+	    _get(Object.getPrototypeOf(ParseRole.prototype), 'constructor', this).call(this, '_Role');
+	    if (typeof name === 'string' && acl instanceof _ParseACL2['default']) {
+	      this.setName(name);
+	      this.setACL(acl);
+	    }
+	  }
+
+	  /**
+	   * Gets the name of the role.  You can alternatively call role.get("name")
+	   *
+	   * @method getName
+	   * @return {String} the name of the role.
+	   */
+
+	  _createClass(ParseRole, [{
+	    key: 'getName',
+	    value: function getName() {
+	      return this.get('name');
+	    }
+
+	    /**
+	     * Sets the name for a role. This value must be set before the role has
+	     * been saved to the server, and cannot be set once the role has been
+	     * saved.
+	     *
+	     * <p>
+	     *   A role's name can only contain alphanumeric characters, _, -, and
+	     *   spaces.
+	     * </p>
+	     *
+	     * <p>This is equivalent to calling role.set("name", name)</p>
+	     *
+	     * @method setName
+	     * @param {String} name The name of the role.
+	     * @param {Object} options Standard options object with success and error
+	     *     callbacks.
+	     */
+	  }, {
+	    key: 'setName',
+	    value: function setName(name, options) {
+	      return this.set('name', name, options);
+	    }
+
+	    /**
+	     * Gets the Parse.Relation for the Parse.Users that are direct
+	     * children of this role. These users are granted any privileges that this
+	     * role has been granted (e.g. read or write access through ACLs). You can
+	     * add or remove users from the role through this relation.
+	     *
+	     * <p>This is equivalent to calling role.relation("users")</p>
+	     *
+	     * @method getUsers
+	     * @return {Parse.Relation} the relation for the users belonging to this
+	     *     role.
+	     */
+	  }, {
+	    key: 'getUsers',
+	    value: function getUsers() {
+	      return this.relation('users');
+	    }
+
+	    /**
+	     * Gets the Parse.Relation for the Parse.Roles that are direct
+	     * children of this role. These roles' users are granted any privileges that
+	     * this role has been granted (e.g. read or write access through ACLs). You
+	     * can add or remove child roles from this role through this relation.
+	     *
+	     * <p>This is equivalent to calling role.relation("roles")</p>
+	     *
+	     * @method getRoles
+	     * @return {Parse.Relation} the relation for the roles belonging to this
+	     *     role.
+	     */
+	  }, {
+	    key: 'getRoles',
+	    value: function getRoles() {
+	      return this.relation('roles');
+	    }
+	  }, {
+	    key: 'validate',
+	    value: function validate(attrs, options) {
+	      var isInvalid = _get(Object.getPrototypeOf(ParseRole.prototype), 'validate', this).call(this, attrs, options);
+	      if (isInvalid) {
+	        return isInvalid;
+	      }
+
+	      if ('name' in attrs && attrs.name !== this.getName()) {
+	        var newName = attrs.name;
+	        if (this.id && this.id !== attrs.objectId) {
+	          // Check to see if the objectId being set matches this.id
+	          // This happens during a fetch -- the id is set before calling fetch
+	          // Let the name be set in this case
+	          return new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'A role\'s name can only be set before it has been saved.');
+	        }
+	        if (typeof newName !== 'string') {
+	          return new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'A role\'s name must be a String.');
+	        }
+	        if (!/^[0-9a-zA-Z\-_ ]+$/.test(newName)) {
+	          return new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'A role\'s name can be only contain alphanumeric characters, _, ' + '-, and spaces.');
+	        }
+	      }
+	      return false;
+	    }
+	  }]);
+
+	  return ParseRole;
+	})(_ParseObject3['default']);
+
+	exports['default'] = ParseRole;
+
+	_ParseObject3['default'].registerSubclass('_Role', ParseRole);
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _Object$getOwnPropertyDescriptor = __webpack_require__(28)["default"];
+
+	exports["default"] = function get(_x, _x2, _x3) {
+	  var _again = true;
+
+	  _function: while (_again) {
+	    var object = _x,
+	        property = _x2,
+	        receiver = _x3;
+	    desc = parent = getter = undefined;
+	    _again = false;
+	    if (object === null) object = Function.prototype;
+
+	    var desc = _Object$getOwnPropertyDescriptor(object, property);
+
+	    if (desc === undefined) {
+	      var parent = Object.getPrototypeOf(object);
+
+	      if (parent === null) {
+	        return undefined;
+	      } else {
+	        _x = parent;
+	        _x2 = property;
+	        _x3 = receiver;
+	        _again = true;
+	        continue _function;
+	      }
+	    } else if ("value" in desc) {
+	      return desc.value;
+	    } else {
+	      var getter = desc.get;
+
+	      if (getter === undefined) {
+	        return undefined;
+	      }
+
+	      return getter.call(receiver);
+	    }
+	  }
+	};
+
+	exports.__esModule = true;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(29), __esModule: true };
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(14);
+	__webpack_require__(30);
+	module.exports = function getOwnPropertyDescriptor(it, key){
+	  return $.getDesc(it, key);
+	};
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+	var toIObject = __webpack_require__(31);
+
+	__webpack_require__(21)('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor){
+	  return function getOwnPropertyDescriptor(it, key){
+	    return $getOwnPropertyDescriptor(toIObject(it), key);
+	  };
+	});
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// to indexed object, toObject with fallback for non-array-like ES3 strings
+	var IObject = __webpack_require__(32)
+	  , defined = __webpack_require__(20);
+	module.exports = function(it){
+	  return IObject(defined(it));
+	};
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// indexed object, fallback for non-array-like ES3 strings
+	var cof = __webpack_require__(33);
+	module.exports = 0 in Object('z') ? Object : function(it){
+	  return cof(it) == 'String' ? it.split('') : Object(it);
+	};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	var toString = {}.toString;
+
+	module.exports = function(it){
+	  return toString.call(it).slice(8, -1);
+	};
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _Object$create = __webpack_require__(35)["default"];
+
+	var _Object$setPrototypeOf = __webpack_require__(37)["default"];
+
+	exports["default"] = function (subClass, superClass) {
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+	  }
+
+	  subClass.prototype = _Object$create(superClass && superClass.prototype, {
+	    constructor: {
+	      value: subClass,
+	      enumerable: false,
+	      writable: true,
+	      configurable: true
+	    }
+	  });
+	  if (superClass) _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	};
+
+	exports.__esModule = true;
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(36), __esModule: true };
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(14);
+	module.exports = function create(P, D){
+	  return $.create(P, D);
+	};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(38), __esModule: true };
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(39);
+	module.exports = __webpack_require__(24).Object.setPrototypeOf;
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.3.19 Object.setPrototypeOf(O, proto)
+	var $def = __webpack_require__(22);
+	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(40).set});
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Works with __proto__ only. Old v8 can't work with null proto objects.
+	/* eslint-disable no-proto */
+	var getDesc  = __webpack_require__(14).getDesc
+	  , isObject = __webpack_require__(41)
+	  , anObject = __webpack_require__(42);
+	var check = function(O, proto){
+	  anObject(O);
+	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
+	};
+	module.exports = {
+	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line no-proto
+	    function(test, buggy, set){
+	      try {
+	        set = __webpack_require__(43)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+	        set(test, []);
+	        buggy = !(test instanceof Array);
+	      } catch(e){ buggy = true; }
+	      return function setPrototypeOf(O, proto){
+	        check(O, proto);
+	        if(buggy)O.__proto__ = proto;
+	        else set(O, proto);
+	        return O;
+	      };
+	    }({}, false) : undefined),
+	  check: check
+	};
+
+/***/ },
+/* 41 */
+/***/ function(module, exports) {
+
+	module.exports = function(it){
+	  return typeof it === 'object' ? it !== null : typeof it === 'function';
+	};
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(41);
+	module.exports = function(it){
+	  if(!isObject(it))throw TypeError(it + ' is not an object!');
+	  return it;
+	};
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// optional / simple context binding
+	var aFunction = __webpack_require__(44);
+	module.exports = function(fn, that, length){
+	  aFunction(fn);
+	  if(that === undefined)return fn;
+	  switch(length){
+	    case 1: return function(a){
+	      return fn.call(that, a);
+	    };
+	    case 2: return function(a, b){
+	      return fn.call(that, a, b);
+	    };
+	    case 3: return function(a, b, c){
+	      return fn.call(that, a, b, c);
+	    };
+	  }
+	  return function(/* ...args */){
+	    return fn.apply(that, arguments);
+	  };
+	};
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	module.exports = function(it){
+	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+	  return it;
+	};
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	/**
+	 * Constructs a new Parse.Error object with the given code and message.
+	 * @class Parse.Error
+	 * @constructor
+	 * @param {Number} code An error code constant from <code>Parse.Error</code>.
+	 * @param {String} message A detailed description of the error.
+	 */
+	"use strict";
+
+	var _classCallCheck = __webpack_require__(15)["default"];
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var ParseError = function ParseError(code, message) {
+	  _classCallCheck(this, ParseError);
+
+	  this.code = code;
+	  this.message = message;
+	}
+
+	/**
+	 * Error code indicating some error other than those enumerated here.
+	 * @property OTHER_CAUSE
+	 * @static
+	 * @final
+	 */
+	;
+
+	exports["default"] = ParseError;
+	ParseError.OTHER_CAUSE = -1;
+
+	/**
+	 * Error code indicating that something has gone wrong with the server.
+	 * If you get this error code, it is Parse's fault. Contact us at
+	 * https://parse.com/help
+	 * @property INTERNAL_SERVER_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.INTERNAL_SERVER_ERROR = 1;
+
+	/**
+	 * Error code indicating the connection to the Parse servers failed.
+	 * @property CONNECTION_FAILED
+	 * @static
+	 * @final
+	 */
+	ParseError.CONNECTION_FAILED = 100;
+
+	/**
+	 * Error code indicating the specified object doesn't exist.
+	 * @property OBJECT_NOT_FOUND
+	 * @static
+	 * @final
+	 */
+	ParseError.OBJECT_NOT_FOUND = 101;
+
+	/**
+	 * Error code indicating you tried to query with a datatype that doesn't
+	 * support it, like exact matching an array or object.
+	 * @property INVALID_QUERY
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_QUERY = 102;
+
+	/**
+	 * Error code indicating a missing or invalid classname. Classnames are
+	 * case-sensitive. They must start with a letter, and a-zA-Z0-9_ are the
+	 * only valid characters.
+	 * @property INVALID_CLASS_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_CLASS_NAME = 103;
+
+	/**
+	 * Error code indicating an unspecified object id.
+	 * @property MISSING_OBJECT_ID
+	 * @static
+	 * @final
+	 */
+	ParseError.MISSING_OBJECT_ID = 104;
+
+	/**
+	 * Error code indicating an invalid key name. Keys are case-sensitive. They
+	 * must start with a letter, and a-zA-Z0-9_ are the only valid characters.
+	 * @property INVALID_KEY_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_KEY_NAME = 105;
+
+	/**
+	 * Error code indicating a malformed pointer. You should not see this unless
+	 * you have been mucking about changing internal Parse code.
+	 * @property INVALID_POINTER
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_POINTER = 106;
+
+	/**
+	 * Error code indicating that badly formed JSON was received upstream. This
+	 * either indicates you have done something unusual with modifying how
+	 * things encode to JSON, or the network is failing badly.
+	 * @property INVALID_JSON
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_JSON = 107;
+
+	/**
+	 * Error code indicating that the feature you tried to access is only
+	 * available internally for testing purposes.
+	 * @property COMMAND_UNAVAILABLE
+	 * @static
+	 * @final
+	 */
+	ParseError.COMMAND_UNAVAILABLE = 108;
+
+	/**
+	 * You must call Parse.initialize before using the Parse library.
+	 * @property NOT_INITIALIZED
+	 * @static
+	 * @final
+	 */
+	ParseError.NOT_INITIALIZED = 109;
+
+	/**
+	 * Error code indicating that a field was set to an inconsistent type.
+	 * @property INCORRECT_TYPE
+	 * @static
+	 * @final
+	 */
+	ParseError.INCORRECT_TYPE = 111;
+
+	/**
+	 * Error code indicating an invalid channel name. A channel name is either
+	 * an empty string (the broadcast channel) or contains only a-zA-Z0-9_
+	 * characters and starts with a letter.
+	 * @property INVALID_CHANNEL_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_CHANNEL_NAME = 112;
+
+	/**
+	 * Error code indicating that push is misconfigured.
+	 * @property PUSH_MISCONFIGURED
+	 * @static
+	 * @final
+	 */
+	ParseError.PUSH_MISCONFIGURED = 115;
+
+	/**
+	 * Error code indicating that the object is too large.
+	 * @property OBJECT_TOO_LARGE
+	 * @static
+	 * @final
+	 */
+	ParseError.OBJECT_TOO_LARGE = 116;
+
+	/**
+	 * Error code indicating that the operation isn't allowed for clients.
+	 * @property OPERATION_FORBIDDEN
+	 * @static
+	 * @final
+	 */
+	ParseError.OPERATION_FORBIDDEN = 119;
+
+	/**
+	 * Error code indicating the result was not found in the cache.
+	 * @property CACHE_MISS
+	 * @static
+	 * @final
+	 */
+	ParseError.CACHE_MISS = 120;
+
+	/**
+	 * Error code indicating that an invalid key was used in a nested
+	 * JSONObject.
+	 * @property INVALID_NESTED_KEY
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_NESTED_KEY = 121;
+
+	/**
+	 * Error code indicating that an invalid filename was used for ParseFile.
+	 * A valid file name contains only a-zA-Z0-9_. characters and is between 1
+	 * and 128 characters.
+	 * @property INVALID_FILE_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_FILE_NAME = 122;
+
+	/**
+	 * Error code indicating an invalid ACL was provided.
+	 * @property INVALID_ACL
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_ACL = 123;
+
+	/**
+	 * Error code indicating that the request timed out on the server. Typically
+	 * this indicates that the request is too expensive to run.
+	 * @property TIMEOUT
+	 * @static
+	 * @final
+	 */
+	ParseError.TIMEOUT = 124;
+
+	/**
+	 * Error code indicating that the email address was invalid.
+	 * @property INVALID_EMAIL_ADDRESS
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_EMAIL_ADDRESS = 125;
+
+	/**
+	 * Error code indicating a missing content type.
+	 * @property MISSING_CONTENT_TYPE
+	 * @static
+	 * @final
+	 */
+	ParseError.MISSING_CONTENT_TYPE = 126;
+
+	/**
+	 * Error code indicating a missing content length.
+	 * @property MISSING_CONTENT_LENGTH
+	 * @static
+	 * @final
+	 */
+	ParseError.MISSING_CONTENT_LENGTH = 127;
+
+	/**
+	 * Error code indicating an invalid content length.
+	 * @property INVALID_CONTENT_LENGTH
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_CONTENT_LENGTH = 128;
+
+	/**
+	 * Error code indicating a file that was too large.
+	 * @property FILE_TOO_LARGE
+	 * @static
+	 * @final
+	 */
+	ParseError.FILE_TOO_LARGE = 129;
+
+	/**
+	 * Error code indicating an error saving a file.
+	 * @property FILE_SAVE_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.FILE_SAVE_ERROR = 130;
+
+	/**
+	 * Error code indicating that a unique field was given a value that is
+	 * already taken.
+	 * @property DUPLICATE_VALUE
+	 * @static
+	 * @final
+	 */
+	ParseError.DUPLICATE_VALUE = 137;
+
+	/**
+	 * Error code indicating that a role's name is invalid.
+	 * @property INVALID_ROLE_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_ROLE_NAME = 139;
+
+	/**
+	 * Error code indicating that an application quota was exceeded.  Upgrade to
+	 * resolve.
+	 * @property EXCEEDED_QUOTA
+	 * @static
+	 * @final
+	 */
+	ParseError.EXCEEDED_QUOTA = 140;
+
+	/**
+	 * Error code indicating that a Cloud Code script failed.
+	 * @property SCRIPT_FAILED
+	 * @static
+	 * @final
+	 */
+	ParseError.SCRIPT_FAILED = 141;
+
+	/**
+	 * Error code indicating that a Cloud Code validation failed.
+	 * @property VALIDATION_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.VALIDATION_ERROR = 142;
+
+	/**
+	 * Error code indicating that invalid image data was provided.
+	 * @property INVALID_IMAGE_DATA
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_IMAGE_DATA = 143;
+
+	/**
+	 * Error code indicating an unsaved file.
+	 * @property UNSAVED_FILE_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.UNSAVED_FILE_ERROR = 151;
+
+	/**
+	 * Error code indicating an invalid push time.
+	 * @property INVALID_PUSH_TIME_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_PUSH_TIME_ERROR = 152;
+
+	/**
+	 * Error code indicating an error deleting a file.
+	 * @property FILE_DELETE_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.FILE_DELETE_ERROR = 153;
+
+	/**
+	 * Error code indicating that the application has exceeded its request
+	 * limit.
+	 * @property REQUEST_LIMIT_EXCEEDED
+	 * @static
+	 * @final
+	 */
+	ParseError.REQUEST_LIMIT_EXCEEDED = 155;
+
+	/**
+	 * Error code indicating an invalid event name.
+	 * @property INVALID_EVENT_NAME
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_EVENT_NAME = 160;
+
+	/**
+	 * Error code indicating that the username is missing or empty.
+	 * @property USERNAME_MISSING
+	 * @static
+	 * @final
+	 */
+	ParseError.USERNAME_MISSING = 200;
+
+	/**
+	 * Error code indicating that the password is missing or empty.
+	 * @property PASSWORD_MISSING
+	 * @static
+	 * @final
+	 */
+	ParseError.PASSWORD_MISSING = 201;
+
+	/**
+	 * Error code indicating that the username has already been taken.
+	 * @property USERNAME_TAKEN
+	 * @static
+	 * @final
+	 */
+	ParseError.USERNAME_TAKEN = 202;
+
+	/**
+	 * Error code indicating that the email has already been taken.
+	 * @property EMAIL_TAKEN
+	 * @static
+	 * @final
+	 */
+	ParseError.EMAIL_TAKEN = 203;
+
+	/**
+	 * Error code indicating that the email is missing, but must be specified.
+	 * @property EMAIL_MISSING
+	 * @static
+	 * @final
+	 */
+	ParseError.EMAIL_MISSING = 204;
+
+	/**
+	 * Error code indicating that a user with the specified email was not found.
+	 * @property EMAIL_NOT_FOUND
+	 * @static
+	 * @final
+	 */
+	ParseError.EMAIL_NOT_FOUND = 205;
+
+	/**
+	 * Error code indicating that a user object without a valid session could
+	 * not be altered.
+	 * @property SESSION_MISSING
+	 * @static
+	 * @final
+	 */
+	ParseError.SESSION_MISSING = 206;
+
+	/**
+	 * Error code indicating that a user can only be created through signup.
+	 * @property MUST_CREATE_USER_THROUGH_SIGNUP
+	 * @static
+	 * @final
+	 */
+	ParseError.MUST_CREATE_USER_THROUGH_SIGNUP = 207;
+
+	/**
+	 * Error code indicating that an an account being linked is already linked
+	 * to another user.
+	 * @property ACCOUNT_ALREADY_LINKED
+	 * @static
+	 * @final
+	 */
+	ParseError.ACCOUNT_ALREADY_LINKED = 208;
+
+	/**
+	 * Error code indicating that the current session token is invalid.
+	 * @property INVALID_SESSION_TOKEN
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_SESSION_TOKEN = 209;
+
+	/**
+	 * Error code indicating that a user cannot be linked to an account because
+	 * that account's id could not be found.
+	 * @property LINKED_ID_MISSING
+	 * @static
+	 * @final
+	 */
+	ParseError.LINKED_ID_MISSING = 250;
+
+	/**
+	 * Error code indicating that a user with a linked (e.g. Facebook) account
+	 * has an invalid session.
+	 * @property INVALID_LINKED_SESSION
+	 * @static
+	 * @final
+	 */
+	ParseError.INVALID_LINKED_SESSION = 251;
+
+	/**
+	 * Error code indicating that a service being linked (e.g. Facebook or
+	 * Twitter) is unsupported.
+	 * @property UNSUPPORTED_SERVICE
+	 * @static
+	 * @final
+	 */
+	ParseError.UNSUPPORTED_SERVICE = 252;
+
+	/**
+	 * Error code indicating that there were multiple errors. Aggregate errors
+	 * have an "errors" property, which is an array of error objects with more
+	 * detail about each error that occurred.
+	 * @property AGGREGATE_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.AGGREGATE_ERROR = 600;
+
+	/**
+	 * Error code indicating the client was unable to read an input file.
+	 * @property FILE_READ_ERROR
+	 * @static
+	 * @final
+	 */
+	ParseError.FILE_READ_ERROR = 601;
+
+	/**
+	 * Error code indicating a real error code is unavailable because
+	 * we had to use an XDomainRequest object to allow CORS requests in
+	 * Internet Explorer, which strips the body from HTTP responses that have
+	 * a non-2XX status code.
+	 * @property X_DOMAIN_REQUEST
+	 * @static
+	 * @final
+	 */
+	ParseError.X_DOMAIN_REQUEST = 602;
+	module.exports = exports["default"];
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _Object$keys = __webpack_require__(16)['default'];
+
+	var _Object$freeze = __webpack_require__(47)['default'];
+
+	var _Object$create = __webpack_require__(35)['default'];
+
+	var _Object$defineProperty = __webpack_require__(12)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _interopRequireWildcard = __webpack_require__(8)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _canBeSerialized = __webpack_require__(52);
+
+	var _canBeSerialized2 = _interopRequireDefault(_canBeSerialized);
+
+	var _decode = __webpack_require__(9);
+
+	var _decode2 = _interopRequireDefault(_decode);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _equals = __webpack_require__(62);
+
+	var _equals2 = _interopRequireDefault(_equals);
+
+	var _escape2 = __webpack_require__(63);
+
+	var _escape3 = _interopRequireDefault(_escape2);
+
+	var _ObjectState = __webpack_require__(64);
+
+	var ObjectState = _interopRequireWildcard(_ObjectState);
+
+	var _ParseACL = __webpack_require__(10);
+
+	var _ParseACL2 = _interopRequireDefault(_ParseACL);
+
+	var _parseDate = __webpack_require__(66);
+
+	var _parseDate2 = _interopRequireDefault(_parseDate);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseOp = __webpack_require__(56);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _ParseQuery = __webpack_require__(61);
+
+	var _ParseQuery2 = _interopRequireDefault(_ParseQuery);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	var _unique = __webpack_require__(60);
+
+	var _unique2 = _interopRequireDefault(_unique);
+
+	var _unsavedChildren = __webpack_require__(67);
+
+	var _unsavedChildren2 = _interopRequireDefault(_unsavedChildren);
+
+	// Mapping of class names to constructors, so we can populate objects from the
+	// server with appropriate subclasses of ParseObject
+	var classMap = {};
+
+	// Global counter for generating unique local Ids
+	var localCount = 0;
+	// Global counter for generating unique Ids for non-single-instance objects
+	var objectCount = 0;
+	// On web clients, objects are single-instance: any two objects with the same Id
+	// will have the same attributes. However, this may be dangerous default
+	// behavior in a server scenario
+	var singleInstance = !_CoreManager2['default'].get('IS_NODE');
+
+	/**
+	 * Creates a new model with defined attributes.
+	 *
+	 * <p>You won't normally call this method directly.  It is recommended that
+	 * you use a subclass of <code>Parse.Object</code> instead, created by calling
+	 * <code>extend</code>.</p>
+	 *
+	 * <p>However, if you don't want to use a subclass, or aren't sure which
+	 * subclass is appropriate, you can use this form:<pre>
+	 *     var object = new Parse.Object("ClassName");
+	 * </pre>
+	 * That is basically equivalent to:<pre>
+	 *     var MyClass = Parse.Object.extend("ClassName");
+	 *     var object = new MyClass();
+	 * </pre></p>
+	 *
+	 * @class Parse.Object
+	 * @constructor
+	 * @param {String} className The class name for the object
+	 * @param {Object} attributes The initial set of data to store in the object.
+	 */
+
+	var ParseObject = (function () {
+	  function ParseObject(className, attributes) {
+	    _classCallCheck(this, ParseObject);
+
+	    var toSet = null;
+	    this._objCount = objectCount++;
+	    if (typeof className === 'string') {
+	      this.className = className;
+	      if (attributes && typeof attributes === 'object') {
+	        toSet = attributes;
+	      }
+	    } else if (className && typeof className === 'object') {
+	      this.className = className.className;
+	      toSet = {};
+	      for (var attr in className) {
+	        if (attr !== 'className') {
+	          toSet[attr] = className[attr];
+	        }
+	      }
+	    }
+	    if (toSet && !this.set(toSet)) {
+	      throw new Error('Can\'t create an invalid Parse Object');
+	    }
+	    // Enable legacy initializers
+	    if (typeof this.initialize === 'function') {
+	      this.initialize.apply(this, arguments);
+	    }
+	  }
+
+	  /** Prototype getters / setters **/
+
+	  _createClass(ParseObject, [{
+	    key: '_getId',
+
+	    /** Private methods **/
+
+	    /**
+	     * Returns a local or server Id used uniquely identify this object
+	     */
+	    value: function _getId() {
+	      if (typeof this.id === 'string') {
+	        return this.id;
+	      }
+	      if (typeof this._localId === 'string') {
+	        return this._localId;
+	      }
+	      var localId = 'local' + String(localCount++);
+	      this._localId = localId;
+	      return localId;
+	    }
+
+	    /**
+	     * Returns a local or server Id used to pull data from the Object State store
+	     * If single instance objects are disabled, it will use the object's unique
+	     * count to separate its data from other objects with the same server Id.
+	     */
+	  }, {
+	    key: '_getStateIdentifier',
+	    value: function _getStateIdentifier() {
+	      if (typeof this.id === 'string') {
+	        if (singleInstance) {
+	          return this.id;
+	        }
+	        return this.id + '_' + String(this._objCount);
+	      }
+	      return this._getId();
+	    }
+	  }, {
+	    key: '_getServerData',
+	    value: function _getServerData() {
+	      return ObjectState.getServerData(this.className, this._getStateIdentifier());
+	    }
+	  }, {
+	    key: '_clearServerData',
+	    value: function _clearServerData() {
+	      var serverData = this._getServerData();
+	      var unset = {};
+	      for (var attr in serverData) {
+	        unset[attr] = undefined;
+	      }
+	      ObjectState.setServerData(this.className, this._getStateIdentifier(), unset);
+	    }
+	  }, {
+	    key: '_getPendingOps',
+	    value: function _getPendingOps() {
+	      return ObjectState.getPendingOps(this.className, this._getStateIdentifier());
+	    }
+	  }, {
+	    key: '_clearPendingOps',
+	    value: function _clearPendingOps() {
+	      var pending = this._getPendingOps();
+	      var latest = pending[pending.length - 1];
+	      var keys = _Object$keys(latest);
+	      keys.forEach(function (key) {
+	        delete latest[key];
+	      });
+	    }
+	  }, {
+	    key: '_getDirtyObjectAttributes',
+	    value: function _getDirtyObjectAttributes() {
+	      var attributes = this.attributes;
+	      var objectCache = ObjectState.getObjectCache(this.className, this._getStateIdentifier());
+	      var dirty = {};
+	      for (var attr in attributes) {
+	        var val = attributes[attr];
+	        if (val && typeof val === 'object' && !(val instanceof ParseObject) && !(val instanceof _ParseFile2['default']) && !(val instanceof _ParseRelation2['default'])) {
+	          // Due to the way browsers construct maps, the key order will not change
+	          // unless the object is changed
+	          var json = (0, _encode2['default'])(val, false, true);
+	          var stringified = JSON.stringify(json);
+	          if (objectCache[attr] !== stringified) {
+	            dirty[attr] = val;
+	          }
+	        }
+	      }
+	      return dirty;
+	    }
+	  }, {
+	    key: '_toFullJSON',
+	    value: function _toFullJSON() {
+	      var json = this.toJSON();
+	      json.__type = 'Object';
+	      json.className = this.className;
+	      return json;
+	    }
+	  }, {
+	    key: '_getSaveJSON',
+	    value: function _getSaveJSON() {
+	      var pending = this._getPendingOps();
+	      var dirtyObjects = this._getDirtyObjectAttributes();
+	      var json = {};
+	      var attr;
+	      for (attr in dirtyObjects) {
+	        json[attr] = new _ParseOp.SetOp(dirtyObjects[attr]).toJSON();
+	      }
+	      for (attr in pending[0]) {
+	        json[attr] = pending[0][attr].toJSON();
+	      }
+	      return json;
+	    }
+	  }, {
+	    key: '_getSaveParams',
+	    value: function _getSaveParams() {
+	      var method = this.id ? 'PUT' : 'POST';
+	      var body = this._getSaveJSON();
+	      var path = 'classes/' + this.className;
+	      if (this.id) {
+	        path += '/' + this.id;
+	      } else if (this.className === '_User') {
+	        path = 'users';
+	      }
+	      return {
+	        method: method,
+	        body: body,
+	        path: path
+	      };
+	    }
+	  }, {
+	    key: '_finishFetch',
+	    value: function _finishFetch(serverData) {
+	      if (!this.id && serverData.objectId) {
+	        this.id = serverData.objectId;
+	      }
+	      ObjectState.initializeState(this.className, this._getStateIdentifier());
+	      var decoded = {};
+	      for (var attr in serverData) {
+	        if (attr === 'ACL') {
+	          decoded[attr] = new _ParseACL2['default'](serverData[attr]);
+	        } else if (attr !== 'objectId') {
+	          decoded[attr] = (0, _decode2['default'])(serverData[attr]);
+	          if (decoded[attr] instanceof _ParseRelation2['default']) {
+	            decoded[attr]._ensureParentAndKey(this, attr);
+	          }
+	        }
+	      }
+	      if (decoded.createdAt && typeof decoded.createdAt === 'string') {
+	        decoded.createdAt = (0, _parseDate2['default'])(decoded.createdAt);
+	      }
+	      if (decoded.updatedAt && typeof decoded.updatedAt === 'string') {
+	        decoded.updatedAt = (0, _parseDate2['default'])(decoded.updatedAt);
+	      }
+	      if (!decoded.updatedAt && decoded.createdAt) {
+	        decoded.updatedAt = decoded.createdAt;
+	      }
+	      ObjectState.commitServerChanges(this.className, this._getStateIdentifier(), decoded);
+	    }
+	  }, {
+	    key: '_setExisted',
+	    value: function _setExisted(existed) {
+	      var state = ObjectState.getState(this.className, this._getStateIdentifier());
+	      if (state) {
+	        state.existed = existed;
+	      }
+	    }
+	  }, {
+	    key: '_migrateId',
+	    value: function _migrateId(serverId) {
+	      if (this._localId && serverId) {
+	        var oldState = ObjectState.removeState(this.className, this._getStateIdentifier());
+	        this.id = serverId;
+	        delete this._localId;
+	        if (oldState) {
+	          ObjectState.initializeState(this.className, this._getStateIdentifier(), oldState);
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_handleSaveResponse',
+	    value: function _handleSaveResponse(response, status) {
+	      var changes = {};
+	      var attr;
+	      var pending = ObjectState.popPendingState(this.className, this._getStateIdentifier());
+	      for (attr in pending) {
+	        if (pending[attr] instanceof _ParseOp.RelationOp) {
+	          changes[attr] = pending[attr].applyTo(undefined, this, attr);
+	        } else if (!(attr in response)) {
+	          // Only SetOps and UnsetOps should not come back with results
+	          changes[attr] = pending[attr].applyTo(undefined);
+	        }
+	      }
+	      for (attr in response) {
+	        if ((attr === 'createdAt' || attr === 'updatedAt') && typeof response[attr] === 'string') {
+	          changes[attr] = (0, _parseDate2['default'])(response[attr]);
+	        } else if (attr !== 'objectId') {
+	          changes[attr] = (0, _decode2['default'])(response[attr]);
+	        }
+	      }
+	      if (changes.createdAt && !changes.updatedAt) {
+	        changes.updatedAt = changes.createdAt;
+	      }
+
+	      this._migrateId(response.objectId);
+
+	      if (status !== 201) {
+	        this._setExisted(true);
+	      }
+
+	      ObjectState.commitServerChanges(this.className, this._getStateIdentifier(), changes);
+	    }
+	  }, {
+	    key: '_handleSaveError',
+	    value: function _handleSaveError() {
+	      var pending = this._getPendingOps();
+	      if (pending.length > 2) {
+	        // There are more saves on the queue
+	        ObjectState.mergeFirstPendingState(this.className, this._getStateIdentifier());
+	      }
+	    }
+
+	    /** Public methods **/
+
+	  }, {
+	    key: 'initialize',
+	    value: function initialize() {}
+	    // NOOP
+
+	    /**
+	     * Returns a JSON version of the object suitable for saving to Parse.
+	     * @method toJSON
+	     * @return {Object}
+	     */
+
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      var json = {};
+	      var attrs = this.attributes;
+	      for (var attr in attrs) {
+	        if ((attr === 'createdAt' || attr === 'updatedAt') && attrs[attr].toJSON) {
+	          json[attr] = attrs[attr].toJSON();
+	        } else {
+	          json[attr] = (0, _encode2['default'])(attrs[attr], false, true);
+	        }
+	      }
+	      var pending = this._getPendingOps();
+	      for (var attr in pending[0]) {
+	        json[attr] = pending[0][attr].toJSON();
+	      }
+
+	      if (this.id) {
+	        json.objectId = this.id;
+	      }
+	      return json;
+	    }
+
+	    /**
+	     * Determines whether this ParseObject is equal to another ParseObject
+	     * @method equals
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'equals',
+	    value: function equals(other) {
+	      if (this === other) {
+	        return true;
+	      }
+	      return other instanceof ParseObject && this.className === other.className && this.id === other.id && typeof this.id !== 'undefined';
+	    }
+
+	    /**
+	     * Returns true if this object has been modified since its last
+	     * save/refresh.  If an attribute is specified, it returns true only if that
+	     * particular attribute has been modified since the last save/refresh.
+	     * @method dirty
+	     * @param {String} attr An attribute name (optional).
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'dirty',
+	    value: function dirty(attr) {
+	      if (!this.id) {
+	        return true;
+	      }
+	      var pendingOps = this._getPendingOps();
+	      var dirtyObjects = this._getDirtyObjectAttributes();
+	      if (attr) {
+	        if (dirtyObjects.hasOwnProperty(attr)) {
+	          return true;
+	        }
+	        for (var i = 0; i < pendingOps.length; i++) {
+	          if (pendingOps[i].hasOwnProperty(attr)) {
+	            return true;
+	          }
+	        }
+	        return false;
+	      }
+	      if (_Object$keys(pendingOps[0]).length !== 0) {
+	        return true;
+	      }
+	      if (_Object$keys(dirtyObjects).length !== 0) {
+	        return true;
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * Returns an array of keys that have been modified since last save/refresh
+	     * @method dirtyKeys
+	     * @return {Array of string}
+	     */
+	  }, {
+	    key: 'dirtyKeys',
+	    value: function dirtyKeys() {
+	      var pendingOps = this._getPendingOps();
+	      var keys = {};
+	      for (var i = 0; i < pendingOps.length; i++) {
+	        for (var attr in pendingOps[i]) {
+	          keys[attr] = true;
+	        }
+	      }
+	      var dirtyObjects = this._getDirtyObjectAttributes();
+	      for (var attr in dirtyObjects) {
+	        keys[attr] = true;
+	      }
+	      return _Object$keys(keys);
+	    }
+
+	    /**
+	     * Gets a Pointer referencing this Object.
+	     * @method toPointer
+	     * @return {Object}
+	     */
+	  }, {
+	    key: 'toPointer',
+	    value: function toPointer() {
+	      if (!this.id) {
+	        throw new Error('Cannot create a pointer to an unsaved ParseObject');
+	      }
+	      return {
+	        __type: 'Pointer',
+	        className: this.className,
+	        objectId: this.id
+	      };
+	    }
+
+	    /**
+	     * Gets the value of an attribute.
+	     * @method get
+	     * @param {String} attr The string name of an attribute.
+	     */
+	  }, {
+	    key: 'get',
+	    value: function get(attr) {
+	      return this.attributes[attr];
+	    }
+
+	    /**
+	     * Gets a relation on the given class for the attribute.
+	     * @method relation
+	     * @param String attr The attribute to get the relation for.
+	     */
+	  }, {
+	    key: 'relation',
+	    value: function relation(attr) {
+	      var value = this.get(attr);
+	      if (value) {
+	        if (!(value instanceof _ParseRelation2['default'])) {
+	          throw new Error('Called relation() on non-relation field ' + attr);
+	        }
+	        value._ensureParentAndKey(this, attr);
+	        return value;
+	      }
+	      return new _ParseRelation2['default'](this, attr);
+	    }
+
+	    /**
+	     * Gets the HTML-escaped value of an attribute.
+	     * @method escape
+	     * @param {String} attr The string name of an attribute.
+	     */
+	  }, {
+	    key: 'escape',
+	    value: function escape(attr) {
+	      var val = this.attributes[attr];
+	      if (val == null) {
+	        return '';
+	      }
+	      var str = val;
+	      if (typeof val !== 'string') {
+	        if (typeof val.toString !== 'function') {
+	          return '';
+	        }
+	        val = val.toString();
+	      }
+	      return (0, _escape3['default'])(val);
+	    }
+
+	    /**
+	     * Returns <code>true</code> if the attribute contains a value that is not
+	     * null or undefined.
+	     * @method has
+	     * @param {String} attr The string name of the attribute.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'has',
+	    value: function has(attr) {
+	      var attributes = this.attributes;
+	      if (attributes.hasOwnProperty(attr)) {
+	        return attributes[attr] != null;
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * Sets a hash of model attributes on the object.
+	     *
+	     * <p>You can call it with an object containing keys and values, or with one
+	     * key and value.  For example:<pre>
+	     *   gameTurn.set({
+	     *     player: player1,
+	     *     diceRoll: 2
+	     *   }, {
+	     *     error: function(gameTurnAgain, error) {
+	     *       // The set failed validation.
+	     *     }
+	     *   });
+	     *
+	     *   game.set("currentPlayer", player2, {
+	     *     error: function(gameTurnAgain, error) {
+	     *       // The set failed validation.
+	     *     }
+	     *   });
+	     *
+	     *   game.set("finished", true);</pre></p>
+	     *
+	     * @method set
+	     * @param {String} key The key to set.
+	     * @param {} value The value to give it.
+	     * @param {Object} options A set of options for the set.
+	     *     The only supported option is <code>error</code>.
+	     * @return {Boolean} true if the set succeeded.
+	     */
+	  }, {
+	    key: 'set',
+	    value: function set(key, value, options) {
+	      var changes = {};
+	      var newOps = {};
+	      if (key && typeof key === 'object') {
+	        changes = key;
+	        options = value;
+	      } else if (typeof key === 'string') {
+	        changes[key] = value;
+	      } else {
+	        return this;
+	      }
+
+	      options = options || {};
+	      var readonly = [];
+	      if (typeof this.constructor.readOnlyAttributes === 'function') {
+	        readonly = readonly.concat(this.constructor.readOnlyAttributes());
+	      }
+	      for (var k in changes) {
+	        if (k === 'createdAt' || k === 'updatedAt') {
+	          // This property is read-only, but for legacy reasons we silently
+	          // ignore it
+	          continue;
+	        }
+	        if (readonly.indexOf(k) > -1) {
+	          throw new Error('Cannot modify readonly attribute: ' + k);
+	        }
+	        if (options.unset) {
+	          newOps[k] = new _ParseOp.UnsetOp();
+	        } else if (changes[k] instanceof _ParseOp.Op) {
+	          newOps[k] = changes[k];
+	        } else if (changes[k] && typeof changes[k] === 'object' && typeof changes[k].__op === 'string') {
+	          newOps[k] = (0, _ParseOp.opFromJSON)(changes[k]);
+	        } else if (k === 'objectId' || k === 'id') {
+	          this.id = changes[k];
+	        } else if (k === 'ACL' && typeof changes[k] === 'object' && !(changes[k] instanceof _ParseACL2['default'])) {
+	          newOps[k] = new _ParseOp.SetOp(new _ParseACL2['default'](changes[k]));
+	        } else {
+	          newOps[k] = new _ParseOp.SetOp(changes[k]);
+	        }
+	      }
+
+	      // Calculate new values
+	      var currentAttributes = this.attributes;
+	      var newValues = {};
+	      for (var attr in newOps) {
+	        if (newOps[attr] instanceof _ParseOp.RelationOp) {
+	          newValues[attr] = newOps[attr].applyTo(currentAttributes[attr], this, attr);
+	        } else if (!(newOps[attr] instanceof _ParseOp.UnsetOp)) {
+	          newValues[attr] = newOps[attr].applyTo(currentAttributes[attr]);
+	        }
+	      }
+
+	      // Validate changes
+	      var validation = this.validate(newValues);
+	      if (validation) {
+	        if (typeof options.error === 'function') {
+	          options.error(this, validation);
+	        }
+	        return false;
+	      }
+
+	      // Consolidate Ops
+	      var pendingOps = this._getPendingOps();
+	      var last = pendingOps.length - 1;
+	      for (var attr in newOps) {
+	        var nextOp = newOps[attr].mergeWith(pendingOps[last][attr]);
+	        ObjectState.setPendingOp(this.className, this._getStateIdentifier(), attr, nextOp);
+	      }
+
+	      return this;
+	    }
+
+	    /**
+	     * Remove an attribute from the model. This is a noop if the attribute doesn't
+	     * exist.
+	     * @method unset
+	     * @param {String} attr The string name of an attribute.
+	     */
+	  }, {
+	    key: 'unset',
+	    value: function unset(attr, options) {
+	      options = options || {};
+	      options.unset = true;
+	      return this.set(attr, null, options);
+	    }
+
+	    /**
+	     * Atomically increments the value of the given attribute the next time the
+	     * object is saved. If no amount is specified, 1 is used by default.
+	     *
+	     * @method increment
+	     * @param attr {String} The key.
+	     * @param amount {Number} The amount to increment by (optional).
+	     */
+	  }, {
+	    key: 'increment',
+	    value: function increment(attr, amount) {
+	      if (typeof amount === 'undefined') {
+	        amount = 1;
+	      }
+	      if (typeof amount !== 'number') {
+	        throw new Error('Cannot increment by a non-numeric amount.');
+	      }
+	      return this.set(attr, new _ParseOp.IncrementOp(amount));
+	    }
+
+	    /**
+	     * Atomically add an object to the end of the array associated with a given
+	     * key.
+	     * @method add
+	     * @param attr {String} The key.
+	     * @param item {} The item to add.
+	     */
+	  }, {
+	    key: 'add',
+	    value: function add(attr, item) {
+	      return this.set(attr, new _ParseOp.AddOp([item]));
+	    }
+
+	    /**
+	     * Atomically add an object to the array associated with a given key, only
+	     * if it is not already present in the array. The position of the insert is
+	     * not guaranteed.
+	     *
+	     * @method addUnique
+	     * @param attr {String} The key.
+	     * @param item {} The object to add.
+	     */
+	  }, {
+	    key: 'addUnique',
+	    value: function addUnique(attr, item) {
+	      return this.set(attr, new _ParseOp.AddUniqueOp([item]));
+	    }
+
+	    /**
+	     * Atomically remove all instances of an object from the array associated
+	     * with a given key.
+	     *
+	     * @method remove
+	     * @param attr {String} The key.
+	     * @param item {} The object to remove.
+	     */
+	  }, {
+	    key: 'remove',
+	    value: function remove(attr, item) {
+	      return this.set(attr, new _ParseOp.RemoveOp([item]));
+	    }
+
+	    /**
+	     * Returns an instance of a subclass of Parse.Op describing what kind of
+	     * modification has been performed on this field since the last time it was
+	     * saved. For example, after calling object.increment("x"), calling
+	     * object.op("x") would return an instance of Parse.Op.Increment.
+	     *
+	     * @method op
+	     * @param attr {String} The key.
+	     * @returns {Parse.Op} The operation, or undefined if none.
+	     */
+	  }, {
+	    key: 'op',
+	    value: function op(attr) {
+	      var pending = this._getPendingOps();
+	      for (var i = pending.length; i--;) {
+	        if (pending[i][attr]) {
+	          return pending[i][attr];
+	        }
+	      }
+	    }
+
+	    /**
+	     * Creates a new model with identical attributes to this one.
+	     * @method clone
+	     * @return {Parse.Object}
+	     */
+	  }, {
+	    key: 'clone',
+	    value: function clone() {
+	      var clone = new this.constructor();
+	      if (clone.set) {
+	        clone.set(this.attributes);
+	      }
+	      if (!clone.className) {
+	        clone.className = this.className;
+	      }
+	      return clone;
+	    }
+
+	    /**
+	     * Returns true if this object has never been saved to Parse.
+	     * @method isNew
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'isNew',
+	    value: function isNew() {
+	      return !this.id;
+	    }
+
+	    /**
+	     * Returns true if this object was created by the Parse server when the
+	     * object might have already been there (e.g. in the case of a Facebook
+	     * login)
+	     * @method existed
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'existed',
+	    value: function existed() {
+	      if (!this.id) {
+	        return false;
+	      }
+	      var state = ObjectState.getState(this.className, this._getStateIdentifier());
+	      if (state) {
+	        return state.existed;
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * Checks if the model is currently in a valid state.
+	     * @method isValid
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'isValid',
+	    value: function isValid() {
+	      return !this.validate(this.attributes);
+	    }
+
+	    /**
+	     * You should not call this function directly unless you subclass
+	     * <code>Parse.Object</code>, in which case you can override this method
+	     * to provide additional validation on <code>set</code> and
+	     * <code>save</code>.  Your implementation should return
+	     *
+	     * @method validate
+	     * @param {Object} attrs The current data to validate.
+	     * @return {} False if the data is valid.  An error object otherwise.
+	     * @see Parse.Object#set
+	     */
+	  }, {
+	    key: 'validate',
+	    value: function validate(attrs) {
+	      if (attrs.hasOwnProperty('ACL') && !(attrs.ACL instanceof _ParseACL2['default'])) {
+	        return new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'ACL must be a Parse ACL.');
+	      }
+	      for (var key in attrs) {
+	        if (!/^[A-Za-z][0-9A-Za-z_]*$/.test(key)) {
+	          return new _ParseError2['default'](_ParseError2['default'].INVALID_KEY_NAME);
+	        }
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * Returns the ACL for this object.
+	     * @method getACL
+	     * @returns {Parse.ACL} An instance of Parse.ACL.
+	     * @see Parse.Object#get
+	     */
+	  }, {
+	    key: 'getACL',
+	    value: function getACL() {
+	      var acl = this.get('ACL');
+	      if (acl instanceof _ParseACL2['default']) {
+	        return acl;
+	      }
+	      return null;
+	    }
+
+	    /**
+	     * Sets the ACL to be used for this object.
+	     * @method setACL
+	     * @param {Parse.ACL} acl An instance of Parse.ACL.
+	     * @param {Object} options Optional Backbone-like options object to be
+	     *     passed in to set.
+	     * @return {Boolean} Whether the set passed validation.
+	     * @see Parse.Object#set
+	     */
+	  }, {
+	    key: 'setACL',
+	    value: function setACL(acl, options) {
+	      return this.set('ACL', acl, options);
+	    }
+
+	    /**
+	     * Clears all attributes on a model
+	     * @method clear
+	     */
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
+	      var attributes = this.attributes;
+	      var erasable = {};
+	      var readonly = ['createdAt', 'updatedAt'];
+	      if (typeof this.constructor.readOnlyAttributes === 'function') {
+	        readonly = readonly.concat(this.constructor.readOnlyAttributes());
+	      }
+	      for (var attr in attributes) {
+	        if (readonly.indexOf(attr) < 0) {
+	          erasable[attr] = true;
+	        }
+	      }
+	      return this.set(erasable, { unset: true });
+	    }
+
+	    /**
+	     * Fetch the model from the server. If the server's representation of the
+	     * model differs from its current attributes, they will be overriden.
+	     *
+	     * @method fetch
+	     * @param {Object} options A Backbone-style callback object.
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback.
+	     *   <li>error: An Backbone-style error callback.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     * @return {Parse.Promise} A promise that is fulfilled when the fetch
+	     *     completes.
+	     */
+	  }, {
+	    key: 'fetch',
+	    value: function fetch(options) {
+	      options = options || {};
+	      var fetchOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        fetchOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        fetchOptions.sessionToken = options.sessionToken;
+	      }
+	      var controller = _CoreManager2['default'].getObjectController();
+	      return controller.fetch(this, true, fetchOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Set a hash of model attributes, and save the model to the server.
+	     * updatedAt will be updated when the request returns.
+	     * You can either call it as:<pre>
+	     *   object.save();</pre>
+	     * or<pre>
+	     *   object.save(null, options);</pre>
+	     * or<pre>
+	     *   object.save(attrs, options);</pre>
+	     * or<pre>
+	     *   object.save(key, value, options);</pre>
+	     *
+	     * For example, <pre>
+	     *   gameTurn.save({
+	     *     player: "Jake Cutter",
+	     *     diceRoll: 2
+	     *   }, {
+	     *     success: function(gameTurnAgain) {
+	     *       // The save was successful.
+	     *     },
+	     *     error: function(gameTurnAgain, error) {
+	     *       // The save failed.  Error is an instance of Parse.Error.
+	     *     }
+	     *   });</pre>
+	     * or with promises:<pre>
+	     *   gameTurn.save({
+	     *     player: "Jake Cutter",
+	     *     diceRoll: 2
+	     *   }).then(function(gameTurnAgain) {
+	     *     // The save was successful.
+	     *   }, function(error) {
+	     *     // The save failed.  Error is an instance of Parse.Error.
+	     *   });</pre>
+	     *
+	     * @method save
+	     * @param {Object} options A Backbone-style callback object.
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback.
+	     *   <li>error: An Backbone-style error callback.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     * @return {Parse.Promise} A promise that is fulfilled when the save
+	     *     completes.
+	     */
+	  }, {
+	    key: 'save',
+	    value: function save(arg1, arg2, arg3) {
+	      var _this = this;
+
+	      var attrs;
+	      var options;
+	      if (typeof arg1 === 'object' || typeof arg1 === 'undefined') {
+	        attrs = arg1;
+	        options = arg2;
+	      } else {
+	        attrs = {};
+	        attrs[arg1] = arg2;
+	        options = arg3;
+	      }
+
+	      // Support save({ success: function() {}, error: function() {} })
+	      if (!options && attrs) {
+	        options = {};
+	        if (typeof attrs.success === 'function') {
+	          options.success = attrs.success;
+	          delete attrs.success;
+	        }
+	        if (typeof attrs.error === 'function') {
+	          options.error = attrs.error;
+	          delete attrs.error;
+	        }
+	      }
+
+	      if (attrs) {
+	        var validation = this.validate(attrs);
+	        if (validation) {
+	          if (options && typeof options.error === 'function') {
+	            options.error(this, validation);
+	          }
+	          return _ParsePromise2['default'].error(validation);
+	        }
+	        this.set(attrs, options);
+	      }
+
+	      options = options || {};
+	      var saveOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        saveOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        saveOptions.sessionToken = options.sessionToken;
+	      }
+
+	      var controller = _CoreManager2['default'].getObjectController();
+	      var unsaved = (0, _unsavedChildren2['default'])(this);
+	      return controller.save(unsaved, saveOptions).then(function () {
+	        return controller.save(_this, saveOptions);
+	      })._thenRunCallbacks(options, this);
+	    }
+
+	    /**
+	     * Destroy this model on the server if it was already persisted.
+	     * If `wait: true` is passed, waits for the server to respond
+	     * before removal.
+	     *
+	     * @method destroy
+	     * @param {Object} options A Backbone-style callback object.
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback
+	     *   <li>error: An Backbone-style error callback.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     * @return {Parse.Promise} A promise that is fulfilled when the destroy
+	     *     completes.
+	     */
+	  }, {
+	    key: 'destroy',
+	    value: function destroy(options) {
+	      options = options || {};
+	      var destroyOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        destroyOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        destroyOptions.sessionToken = options.sessionToken;
+	      }
+	      if (!this.id) {
+	        return _ParsePromise2['default'].as()._thenRunCallbacks(options);
+	      }
+	      return _CoreManager2['default'].getObjectController().destroy(this, destroyOptions)._thenRunCallbacks(options);
+	    }
+
+	    /** Static methods **/
+
+	  }, {
+	    key: 'attributes',
+	    get: function get() {
+	      return _Object$freeze(ObjectState.estimateAttributes(this.className, this._getStateIdentifier()));
+	    }
+
+	    /**
+	     * The first time this object was saved on the server.
+	     * @property createdAt
+	     * @type Date
+	     */
+	  }, {
+	    key: 'createdAt',
+	    get: function get() {
+	      return this._getServerData().createdAt;
+	    }
+
+	    /**
+	     * The last time this object was updated on the server.
+	     * @property updatedAt
+	     * @type Date
+	     */
+	  }, {
+	    key: 'updatedAt',
+	    get: function get() {
+	      return this._getServerData().updatedAt;
+	    }
+	  }], [{
+	    key: '_clearAllState',
+	    value: function _clearAllState() {
+	      ObjectState._clearAllState();
+	    }
+
+	    /**
+	     * Fetches the given list of Parse.Object.
+	     * If any error is encountered, stops and calls the error handler.
+	     *
+	     * <pre>
+	     *   Parse.Object.fetchAll([object1, object2, ...], {
+	     *     success: function(list) {
+	     *       // All the objects were fetched.
+	     *     },
+	     *     error: function(error) {
+	     *       // An error occurred while fetching one of the objects.
+	     *     },
+	     *   });
+	     * </pre>
+	     *
+	     * @method fetchAll
+	     * @param {Array} list A list of <code>Parse.Object</code>.
+	     * @param {Object} options A Backbone-style callback object.
+	     * @static
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback.
+	     *   <li>error: An Backbone-style error callback.
+	     * </ul>
+	     */
+	  }, {
+	    key: 'fetchAll',
+	    value: function fetchAll(list, options) {
+	      var options = options || {};
+
+	      var queryOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        queryOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        queryOptions.sessionToken = options.sessionToken;
+	      }
+	      return _CoreManager2['default'].getObjectController().fetch(list, true, queryOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Fetches the given list of Parse.Object if needed.
+	     * If any error is encountered, stops and calls the error handler.
+	     *
+	     * <pre>
+	     *   Parse.Object.fetchAllIfNeeded([object1, ...], {
+	     *     success: function(list) {
+	     *       // Objects were fetched and updated.
+	     *     },
+	     *     error: function(error) {
+	     *       // An error occurred while fetching one of the objects.
+	     *     },
+	     *   });
+	     * </pre>
+	     *
+	     * @method fetchAllIfNeeded
+	     * @param {Array} list A list of <code>Parse.Object</code>.
+	     * @param {Object} options A Backbone-style callback object.
+	     * @static
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback.
+	     *   <li>error: An Backbone-style error callback.
+	     * </ul>
+	     */
+	  }, {
+	    key: 'fetchAllIfNeeded',
+	    value: function fetchAllIfNeeded(list, options) {
+	      var options = options || {};
+
+	      var queryOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        queryOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        queryOptions.sessionToken = options.sessionToken;
+	      }
+	      return _CoreManager2['default'].getObjectController().fetch(list, false, queryOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Destroy the given list of models on the server if it was already persisted.
+	     *
+	     * <p>Unlike saveAll, if an error occurs while deleting an individual model,
+	     * this method will continue trying to delete the rest of the models if
+	     * possible, except in the case of a fatal error like a connection error.
+	     *
+	     * <p>In particular, the Parse.Error object returned in the case of error may
+	     * be one of two types:
+	     *
+	     * <ul>
+	     *   <li>A Parse.Error.AGGREGATE_ERROR. This object's "errors" property is an
+	     *       array of other Parse.Error objects. Each error object in this array
+	     *       has an "object" property that references the object that could not be
+	     *       deleted (for instance, because that object could not be found).</li>
+	     *   <li>A non-aggregate Parse.Error. This indicates a serious error that
+	     *       caused the delete operation to be aborted partway through (for
+	     *       instance, a connection failure in the middle of the delete).</li>
+	     * </ul>
+	     *
+	     * <pre>
+	     *   Parse.Object.destroyAll([object1, object2, ...], {
+	     *     success: function() {
+	     *       // All the objects were deleted.
+	     *     },
+	     *     error: function(error) {
+	     *       // An error occurred while deleting one or more of the objects.
+	     *       // If this is an aggregate error, then we can inspect each error
+	     *       // object individually to determine the reason why a particular
+	     *       // object was not deleted.
+	     *       if (error.code === Parse.Error.AGGREGATE_ERROR) {
+	     *         for (var i = 0; i < error.errors.length; i++) {
+	     *           console.log("Couldn't delete " + error.errors[i].object.id +
+	     *             "due to " + error.errors[i].message);
+	     *         }
+	     *       } else {
+	     *         console.log("Delete aborted because of " + error.message);
+	     *       }
+	     *     },
+	     *   });
+	     * </pre>
+	     *
+	     * @method destroyAll
+	     * @param {Array} list A list of <code>Parse.Object</code>.
+	     * @param {Object} options A Backbone-style callback object.
+	     * @static
+	     * Valid options are:<ul>
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     * @return {Parse.Promise} A promise that is fulfilled when the destroyAll
+	     *     completes.
+	     */
+	  }, {
+	    key: 'destroyAll',
+	    value: function destroyAll(list, options) {
+	      var options = options || {};
+
+	      var destroyOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        destroyOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        destroyOptions.sessionToken = options.sessionToken;
+	      }
+	      return _CoreManager2['default'].getObjectController().destroy(list, destroyOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Saves the given list of Parse.Object.
+	     * If any error is encountered, stops and calls the error handler.
+	     *
+	     * <pre>
+	     *   Parse.Object.saveAll([object1, object2, ...], {
+	     *     success: function(list) {
+	     *       // All the objects were saved.
+	     *     },
+	     *     error: function(error) {
+	     *       // An error occurred while saving one of the objects.
+	     *     },
+	     *   });
+	     * </pre>
+	     *
+	     * @method saveAll
+	     * @param {Array} list A list of <code>Parse.Object</code>.
+	     * @param {Object} options A Backbone-style callback object.
+	     * @static
+	     * Valid options are:<ul>
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     */
+	  }, {
+	    key: 'saveAll',
+	    value: function saveAll(list, options) {
+	      var options = options || {};
+
+	      var saveOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        saveOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        saveOptions.sessionToken = options.sessionToken;
+	      }
+	      return _CoreManager2['default'].getObjectController().save(list, saveOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Creates a reference to a subclass of Parse.Object with the given id. This
+	     * does not exist on Parse.Object, only on subclasses.
+	     *
+	     * <p>A shortcut for: <pre>
+	     *  var Foo = Parse.Object.extend("Foo");
+	     *  var pointerToFoo = new Foo();
+	     *  pointerToFoo.id = "myObjectId";
+	     * </pre>
+	     *
+	     * @method createWithoutData
+	     * @param {String} id The ID of the object to create a reference to.
+	     * @static
+	     * @return {Parse.Object} A Parse.Object reference.
+	     */
+	  }, {
+	    key: 'createWithoutData',
+	    value: function createWithoutData(id) {
+	      var obj = new this();
+	      obj.id = id;
+	      return obj;
+	    }
+
+	    /**
+	     * Creates a new instance of a Parse Object from a JSON representation.
+	     * @method fromJSON
+	     * @param {Object} json The JSON map of the Object's data
+	     * @static
+	     * @return {Parse.Object} A Parse.Object reference
+	     */
+	  }, {
+	    key: 'fromJSON',
+	    value: function fromJSON(json) {
+	      if (!json.className) {
+	        throw new Error('Cannot create an object without a className');
+	      }
+	      var constructor = classMap[json.className];
+	      var o = constructor ? new constructor() : new ParseObject(json.className);
+	      var otherAttributes = {};
+	      for (var attr in json) {
+	        if (attr !== 'className' && attr !== '__type') {
+	          otherAttributes[attr] = json[attr];
+	        }
+	      }
+	      o._finishFetch(otherAttributes);
+	      if (json.objectId) {
+	        o._setExisted(true);
+	      }
+	      return o;
+	    }
+
+	    /**
+	     * Registers a subclass of Parse.Object with a specific class name.
+	     * When objects of that class are retrieved from a query, they will be
+	     * instantiated with this subclass.
+	     * This is only necessary when using ES6 subclassing.
+	     * @method registerSubclass
+	     * @param {String} className The class name of the subclass
+	     * @param {Class} constructor The subclass
+	     */
+	  }, {
+	    key: 'registerSubclass',
+	    value: function registerSubclass(className, constructor) {
+	      if (typeof className !== 'string') {
+	        throw new TypeError('The first argument must be a valid class name.');
+	      }
+	      if (typeof constructor === 'undefined') {
+	        throw new TypeError('You must supply a subclass constructor.');
+	      }
+	      if (typeof constructor !== 'function') {
+	        throw new TypeError('You must register the subclass constructor. ' + 'Did you attempt to register an instance of the subclass?');
+	      }
+	      classMap[className] = constructor;
+	      if (!constructor.className) {
+	        constructor.className = className;
+	      }
+	    }
+
+	    /**
+	     * Creates a new subclass of Parse.Object for the given Parse class name.
+	     *
+	     * <p>Every extension of a Parse class will inherit from the most recent
+	     * previous extension of that class. When a Parse.Object is automatically
+	     * created by parsing JSON, it will use the most recent extension of that
+	     * class.</p>
+	     *
+	     * <p>You should call either:<pre>
+	     *     var MyClass = Parse.Object.extend("MyClass", {
+	     *         <i>Instance methods</i>,
+	     *         initialize: function(attrs, options) {
+	     *             this.someInstanceProperty = [],
+	     *             <i>Other instance properties</i>
+	     *         }
+	     *     }, {
+	     *         <i>Class properties</i>
+	     *     });</pre>
+	     * or, for Backbone compatibility:<pre>
+	     *     var MyClass = Parse.Object.extend({
+	     *         className: "MyClass",
+	     *         <i>Instance methods</i>,
+	     *         initialize: function(attrs, options) {
+	     *             this.someInstanceProperty = [],
+	     *             <i>Other instance properties</i>
+	     *         }
+	     *     }, {
+	     *         <i>Class properties</i>
+	     *     });</pre></p>
+	     *
+	     * @method extend
+	     * @param {String} className The name of the Parse class backing this model.
+	     * @param {Object} protoProps Instance properties to add to instances of the
+	     *     class returned from this method.
+	     * @param {Object} classProps Class properties to add the class returned from
+	     *     this method.
+	     * @return {Class} A new subclass of Parse.Object.
+	     */
+	  }, {
+	    key: 'extend',
+	    value: function extend(className, protoProps, classProps) {
+	      if (typeof className !== 'string') {
+	        if (className && typeof className.className === 'string') {
+	          return ParseObject.extend(className.className, className, protoProps);
+	        } else {
+	          throw new Error('Parse.Object.extend\'s first argument should be the className.');
+	        }
+	      }
+	      var adjustedClassName = className;
+
+	      if (adjustedClassName === 'User' && _CoreManager2['default'].get('PERFORM_USER_REWRITE')) {
+	        adjustedClassName = '_User';
+	      }
+
+	      var parentProto = ParseObject.prototype;
+	      if (this.hasOwnProperty('__super__') && this.__super__) {
+	        parentProto = this.prototype;
+	      } else if (classMap[adjustedClassName]) {
+	        parentProto = classMap[adjustedClassName].prototype;
+	      }
+	      var ParseObjectSubclass = function ParseObjectSubclass(attributes) {
+	        this.className = adjustedClassName;
+	        this._objCount = objectCount++;
+	        if (attributes && typeof attributes === 'object') {
+	          if (!this.set(attributes || {})) {
+	            throw new Error('Can\'t create an invalid Parse Object');
+	          }
+	        }
+	        // Enable legacy initializers
+	        if (typeof this.initialize === 'function') {
+	          this.initialize.apply(this, arguments);
+	        }
+	      };
+	      ParseObjectSubclass.className = adjustedClassName;
+	      ParseObjectSubclass.__super__ = parentProto;
+
+	      ParseObjectSubclass.prototype = _Object$create(parentProto, {
+	        constructor: {
+	          value: ParseObjectSubclass,
+	          enumerable: false,
+	          writable: true,
+	          configurable: true
+	        }
+	      });
+
+	      if (protoProps) {
+	        for (var prop in protoProps) {
+	          if (prop !== 'className') {
+	            _Object$defineProperty(ParseObjectSubclass.prototype, prop, {
+	              value: protoProps[prop],
+	              enumerable: false,
+	              writable: true,
+	              configurable: true
+	            });
+	          }
+	        }
+	      }
+
+	      if (classProps) {
+	        for (var prop in classProps) {
+	          if (prop !== 'className') {
+	            _Object$defineProperty(ParseObjectSubclass, prop, {
+	              value: classProps[prop],
+	              enumerable: false,
+	              writable: true,
+	              configurable: true
+	            });
+	          }
+	        }
+	      }
+
+	      ParseObjectSubclass.extend = function (name, protoProps, classProps) {
+	        if (typeof name === 'string') {
+	          return ParseObject.extend.call(ParseObjectSubclass, name, protoProps, classProps);
+	        }
+	        return ParseObject.extend.call(ParseObjectSubclass, adjustedClassName, name, protoProps);
+	      };
+	      ParseObjectSubclass.createWithoutData = ParseObject.createWithoutData;
+
+	      classMap[adjustedClassName] = ParseObjectSubclass;
+	      return ParseObjectSubclass;
+	    }
+
+	    /**
+	     * Enable single instance objects, where any local objects with the same Id
+	     * share the same attributes, and stay synchronized with each other.
+	     * This is disabled by default in server environments, since it can lead to
+	     * security issues.
+	     * @method enableSingleInstance
+	     */
+	  }, {
+	    key: 'enableSingleInstance',
+	    value: function enableSingleInstance() {
+	      singleInstance = true;
+	    }
+
+	    /**
+	     * Disable single instance objects, where any local objects with the same Id
+	     * share the same attributes, and stay synchronized with each other.
+	     * When disabled, you can have two instances of the same object in memory
+	     * without them sharing attributes.
+	     * @method disableSingleInstance
+	     */
+	  }, {
+	    key: 'disableSingleInstance',
+	    value: function disableSingleInstance() {
+	      singleInstance = false;
+	    }
+	  }]);
+
+	  return ParseObject;
+	})();
+
+	exports['default'] = ParseObject;
+
+	_CoreManager2['default'].setObjectController({
+	  fetch: function fetch(target, forceFetch, options) {
+	    if (Array.isArray(target)) {
+	      if (target.length < 1) {
+	        return _ParsePromise2['default'].as([]);
+	      }
+	      var objs = [];
+	      var ids = [];
+	      var className = null;
+	      var results = [];
+	      var error = null;
+	      target.forEach(function (el, i) {
+	        if (error) {
+	          return;
+	        }
+	        if (!className) {
+	          className = el.className;
+	        }
+	        if (className !== el.className) {
+	          error = new _ParseError2['default'](_ParseError2['default'].INVALID_CLASS_NAME, 'All objects should be of the same class');
+	        }
+	        if (!el.id) {
+	          error = new _ParseError2['default'](_ParseError2['default'].MISSING_OBJECT_ID, 'All objects must have an ID');
+	        }
+	        if (forceFetch || _Object$keys(el._getServerData()).length === 0) {
+	          ids.push(el.id);
+	          objs.push(el);
+	        }
+	        results.push(el);
+	      });
+	      if (error) {
+	        return _ParsePromise2['default'].error(error);
+	      }
+	      var query = new _ParseQuery2['default'](className);
+	      query.containedIn('objectId', ids);
+	      query._limit = ids.length;
+	      return query.find(options).then(function (objects) {
+	        var idMap = {};
+	        objects.forEach(function (o) {
+	          idMap[o.id] = o;
+	        });
+	        for (var i = 0; i < objs.length; i++) {
+	          var obj = objs[i];
+	          if (!obj || !obj.id || !idMap[obj.id]) {
+	            if (forceFetch) {
+	              return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].OBJECT_NOT_FOUND, 'All objects must exist on the server.'));
+	            }
+	          }
+	        }
+	        if (!singleInstance) {
+	          // If single instance objects are disabled, we need to replace the
+	          for (var i = 0; i < results.length; i++) {
+	            var obj = results[i];
+	            if (obj && obj.id && idMap[obj.id]) {
+	              var id = obj.id;
+	              obj._finishFetch(idMap[id].toJSON());
+	              results[i] = idMap[id];
+	            }
+	          }
+	        }
+	        return _ParsePromise2['default'].as(results);
+	      });
+	    } else {
+	      var RESTController = _CoreManager2['default'].getRESTController();
+	      return RESTController.request('GET', 'classes/' + target.className + '/' + target._getId(), {}, options).then(function (response, status, xhr) {
+	        if (target instanceof ParseObject) {
+	          target._clearPendingOps();
+	          target._finishFetch(response);
+	        }
+	        return target;
+	      });
+	    }
+	  },
+
+	  destroy: function destroy(target, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    if (Array.isArray(target)) {
+	      if (target.length < 1) {
+	        return _ParsePromise2['default'].as([]);
+	      }
+	      var batches = [[]];
+	      target.forEach(function (obj) {
+	        if (!obj.id) {
+	          return;
+	        }
+	        batches[batches.length - 1].push(obj);
+	        if (batches[batches.length - 1].length >= 20) {
+	          batches.push([]);
+	        }
+	      });
+	      if (batches[batches.length - 1].length === 0) {
+	        // If the last batch is empty, remove it
+	        batches.pop();
+	      }
+	      var deleteCompleted = _ParsePromise2['default'].as();
+	      var errors = [];
+	      batches.forEach(function (batch) {
+	        deleteCompleted = deleteCompleted.then(function () {
+	          return RESTController.request('POST', 'batch', {
+	            requests: batch.map(function (obj) {
+	              return {
+	                method: 'DELETE',
+	                path: '/1/classes/' + obj.className + '/' + obj._getId(),
+	                body: {}
+	              };
+	            })
+	          }, options).then(function (results) {
+	            for (var i = 0; i < results.length; i++) {
+	              if (results[i] && results[i].hasOwnProperty('error')) {
+	                var err = new _ParseError2['default'](results[i].error.code, results[i].error.error);
+	                err.object = batch[i];
+	                errors.push(err);
+	              }
+	            }
+	          });
+	        });
+	      });
+	      return deleteCompleted.then(function () {
+	        if (errors.length) {
+	          var aggregate = new _ParseError2['default'](_ParseError2['default'].AGGREGATE_ERROR);
+	          aggregate.errors = errors;
+	          return _ParsePromise2['default'].error(aggregate);
+	        }
+	        return _ParsePromise2['default'].as(target);
+	      });
+	    } else if (target instanceof ParseObject) {
+	      return RESTController.request('DELETE', 'classes/' + target.className + '/' + target._getId(), {}, options).then(function () {
+	        return _ParsePromise2['default'].as(target);
+	      });
+	    }
+	    return _ParsePromise2['default'].as(target);
+	  },
+
+	  save: function save(target, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    if (Array.isArray(target)) {
+	      if (target.length < 1) {
+	        return _ParsePromise2['default'].as([]);
+	      }
+
+	      var unsaved = target.concat();
+	      for (var i = 0; i < target.length; i++) {
+	        if (target[i] instanceof ParseObject) {
+	          unsaved = unsaved.concat((0, _unsavedChildren2['default'])(target[i], true));
+	        }
+	      }
+	      unsaved = (0, _unique2['default'])(unsaved);
+
+	      var filesSaved = _ParsePromise2['default'].as();
+	      var pending = [];
+	      unsaved.forEach(function (el) {
+	        if (el instanceof _ParseFile2['default']) {
+	          filesSaved = filesSaved.then(function () {
+	            return el.save();
+	          });
+	        } else if (el instanceof ParseObject) {
+	          pending.push(el);
+	        }
+	      });
+
+	      return filesSaved.then(function () {
+	        var objectError = null;
+	        return _ParsePromise2['default']._continueWhile(function () {
+	          return pending.length > 0;
+	        }, function () {
+	          var batch = [];
+	          var nextPending = [];
+	          pending.forEach(function (el) {
+	            if (batch.length < 20 && (0, _canBeSerialized2['default'])(el)) {
+	              batch.push(el);
+	            } else {
+	              nextPending.push(el);
+	            }
+	          });
+	          pending = nextPending;
+	          if (batch.length < 1) {
+	            return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'Tried to save a batch with a cycle.'));
+	          }
+
+	          // Queue up tasks for each object in the batch.
+	          // When every task is ready, the API request will execute
+	          var batchReturned = new _ParsePromise2['default']();
+	          var batchReady = [];
+	          var batchTasks = [];
+	          batch.forEach(function (obj, index) {
+	            var ready = new _ParsePromise2['default']();
+	            batchReady.push(ready);
+	            var task = function task() {
+	              ready.resolve();
+	              return batchReturned.then(function (responses, status) {
+	                if (responses[index].hasOwnProperty('success')) {
+	                  obj._handleSaveResponse(responses[index].success, status);
+	                } else {
+	                  if (!objectError && responses[index].hasOwnProperty('error')) {
+	                    var serverError = responses[index].error;
+	                    objectError = new _ParseError2['default'](serverError.code, serverError.error);
+	                    // Cancel the rest of the save
+	                    pending = [];
+	                  }
+	                  obj._handleSaveError();
+	                }
+	              });
+	            };
+	            ObjectState.pushPendingState(obj.className, obj._getStateIdentifier());
+	            batchTasks.push(ObjectState.enqueueTask(obj.className, obj._getStateIdentifier(), task));
+	          });
+
+	          _ParsePromise2['default'].when(batchReady).then(function () {
+	            // Kick off the batch request
+	            return RESTController.request('POST', 'batch', {
+	              requests: batch.map(function (obj) {
+	                var params = obj._getSaveParams();
+	                params.path = '/1/' + params.path;
+	                return params;
+	              })
+	            }, options);
+	          }).then(function (response, status, xhr) {
+	            batchReturned.resolve(response, status);
+	          });
+
+	          return _ParsePromise2['default'].when(batchTasks);
+	        }).then(function () {
+	          if (objectError) {
+	            return _ParsePromise2['default'].error(objectError);
+	          }
+	          return _ParsePromise2['default'].as(target);
+	        });
+	      });
+	    } else if (target instanceof ParseObject) {
+	      // copying target lets Flow guarantee the pointer isn't modified elsewhere
+	      var targetCopy = target;
+	      var task = function task() {
+	        var params = targetCopy._getSaveParams();
+	        return RESTController.request(params.method, params.path, params.body, options).then(function (response, status) {
+	          targetCopy._handleSaveResponse(response, status);
+	        }, function (error) {
+	          targetCopy._handleSaveError();
+	          return _ParsePromise2['default'].error(error);
+	        });
+	      };
+	      ObjectState.pushPendingState(target.className, target._getStateIdentifier());
+	      return ObjectState.enqueueTask(target.className, target._getStateIdentifier(), task).then(function () {
+	        return target;
+	      }, function (error) {
+	        return error;
+	      });
+	    }
+	    return _ParsePromise2['default'].as();
+	  }
+	});
+	module.exports = exports['default'];
+
+	/**
+	 * The ID of this object, unique within its class.
+	 * @property id
+	 * @type String
+	 */
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(48), __esModule: true };
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(49);
+	module.exports = __webpack_require__(24).Object.freeze;
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.5 Object.freeze(O)
+	var isObject = __webpack_require__(41);
+
+	__webpack_require__(21)('freeze', function($freeze){
+	  return function freeze(it){
+	    return $freeze && isObject(it) ? $freeze(it) : it;
+	  };
+	});
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var config = {
+	  // Defaults
+	  IS_NODE: typeof process !== 'undefined' && !!process.versions && !!process.versions.node,
+	  REQUEST_ATTEMPT_LIMIT: 5,
+	  SERVER_URL: 'https://api.parse.com',
+	  VERSION: '1.6.5',
+	  APPLICATION_ID: null,
+	  JAVASCRIPT_KEY: null,
+	  MASTER_KEY: null,
+	  USE_MASTER_KEY: false,
+	  PERFORM_USER_REWRITE: true,
+	  FORCE_REVOCABLE_SESSION: false
+	};
+
+	module.exports = {
+	  get: function get(key) {
+	    if (config.hasOwnProperty(key)) {
+	      return config[key];
+	    }
+	    throw new Error('Configuration key not found: ' + key);
+	  },
+
+	  set: function set(key, value) {
+	    config[key] = value;
+	  },
+
+	  /* Specialized Controller Setters/Getters */
+
+	  setAnalyticsController: function setAnalyticsController(controller) {
+	    if (typeof controller.track !== 'function') {
+	      throw new Error('AnalyticsController must implement track()');
+	    }
+	    config['AnalyticsController'] = controller;
+	  },
+
+	  getAnalyticsController: function getAnalyticsController() {
+	    return config['AnalyticsController'];
+	  },
+
+	  setCloudController: function setCloudController(controller) {
+	    if (typeof controller.run !== 'function') {
+	      throw new Error('CloudController must implement run()');
+	    }
+	    config['CloudController'] = controller;
+	  },
+
+	  getCloudController: function getCloudController() {
+	    return config['CloudController'];
+	  },
+
+	  setConfigController: function setConfigController(controller) {
+	    if (typeof controller.current !== 'function') {
+	      throw new Error('ConfigController must implement current()');
+	    }
+	    if (typeof controller.get !== 'function') {
+	      throw new Error('ConfigController must implement get()');
+	    }
+	    config['ConfigController'] = controller;
+	  },
+
+	  getConfigController: function getConfigController() {
+	    return config['ConfigController'];
+	  },
+
+	  setFileController: function setFileController(controller) {
+	    if (typeof controller.saveFile !== 'function') {
+	      throw new Error('FileController must implement saveFile()');
+	    }
+	    if (typeof controller.saveBase64 !== 'function') {
+	      throw new Error('FileController must implement saveBase64()');
+	    }
+	    config['FileController'] = controller;
+	  },
+
+	  getFileController: function getFileController() {
+	    return config['FileController'];
+	  },
+
+	  setInstallationController: function setInstallationController(controller) {
+	    if (typeof controller.currentInstallationId !== 'function') {
+	      throw new Error('InstallationController must implement currentInstallationId()');
+	    }
+	    config['InstallationController'] = controller;
+	  },
+
+	  getInstallationController: function getInstallationController() {
+	    return config['InstallationController'];
+	  },
+
+	  setPushController: function setPushController(controller) {
+	    if (typeof controller.send !== 'function') {
+	      throw new Error('PushController must implement send()');
+	    }
+	    config['PushController'] = controller;
+	  },
+
+	  getPushController: function getPushController() {
+	    return config['PushController'];
+	  },
+
+	  setObjectController: function setObjectController(controller) {
+	    if (typeof controller.save !== 'function') {
+	      throw new Error('ObjectController must implement save()');
+	    }
+	    if (typeof controller.fetch !== 'function') {
+	      throw new Error('ObjectController must implement fetch()');
+	    }
+	    if (typeof controller.destroy !== 'function') {
+	      throw new Error('ObjectController must implement destroy()');
+	    }
+	    config['ObjectController'] = controller;
+	  },
+
+	  getObjectController: function getObjectController() {
+	    return config['ObjectController'];
+	  },
+
+	  setQueryController: function setQueryController(controller) {
+	    if (typeof controller.find !== 'function') {
+	      throw new Error('QueryController must implement find()');
+	    }
+	    config['QueryController'] = controller;
+	  },
+
+	  getQueryController: function getQueryController() {
+	    return config['QueryController'];
+	  },
+
+	  setRESTController: function setRESTController(controller) {
+	    if (typeof controller.request !== 'function') {
+	      throw new Error('RESTController must implement request()');
+	    }
+	    if (typeof controller.ajax !== 'function') {
+	      throw new Error('RESTController must implement ajax()');
+	    }
+	    config['RESTController'] = controller;
+	  },
+
+	  getRESTController: function getRESTController() {
+	    return config['RESTController'];
+	  },
+
+	  setSessionController: function setSessionController(controller) {
+	    if (typeof controller.getSession !== 'function') {
+	      throw new Error('A SessionController must implement getSession()');
+	    }
+	    config['SessionController'] = controller;
+	  },
+
+	  getSessionController: function getSessionController() {
+	    return config['SessionController'];
+	  },
+
+	  setStorageController: function setStorageController(controller) {
+	    if (controller.async) {
+	      if (typeof controller.getItemAsync !== 'function') {
+	        throw new Error('An async StorageController must implement getItemAsync()');
+	      }
+	      if (typeof controller.setItemAsync !== 'function') {
+	        throw new Error('An async StorageController must implement setItemAsync()');
+	      }
+	      if (typeof controller.removeItemAsync !== 'function') {
+	        throw new Error('An async StorageController must implement removeItemAsync()');
+	      }
+	    } else {
+	      if (typeof controller.getItem !== 'function') {
+	        throw new Error('A synchronous StorageController must implement getItem()');
+	      }
+	      if (typeof controller.setItem !== 'function') {
+	        throw new Error('A synchronous StorageController must implement setItem()');
+	      }
+	      if (typeof controller.removeItem !== 'function') {
+	        throw new Error('A synchonous StorageController must implement removeItem()');
+	      }
+	    }
+	    config['StorageController'] = controller;
+	  },
+
+	  getStorageController: function getStorageController() {
+	    return config['StorageController'];
+	  },
+
+	  setUserController: function setUserController(controller) {
+	    if (typeof controller.setCurrentUser !== 'function') {
+	      throw new Error('A UserController must implement setCurrentUser()');
+	    }
+	    if (typeof controller.currentUser !== 'function') {
+	      throw new Error('A UserController must implement currentUser()');
+	    }
+	    if (typeof controller.currentUserAsync !== 'function') {
+	      throw new Error('A UserController must implement currentUserAsync()');
+	    }
+	    if (typeof controller.signUp !== 'function') {
+	      throw new Error('A UserController must implement signUp()');
+	    }
+	    if (typeof controller.logIn !== 'function') {
+	      throw new Error('A UserController must implement logIn()');
+	    }
+	    if (typeof controller.become !== 'function') {
+	      throw new Error('A UserController must implement become()');
+	    }
+	    if (typeof controller.logOut !== 'function') {
+	      throw new Error('A UserController must implement logOut()');
+	    }
+	    if (typeof controller.requestPasswordReset !== 'function') {
+	      throw new Error('A UserController must implement requestPasswordReset()');
+	    }
+	    if (typeof controller.upgradeToRevocableSession !== 'function') {
+	      throw new Error('A UserController must implement upgradeToRevocableSession()');
+	    }
+	    if (typeof controller.linkWith !== 'function') {
+	      throw new Error('A UserController must implement linkWith()');
+	    }
+	    config['UserController'] = controller;
+	  },
+
+	  getUserController: function getUserController() {
+	    return config['UserController'];
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
+	};
+
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+
+	function noop() {}
+
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = canBeSerialized;
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	function canBeSerialized(obj) {
+	  if (!(obj instanceof _ParseObject2['default'])) {
+	    return true;
+	  }
+	  var attributes = obj.attributes;
+	  for (var attr in attributes) {
+	    var val = attributes[attr];
+	    if (!canBeSerializedHelper(val)) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+
+	function canBeSerializedHelper(value) {
+	  if (typeof value !== 'object') {
+	    return true;
+	  }
+	  if (value instanceof _ParseRelation2['default']) {
+	    return true;
+	  }
+	  if (value instanceof _ParseObject2['default']) {
+	    return !!value.id;
+	  }
+	  if (value instanceof _ParseFile2['default']) {
+	    if (value.url()) {
+	      return true;
+	    }
+	    return false;
+	  }
+	  if (Array.isArray(value)) {
+	    for (var i = 0; i < value.length; i++) {
+	      if (!canBeSerializedHelper(value[i])) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  }
+	  for (var k in value) {
+	    if (!canBeSerializedHelper(value[k])) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	function b64Digit(number) {
+	  if (number < 26) {
+	    return String.fromCharCode(65 + number);
+	  }
+	  if (number < 52) {
+	    return String.fromCharCode(97 + (number - 26));
+	  }
+	  if (number < 62) {
+	    return String.fromCharCode(48 + (number - 52));
+	  }
+	  if (number === 62) {
+	    return '+';
+	  }
+	  if (number === 63) {
+	    return '/';
+	  }
+	  throw new TypeError('Tried to encode large digit ' + number + ' in base64.');
+	}
+
+	/**
+	 * A Parse.File is a local representation of a file that is saved to the Parse
+	 * cloud.
+	 * @class Parse.File
+	 * @constructor
+	 * @param name {String} The file's name. This will be prefixed by a unique
+	 *     value once the file has finished saving. The file name must begin with
+	 *     an alphanumeric character, and consist of alphanumeric characters,
+	 *     periods, spaces, underscores, or dashes.
+	 * @param data {Array} The data for the file, as either:
+	 *     1. an Array of byte value Numbers, or
+	 *     2. an Object like { base64: "..." } with a base64-encoded String.
+	 *     3. a File object selected with a file upload control. (3) only works
+	 *        in Firefox 3.6+, Safari 6.0.2+, Chrome 7+, and IE 10+.
+	 *        For example:<pre>
+	 * var fileUploadControl = $("#profilePhotoFileUpload")[0];
+	 * if (fileUploadControl.files.length > 0) {
+	 *   var file = fileUploadControl.files[0];
+	 *   var name = "photo.jpg";
+	 *   var parseFile = new Parse.File(name, file);
+	 *   parseFile.save().then(function() {
+	 *     // The file has been saved to Parse.
+	 *   }, function(error) {
+	 *     // The file either could not be read, or could not be saved to Parse.
+	 *   });
+	 * }</pre>
+	 * @param type {String} Optional Content-Type header to use for the file. If
+	 *     this is omitted, the content type will be inferred from the name's
+	 *     extension.
+	 */
+
+	var ParseFile = (function () {
+	  function ParseFile(name, data, type) {
+	    _classCallCheck(this, ParseFile);
+
+	    var specifiedType = type || '';
+
+	    this._name = name;
+
+	    if (Array.isArray(data)) {
+	      this._source = {
+	        format: 'base64',
+	        base64: ParseFile.encodeBase64(data),
+	        type: specifiedType
+	      };
+	    } else if (typeof File !== 'undefined' && data instanceof File) {
+	      this._source = {
+	        format: 'file',
+	        file: data,
+	        type: specifiedType
+	      };
+	    } else if (data && data.hasOwnProperty('base64')) {
+	      var matches = /^data:([a-zA-Z]*\/[a-zA-Z+.-]*);(charset=[a-zA-Z0-9\-\/\s]*,)?base64,(\S+)/.exec(data.base64);
+	      if (matches && matches.length > 0) {
+	        // if data URI with type and charset, there will be 4 matches.
+	        this._source = {
+	          format: 'base64',
+	          base64: matches.length === 4 ? matches[3] : matches[2],
+	          type: matches[1]
+	        };
+	      } else {
+	        this._source = {
+	          format: 'base64',
+	          base64: data.base64,
+	          type: specifiedType
+	        };
+	      }
+	    } else if (typeof data !== 'undefined') {
+	      throw new TypeError('Cannot create a Parse.File with that data.');
+	    }
+	  }
+
+	  /**
+	   * Gets the name of the file. Before save is called, this is the filename
+	   * given by the user. After save is called, that name gets prefixed with a
+	   * unique identifier.
+	   * @method name
+	   * @return {String}
+	   */
+
+	  _createClass(ParseFile, [{
+	    key: 'name',
+	    value: function name() {
+	      return this._name;
+	    }
+
+	    /**
+	     * Gets the url of the file. It is only available after you save the file or
+	     * after you get the file from a Parse.Object.
+	     * @method url
+	     * @return {String}
+	     */
+	  }, {
+	    key: 'url',
+	    value: function url() {
+	      return this._url;
+	    }
+
+	    /**
+	     * Saves the file to the Parse cloud.
+	     * @method save
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Parse.Promise} Promise that is resolved when the save finishes.
+	     */
+	  }, {
+	    key: 'save',
+	    value: function save(options) {
+	      var _this = this;
+
+	      options = options || {};
+	      var controller = _CoreManager2['default'].getFileController();
+	      if (!this._previousSave) {
+	        if (this._source.format === 'file') {
+	          this._previousSave = controller.saveFile(this._name, this._source).then(function (res) {
+	            _this._name = res.name;
+	            _this._url = res.url;
+	            return _this;
+	          });
+	        } else {
+	          this._previousSave = controller.saveBase64(this._name, this._source).then(function (res) {
+	            _this._name = res.name;
+	            _this._url = res.url;
+	            return _this;
+	          });
+	        }
+	      }
+	      if (this._previousSave) {
+	        return this._previousSave._thenRunCallbacks(options);
+	      }
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return {
+	        __type: 'File',
+	        name: this._name,
+	        url: this._url
+	      };
+	    }
+	  }, {
+	    key: 'equals',
+	    value: function equals(other) {
+	      if (this === other) {
+	        return true;
+	      }
+	      // Unsaved Files are never equal, since they will be saved to different URLs
+	      return other instanceof ParseFile && this.name() === other.name() && this.url() === other.url() && typeof this.url() !== 'undefined';
+	    }
+	  }], [{
+	    key: 'fromJSON',
+	    value: function fromJSON(obj) {
+	      if (obj.__type !== 'File') {
+	        throw new TypeError('JSON object does not represent a ParseFile');
+	      }
+	      var file = new ParseFile(obj.name);
+	      file._url = obj.url;
+	      return file;
+	    }
+	  }, {
+	    key: 'encodeBase64',
+	    value: function encodeBase64(bytes) {
+	      var chunks = [];
+	      chunks.length = Math.ceil(bytes.length / 3);
+	      for (var i = 0; i < chunks.length; i++) {
+	        var b1 = bytes[i * 3];
+	        var b2 = bytes[i * 3 + 1] || 0;
+	        var b3 = bytes[i * 3 + 2] || 0;
+
+	        var has2 = i * 3 + 1 < bytes.length;
+	        var has3 = i * 3 + 2 < bytes.length;
+
+	        chunks[i] = [b64Digit(b1 >> 2 & 0x3F), b64Digit(b1 << 4 & 0x30 | b2 >> 4 & 0x0F), has2 ? b64Digit(b2 << 2 & 0x3C | b3 >> 6 & 0x03) : '=', has3 ? b64Digit(b3 & 0x3F) : '='].join('');
+	      }
+
+	      return chunks.join('');
+	    }
+	  }]);
+
+	  return ParseFile;
+	})();
+
+	exports['default'] = ParseFile;
+
+	_CoreManager2['default'].setFileController({
+	  saveFile: function saveFile(name, source) {
+	    if (source.format !== 'file') {
+	      throw new Error('saveFile can only be used with File-type sources.');
+	    }
+	    // To directly upload a File, we use a REST-style AJAX request
+	    var headers = {
+	      'X-Parse-Application-ID': _CoreManager2['default'].get('APPLICATION_ID'),
+	      'X-Parse-JavaScript-Key': _CoreManager2['default'].get('JAVASCRIPT_KEY')
+	    };
+	    var url = _CoreManager2['default'].get('SERVER_URL');
+	    url += '/1/files/' + name;
+	    return _CoreManager2['default'].getRESTController().ajax('POST', url, source.file, headers);
+	  },
+
+	  saveBase64: function saveBase64(name, source) {
+	    if (source.format !== 'base64') {
+	      throw new Error('saveBase64 can only be used with Base64-type sources.');
+	    }
+	    var data = {
+	      base64: source.base64
+	    };
+	    if (source.type) {
+	      data._ContentType = source.type;
+	    }
+
+	    return _CoreManager2['default'].getRESTController().request('POST', 'files/' + name, data);
+	  }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	// We may want to expose this value at a later time, so that Promises/A+ style
+	// can be employed instead
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var _isPromisesAPlusCompliant = false;
+
+	/**
+	 * A Promise is returned by async methods as a hook to provide callbacks to be
+	 * called when the async task is fulfilled.
+	 *
+	 * <p>Typical usage would be like:<pre>
+	 *    query.find().then(function(results) {
+	 *      results[0].set("foo", "bar");
+	 *      return results[0].saveAsync();
+	 *    }).then(function(result) {
+	 *      console.log("Updated " + result.id);
+	 *    });
+	 * </pre></p>
+	 *
+	 * @class Parse.Promise
+	 * @constructor
+	 */
+
+	var ParsePromise = (function () {
+	  function ParsePromise() {
+	    _classCallCheck(this, ParsePromise);
+
+	    this._resolved = false;
+	    this._rejected = false;
+	    this._resolvedCallbacks = [];
+	    this._rejectedCallbacks = [];
+	  }
+
+	  /**
+	   * Marks this promise as fulfilled, firing any callbacks waiting on it.
+	   * @method resolve
+	   * @param {Object} result the result to pass to the callbacks.
+	   */
+
+	  _createClass(ParsePromise, [{
+	    key: 'resolve',
+	    value: function resolve() {
+	      if (this._resolved || this._rejected) {
+	        throw new Error('A promise was resolved even though it had already been ' + (this._resolved ? 'resolved' : 'rejected') + '.');
+	      }
+	      this._resolved = true;
+
+	      for (var _len = arguments.length, results = Array(_len), _key = 0; _key < _len; _key++) {
+	        results[_key] = arguments[_key];
+	      }
+
+	      this._result = results;
+	      for (var i = 0; i < this._resolvedCallbacks.length; i++) {
+	        this._resolvedCallbacks[i].apply(this, results);
+	      }
+
+	      this._resolvedCallbacks = [];
+	      this._rejectedCallbacks = [];
+	    }
+
+	    /**
+	     * Marks this promise as fulfilled, firing any callbacks waiting on it.
+	     * @method reject
+	     * @param {Object} error the error to pass to the callbacks.
+	     */
+	  }, {
+	    key: 'reject',
+	    value: function reject(error) {
+	      if (this._resolved || this._rejected) {
+	        throw new Error('A promise was resolved even though it had already been ' + (this._resolved ? 'resolved' : 'rejected') + '.');
+	      }
+	      this._rejected = true;
+	      this._error = error;
+	      for (var i = 0; i < this._rejectedCallbacks.length; i++) {
+	        this._rejectedCallbacks[i](error);
+	      }
+	      this._resolvedCallbacks = [];
+	      this._rejectedCallbacks = [];
+	    }
+
+	    /**
+	     * Adds callbacks to be called when this promise is fulfilled. Returns a new
+	     * Promise that will be fulfilled when the callback is complete. It allows
+	     * chaining. If the callback itself returns a Promise, then the one returned
+	     * by "then" will not be fulfilled until that one returned by the callback
+	     * is fulfilled.
+	     * @method then
+	     * @param {Function} resolvedCallback Function that is called when this
+	     * Promise is resolved. Once the callback is complete, then the Promise
+	     * returned by "then" will also be fulfilled.
+	     * @param {Function} rejectedCallback Function that is called when this
+	     * Promise is rejected with an error. Once the callback is complete, then
+	     * the promise returned by "then" with be resolved successfully. If
+	     * rejectedCallback is null, or it returns a rejected Promise, then the
+	     * Promise returned by "then" will be rejected with that error.
+	     * @return {Parse.Promise} A new Promise that will be fulfilled after this
+	     * Promise is fulfilled and either callback has completed. If the callback
+	     * returned a Promise, then this Promise will not be fulfilled until that
+	     * one is.
+	     */
+	  }, {
+	    key: 'then',
+	    value: function then(resolvedCallback, rejectedCallback) {
+	      var _this = this;
+
+	      var promise = new ParsePromise();
+
+	      var wrappedResolvedCallback = function wrappedResolvedCallback() {
+	        for (var _len2 = arguments.length, results = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	          results[_key2] = arguments[_key2];
+	        }
+
+	        if (typeof resolvedCallback === 'function') {
+	          results = [resolvedCallback.apply(this, results)];
+	        }
+	        if (results.length === 1 && ParsePromise.is(results[0])) {
+	          results[0].then(function () {
+	            promise.resolve.apply(promise, arguments);
+	          }, function (error) {
+	            promise.reject(error);
+	          });
+	        } else {
+	          promise.resolve.apply(promise, results);
+	        }
+	      };
+
+	      var wrappedRejectedCallback = function wrappedRejectedCallback(error) {
+	        var result = [];
+	        if (typeof rejectedCallback === 'function') {
+	          result = [rejectedCallback(error)];
+
+	          if (result.length === 1 && ParsePromise.is(result[0])) {
+	            result[0].then(function () {
+	              promise.resolve.apply(promise, arguments);
+	            }, function (error) {
+	              promise.reject(error);
+	            });
+	          } else {
+	            promise.reject(result[0]);
+	          }
+	        } else {
+	          promise.reject(error);
+	        }
+	      };
+
+	      var runLater = function runLater(fn) {
+	        fn.call();
+	      };
+
+	      if (this._resolved) {
+	        runLater(function () {
+	          wrappedResolvedCallback.apply(_this, _this._result);
+	        });
+	      } else if (this._rejected) {
+	        runLater(function () {
+	          wrappedRejectedCallback(_this._error);
+	        });
+	      } else {
+	        this._resolvedCallbacks.push(wrappedResolvedCallback);
+	        this._rejectedCallbacks.push(wrappedRejectedCallback);
+	      }
+
+	      return promise;
+	    }
+
+	    /**
+	     * Add handlers to be called when the promise
+	     * is either resolved or rejected
+	     * @method always
+	     */
+	  }, {
+	    key: 'always',
+	    value: function always(callback) {
+	      return this.then(callback, callback);
+	    }
+
+	    /**
+	     * Add handlers to be called when the Promise object is resolved
+	     * @method done
+	     */
+	  }, {
+	    key: 'done',
+	    value: function done(callback) {
+	      return this.then(callback);
+	    }
+
+	    /**
+	     * Add handlers to be called when the Promise object is rejected
+	     * @method fail
+	     */
+	  }, {
+	    key: 'fail',
+	    value: function fail(callback) {
+	      return this.then(null, callback);
+	    }
+
+	    /**
+	     * Run the given callbacks after this promise is fulfilled.
+	     * @method _thenRunCallbacks
+	     * @param optionsOrCallback {} A Backbone-style options callback, or a
+	     * callback function. If this is an options object and contains a "model"
+	     * attributes, that will be passed to error callbacks as the first argument.
+	     * @param model {} If truthy, this will be passed as the first result of
+	     * error callbacks. This is for Backbone-compatability.
+	     * @return {Parse.Promise} A promise that will be resolved after the
+	     * callbacks are run, with the same result as this.
+	     */
+	  }, {
+	    key: '_thenRunCallbacks',
+	    value: function _thenRunCallbacks(optionsOrCallback, model) {
+	      var options = {};
+	      if (typeof optionsOrCallback === 'function') {
+	        options.success = function (result) {
+	          optionsOrCallback(result, null);
+	        };
+	        options.error = function (error) {
+	          optionsOrCallback(null, error);
+	        };
+	      } else if (typeof optionsOrCallback === 'object') {
+	        if (typeof optionsOrCallback.success === 'function') {
+	          options.success = optionsOrCallback.success;
+	        }
+	        if (typeof optionsOrCallback.error === 'function') {
+	          options.error = optionsOrCallback.error;
+	        }
+	      }
+
+	      return this.then(function () {
+	        for (var _len3 = arguments.length, results = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	          results[_key3] = arguments[_key3];
+	        }
+
+	        if (options.success) {
+	          options.success.apply(this, results);
+	        }
+	        return ParsePromise.as.apply(ParsePromise, arguments);
+	      }, function (error) {
+	        if (options.error) {
+	          if (typeof model !== 'undefined') {
+	            options.error(model, error);
+	          } else {
+	            options.error(error);
+	          }
+	        }
+	        // By explicitly returning a rejected Promise, this will work with
+	        // either jQuery or Promises/A+ semantics.
+	        return ParsePromise.error(error);
+	      });
+	    }
+
+	    /**
+	     * Adds a callback function that should be called regardless of whether
+	     * this promise failed or succeeded. The callback will be given either the
+	     * array of results for its first argument, or the error as its second,
+	     * depending on whether this Promise was rejected or resolved. Returns a
+	     * new Promise, like "then" would.
+	     * @method _continueWith
+	     * @param {Function} continuation the callback.
+	     */
+	  }, {
+	    key: '_continueWith',
+	    value: function _continueWith(continuation) {
+	      return this.then(function () {
+	        return continuation(arguments, null);
+	      }, function (error) {
+	        return continuation(null, error);
+	      });
+	    }
+
+	    /**
+	     * Returns true iff the given object fulfils the Promise interface.
+	     * @method is
+	     * @param {Object} promise The object to test
+	     * @static
+	     * @return {Boolean}
+	     */
+	  }], [{
+	    key: 'is',
+	    value: function is(promise) {
+	      return typeof promise !== 'undefined' && typeof promise.then === 'function';
+	    }
+
+	    /**
+	     * Returns a new promise that is resolved with a given value.
+	     * @method as
+	     * @param value The value to resolve the promise with
+	     * @static
+	     * @return {Parse.Promise} the new promise.
+	     */
+	  }, {
+	    key: 'as',
+	    value: function as() {
+	      var promise = new ParsePromise();
+
+	      for (var _len4 = arguments.length, values = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	        values[_key4] = arguments[_key4];
+	      }
+
+	      promise.resolve.apply(promise, values);
+	      return promise;
+	    }
+
+	    /**
+	     * Returns a new promise that is rejected with a given error.
+	     * @method error
+	     * @param error The error to reject the promise with
+	     * @static
+	     * @return {Parse.Promise} the new promise.
+	     */
+	  }, {
+	    key: 'error',
+	    value: function error() {
+	      var promise = new ParsePromise();
+
+	      for (var _len5 = arguments.length, errors = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+	        errors[_key5] = arguments[_key5];
+	      }
+
+	      promise.reject.apply(promise, errors);
+	      return promise;
+	    }
+
+	    /**
+	     * Returns a new promise that is fulfilled when all of the input promises
+	     * are resolved. If any promise in the list fails, then the returned promise
+	     * will fail with the last error. If they all succeed, then the returned
+	     * promise will succeed, with the results being the results of all the input
+	     * promises. For example: <pre>
+	     *   var p1 = Parse.Promise.as(1);
+	     *   var p2 = Parse.Promise.as(2);
+	     *   var p3 = Parse.Promise.as(3);
+	     *
+	     *   Parse.Promise.when(p1, p2, p3).then(function(r1, r2, r3) {
+	     *     console.log(r1);  // prints 1
+	     *     console.log(r2);  // prints 2
+	     *     console.log(r3);  // prints 3
+	     *   });</pre>
+	     *
+	     * The input promises can also be specified as an array: <pre>
+	     *   var promises = [p1, p2, p3];
+	     *   Parse.Promise.when(promises).then(function(r1, r2, r3) {
+	     *     console.log(r1);  // prints 1
+	     *     console.log(r2);  // prints 2
+	     *     console.log(r3);  // prints 3
+	     *   });
+	     * </pre>
+	     * @method when
+	     * @param {Array} promises a list of promises to wait for.
+	     * @static
+	     * @return {Parse.Promise} the new promise.
+	     */
+	  }, {
+	    key: 'when',
+	    value: function when(promises) {
+	      var objects;
+	      if (Array.isArray(promises)) {
+	        objects = promises;
+	      } else {
+	        objects = arguments;
+	      }
+
+	      var total = objects.length;
+	      var hadError = false;
+	      var results = [];
+	      var errors = [];
+	      results.length = objects.length;
+	      errors.length = objects.length;
+
+	      if (total === 0) {
+	        return ParsePromise.as.apply(this, results);
+	      }
+
+	      var promise = new ParsePromise();
+
+	      var resolveOne = function resolveOne() {
+	        total--;
+	        if (total <= 0) {
+	          if (hadError) {
+	            promise.reject(errors);
+	          } else {
+	            promise.resolve.apply(promise, results);
+	          }
+	        }
+	      };
+
+	      var chain = function chain(object, index) {
+	        if (ParsePromise.is(object)) {
+	          object.then(function (result) {
+	            results[index] = result;
+	            resolveOne();
+	          }, function (error) {
+	            errors[index] = error;
+	            hadError = true;
+	            resolveOne();
+	          });
+	        } else {
+	          results[i] = object;
+	          resolveOne();
+	        }
+	      };
+	      for (var i = 0; i < objects.length; i++) {
+	        chain(objects[i], i);
+	      }
+
+	      return promise;
+	    }
+
+	    /**
+	     * Runs the given asyncFunction repeatedly, as long as the predicate
+	     * function returns a truthy value. Stops repeating if asyncFunction returns
+	     * a rejected promise.
+	     * @method _continueWhile
+	     * @param {Function} predicate should return false when ready to stop.
+	     * @param {Function} asyncFunction should return a Promise.
+	     * @static
+	     */
+	  }, {
+	    key: '_continueWhile',
+	    value: function _continueWhile(predicate, asyncFunction) {
+	      if (predicate()) {
+	        return asyncFunction().then(function () {
+	          return ParsePromise._continueWhile(predicate, asyncFunction);
+	        });
+	      }
+	      return ParsePromise.as();
+	    }
+	  }, {
+	    key: 'isPromisesAPlusCompliant',
+	    value: function isPromisesAPlusCompliant() {
+	      return _isPromisesAPlusCompliant;
+	    }
+	  }]);
+
+	  return ParsePromise;
+	})();
+
+	exports['default'] = ParsePromise;
+	module.exports = exports['default'];
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParseOp = __webpack_require__(56);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseQuery = __webpack_require__(61);
+
+	var _ParseQuery2 = _interopRequireDefault(_ParseQuery);
+
+	/**
+	 * Creates a new Relation for the given parent object and key. This
+	 * constructor should rarely be used directly, but rather created by
+	 * Parse.Object.relation.
+	 * @class Parse.Relation
+	 * @constructor
+	 * @param {Parse.Object} parent The parent of this relation.
+	 * @param {String} key The key for this relation on the parent.
+	 *
+	 * <p>
+	 * A class that is used to access all of the children of a many-to-many
+	 * relationship.  Each instance of Parse.Relation is associated with a
+	 * particular parent object and key.
+	 * </p>
+	 */
+
+	var ParseRelation = (function () {
+	  function ParseRelation(parent, key) {
+	    _classCallCheck(this, ParseRelation);
+
+	    this.parent = parent;
+	    this.key = key;
+	    this.targetClassName = null;
+	  }
+
+	  /**
+	   * Makes sure that this relation has the right parent and key.
+	   */
+
+	  _createClass(ParseRelation, [{
+	    key: '_ensureParentAndKey',
+	    value: function _ensureParentAndKey(parent, key) {
+	      this.key = this.key || key;
+	      if (this.key !== key) {
+	        throw new Error('Internal Error. Relation retrieved from two different keys.');
+	      }
+	      if (this.parent) {
+	        if (this.parent.className !== parent.className) {
+	          throw new Error('Internal Error. Relation retrieved from two different Objects.');
+	        }
+	        if (this.parent.id) {
+	          if (this.parent.id !== parent.id) {
+	            throw new Error('Internal Error. Relation retrieved from two different Objects.');
+	          }
+	        } else if (parent.id) {
+	          this.parent = parent;
+	        }
+	      } else {
+	        this.parent = parent;
+	      }
+	    }
+
+	    /**
+	     * Adds a Parse.Object or an array of Parse.Objects to the relation.
+	     * @method add
+	     * @param {} objects The item or items to add.
+	     */
+	  }, {
+	    key: 'add',
+	    value: function add(objects) {
+	      if (!Array.isArray(objects)) {
+	        objects = [objects];
+	      }
+
+	      var change = new _ParseOp.RelationOp(objects, []);
+	      this.parent.set(this.key, change);
+	      this.targetClassName = change._targetClassName;
+	      return this.parent;
+	    }
+
+	    /**
+	     * Removes a Parse.Object or an array of Parse.Objects from this relation.
+	     * @method remove
+	     * @param {} objects The item or items to remove.
+	     */
+	  }, {
+	    key: 'remove',
+	    value: function remove(objects) {
+	      if (!Array.isArray(objects)) {
+	        objects = [objects];
+	      }
+
+	      var change = new _ParseOp.RelationOp([], objects);
+	      this.parent.set(this.key, change);
+	      this.targetClassName = change._targetClassName;
+	    }
+
+	    /**
+	     * Returns a JSON version of the object suitable for saving to disk.
+	     * @method toJSON
+	     * @return {Object}
+	     */
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return {
+	        __type: 'Relation',
+	        className: this.targetClassName
+	      };
+	    }
+
+	    /**
+	     * Returns a Parse.Query that is limited to objects in this
+	     * relation.
+	     * @method query
+	     * @return {Parse.Query}
+	     */
+	  }, {
+	    key: 'query',
+	    value: function query() {
+	      var query;
+	      if (!this.targetClassName) {
+	        query = new _ParseQuery2['default'](this.parent.className);
+	        query._extraOptions.redirectClassNameForKey = this.key;
+	      } else {
+	        query = new _ParseQuery2['default'](this.targetClassName);
+	      }
+	      query._addCondition('$relatedTo', 'object', {
+	        __type: 'Pointer',
+	        className: this.parent.className,
+	        objectId: this.parent.id
+	      });
+	      query._addCondition('$relatedTo', 'key', this.key);
+
+	      return query;
+	    }
+	  }]);
+
+	  return ParseRelation;
+	})();
+
+	exports['default'] = ParseRelation;
+	module.exports = exports['default'];
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _get = __webpack_require__(27)['default'];
+
+	var _inherits = __webpack_require__(34)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.opFromJSON = opFromJSON;
+
+	var _arrayContainsObject = __webpack_require__(57);
+
+	var _arrayContainsObject2 = _interopRequireDefault(_arrayContainsObject);
+
+	var _decode = __webpack_require__(9);
+
+	var _decode2 = _interopRequireDefault(_decode);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	var _unique = __webpack_require__(60);
+
+	var _unique2 = _interopRequireDefault(_unique);
+
+	function opFromJSON(json) {
+	  if (!json || !json.__op) {
+	    return null;
+	  }
+	  switch (json.__op) {
+	    case 'Delete':
+	      return new UnsetOp();
+	    case 'Increment':
+	      return new IncrementOp(json.amount);
+	    case 'Add':
+	      return new AddOp((0, _decode2['default'])(json.objects));
+	    case 'AddUnique':
+	      return new AddUniqueOp((0, _decode2['default'])(json.objects));
+	    case 'Remove':
+	      return new RemoveOp((0, _decode2['default'])(json.objects));
+	    case 'AddRelation':
+	      var toAdd = (0, _decode2['default'])(json.objects);
+	      if (!Array.isArray(toAdd)) {
+	        return new RelationOp([], []);
+	      }
+	      return new RelationOp(toAdd, []);
+	    case 'RemoveRelation':
+	      var toRemove = (0, _decode2['default'])(json.objects);
+	      if (!Array.isArray(toRemove)) {
+	        return new RelationOp([], []);
+	      }
+	      return new RelationOp([], toRemove);
+	    case 'Batch':
+	      var toAdd = [];
+	      var toRemove = [];
+	      for (var i = 0; i < json.ops.length; i++) {
+	        if (json.ops[i].__op === 'AddRelation') {
+	          toAdd = toAdd.concat((0, _decode2['default'])(json.ops[i].objects));
+	        } else if (json.ops[i].__op === 'RemoveRelation') {
+	          toRemove = toRemove.concat((0, _decode2['default'])(json.ops[i].objects));
+	        }
+	      }
+	      return new RelationOp(toAdd, toRemove);
+	  }
+	  return null;
+	}
+
+	var Op = (function () {
+	  function Op() {
+	    _classCallCheck(this, Op);
+	  }
+
+	  _createClass(Op, [{
+	    key: 'applyTo',
+
+	    // Empty parent class
+	    value: function applyTo(value) {}
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {}
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {}
+	  }]);
+
+	  return Op;
+	})();
+
+	exports.Op = Op;
+
+	var SetOp = (function (_Op) {
+	  _inherits(SetOp, _Op);
+
+	  function SetOp(value) {
+	    _classCallCheck(this, SetOp);
+
+	    _get(Object.getPrototypeOf(SetOp.prototype), 'constructor', this).call(this);
+	    this._value = value;
+	  }
+
+	  _createClass(SetOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      return this._value;
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      return new SetOp(this._value);
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return (0, _encode2['default'])(this._value, false, true);
+	    }
+	  }]);
+
+	  return SetOp;
+	})(Op);
+
+	exports.SetOp = SetOp;
+
+	var UnsetOp = (function (_Op2) {
+	  _inherits(UnsetOp, _Op2);
+
+	  function UnsetOp() {
+	    _classCallCheck(this, UnsetOp);
+
+	    _get(Object.getPrototypeOf(UnsetOp.prototype), 'constructor', this).apply(this, arguments);
+	  }
+
+	  _createClass(UnsetOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      return undefined;
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      return new UnsetOp();
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return { __op: 'Delete' };
+	    }
+	  }]);
+
+	  return UnsetOp;
+	})(Op);
+
+	exports.UnsetOp = UnsetOp;
+
+	var IncrementOp = (function (_Op3) {
+	  _inherits(IncrementOp, _Op3);
+
+	  function IncrementOp(amount) {
+	    _classCallCheck(this, IncrementOp);
+
+	    _get(Object.getPrototypeOf(IncrementOp.prototype), 'constructor', this).call(this);
+	    if (typeof amount !== 'number') {
+	      throw new TypeError('Increment Op must be initialized with a numeric amount.');
+	    }
+	    this._amount = amount;
+	  }
+
+	  _createClass(IncrementOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      if (typeof value === 'undefined') {
+	        return this._amount;
+	      }
+	      if (typeof value !== 'number') {
+	        throw new TypeError('Cannot increment a non-numeric value.');
+	      }
+	      return this._amount + value;
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      if (!previous) {
+	        return this;
+	      }
+	      if (previous instanceof SetOp) {
+	        return new SetOp(this.applyTo(previous._value));
+	      }
+	      if (previous instanceof UnsetOp) {
+	        return new SetOp(this._amount);
+	      }
+	      if (previous instanceof IncrementOp) {
+	        return new IncrementOp(this.applyTo(previous._amount));
+	      }
+	      throw new Error('Cannot merge Increment Op with the previous Op');
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return { __op: 'Increment', amount: this._amount };
+	    }
+	  }]);
+
+	  return IncrementOp;
+	})(Op);
+
+	exports.IncrementOp = IncrementOp;
+
+	var AddOp = (function (_Op4) {
+	  _inherits(AddOp, _Op4);
+
+	  function AddOp(value) {
+	    _classCallCheck(this, AddOp);
+
+	    _get(Object.getPrototypeOf(AddOp.prototype), 'constructor', this).call(this);
+	    this._value = Array.isArray(value) ? value : [value];
+	  }
+
+	  _createClass(AddOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      if (value == null) {
+	        return this._value;
+	      }
+	      if (Array.isArray(value)) {
+	        return value.concat(this._value);
+	      }
+	      throw new Error('Cannot add elements to a non-array value');
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      if (!previous) {
+	        return this;
+	      }
+	      if (previous instanceof SetOp) {
+	        return new SetOp(this.applyTo(previous._value));
+	      }
+	      if (previous instanceof UnsetOp) {
+	        return new SetOp(this._value);
+	      }
+	      if (previous instanceof AddOp) {
+	        return new AddOp(this.applyTo(previous._value));
+	      }
+	      throw new Error('Cannot merge Add Op with the previous Op');
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return { __op: 'Add', objects: (0, _encode2['default'])(this._value, false, true) };
+	    }
+	  }]);
+
+	  return AddOp;
+	})(Op);
+
+	exports.AddOp = AddOp;
+
+	var AddUniqueOp = (function (_Op5) {
+	  _inherits(AddUniqueOp, _Op5);
+
+	  function AddUniqueOp(value) {
+	    _classCallCheck(this, AddUniqueOp);
+
+	    _get(Object.getPrototypeOf(AddUniqueOp.prototype), 'constructor', this).call(this);
+	    this._value = (0, _unique2['default'])(Array.isArray(value) ? value : [value]);
+	  }
+
+	  _createClass(AddUniqueOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      if (value == null) {
+	        return this._value || [];
+	      }
+	      if (Array.isArray(value)) {
+	        // copying value lets Flow guarantee the pointer isn't modified elsewhere
+	        var valueCopy = value;
+	        var toAdd = [];
+	        this._value.forEach(function (v) {
+	          if (v instanceof _ParseObject2['default']) {
+	            if (!(0, _arrayContainsObject2['default'])(valueCopy, v)) {
+	              toAdd.push(v);
+	            }
+	          } else {
+	            if (valueCopy.indexOf(v) < 0) {
+	              toAdd.push(v);
+	            }
+	          }
+	        });
+	        return value.concat(toAdd);
+	      }
+	      throw new Error('Cannot add elements to a non-array value');
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      if (!previous) {
+	        return this;
+	      }
+	      if (previous instanceof SetOp) {
+	        return new SetOp(this.applyTo(previous._value));
+	      }
+	      if (previous instanceof UnsetOp) {
+	        return new SetOp(this._value);
+	      }
+	      if (previous instanceof AddUniqueOp) {
+	        return new AddUniqueOp(this.applyTo(previous._value));
+	      }
+	      throw new Error('Cannot merge AddUnique Op with the previous Op');
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return { __op: 'AddUnique', objects: (0, _encode2['default'])(this._value, false, true) };
+	    }
+	  }]);
+
+	  return AddUniqueOp;
+	})(Op);
+
+	exports.AddUniqueOp = AddUniqueOp;
+
+	var RemoveOp = (function (_Op6) {
+	  _inherits(RemoveOp, _Op6);
+
+	  function RemoveOp(value) {
+	    _classCallCheck(this, RemoveOp);
+
+	    _get(Object.getPrototypeOf(RemoveOp.prototype), 'constructor', this).call(this);
+	    this._value = (0, _unique2['default'])(Array.isArray(value) ? value : [value]);
+	  }
+
+	  _createClass(RemoveOp, [{
+	    key: 'applyTo',
+	    value: function applyTo(value) {
+	      if (value == null) {
+	        return [];
+	      }
+	      if (Array.isArray(value)) {
+	        var i = value.indexOf(this._value);
+	        var removed = value.concat([]);
+	        for (var i = 0; i < this._value.length; i++) {
+	          var index = removed.indexOf(this._value[i]);
+	          while (index > -1) {
+	            removed.splice(index, 1);
+	            index = removed.indexOf(this._value[i]);
+	          }
+	          if (this._value[i] instanceof _ParseObject2['default'] && this._value[i].id) {
+	            for (var j = 0; j < removed.length; j++) {
+	              if (removed[j] instanceof _ParseObject2['default'] && this._value[i].id === removed[j].id) {
+	                removed.splice(j, 1);
+	                j--;
+	              }
+	            }
+	          }
+	        }
+	        return removed;
+	      }
+	      throw new Error('Cannot remove elements from a non-array value');
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      if (!previous) {
+	        return this;
+	      }
+	      if (previous instanceof SetOp) {
+	        return new SetOp(this.applyTo(previous._value));
+	      }
+	      if (previous instanceof UnsetOp) {
+	        return new UnsetOp();
+	      }
+	      if (previous instanceof RemoveOp) {
+	        var uniques = previous._value.concat([]);
+	        for (var i = 0; i < this._value.length; i++) {
+	          if (this._value[i] instanceof _ParseObject2['default']) {
+	            if (!(0, _arrayContainsObject2['default'])(uniques, this._value[i])) {
+	              uniques.push(this._value[i]);
+	            }
+	          } else {
+	            if (uniques.indexOf(this._value[i]) < 0) {
+	              uniques.push(this._value[i]);
+	            }
+	          }
+	        }
+	        return new RemoveOp(uniques);
+	      }
+	      throw new Error('Cannot merge Remove Op with the previous Op');
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      return { __op: 'Remove', objects: (0, _encode2['default'])(this._value, false, true) };
+	    }
+	  }]);
+
+	  return RemoveOp;
+	})(Op);
+
+	exports.RemoveOp = RemoveOp;
+
+	var RelationOp = (function (_Op7) {
+	  _inherits(RelationOp, _Op7);
+
+	  function RelationOp(adds, removes) {
+	    _classCallCheck(this, RelationOp);
+
+	    _get(Object.getPrototypeOf(RelationOp.prototype), 'constructor', this).call(this);
+	    this._targetClassName = null;
+
+	    if (Array.isArray(adds)) {
+	      this.relationsToAdd = (0, _unique2['default'])(adds.map(this._extractId, this));
+	    }
+
+	    if (Array.isArray(removes)) {
+	      this.relationsToRemove = (0, _unique2['default'])(removes.map(this._extractId, this));
+	    }
+	  }
+
+	  _createClass(RelationOp, [{
+	    key: '_extractId',
+	    value: function _extractId(obj) {
+	      if (typeof obj === 'string') {
+	        return obj;
+	      }
+	      if (!obj.id) {
+	        throw new Error('You cannot add or remove an unsaved Parse Object from a relation');
+	      }
+	      if (!this._targetClassName) {
+	        this._targetClassName = obj.className;
+	      }
+	      if (this._targetClassName !== obj.className) {
+	        throw new Error('Tried to create a Relation with 2 different object types: ' + this._targetClassName + ' and ' + obj.className + '.');
+	      }
+	      return obj.id;
+	    }
+	  }, {
+	    key: 'applyTo',
+	    value: function applyTo(value, object, key) {
+	      if (!value) {
+	        var parent = new _ParseObject2['default'](object.className);
+	        if (object.id && object.id.indexOf('local') === 0) {
+	          parent._localId = object.id;
+	        } else if (object.id) {
+	          parent.id = object.id;
+	        }
+	        var relation = new _ParseRelation2['default'](parent, key);
+	        relation.targetClassName = this._targetClassName;
+	        return relation;
+	      }
+	      if (value instanceof _ParseRelation2['default']) {
+	        if (this._targetClassName) {
+	          if (value.targetClassName) {
+	            if (this._targetClassName !== value.targetClassName) {
+	              throw new Error('Related object must be a ' + value.targetClassName + ', but a ' + this._targetClassName + ' was passed in.');
+	            }
+	          } else {
+	            value.targetClassName = this._targetClassName;
+	          }
+	        }
+	        return value;
+	      } else {
+	        throw new Error('Relation cannot be applied to a non-relation field');
+	      }
+	    }
+	  }, {
+	    key: 'mergeWith',
+	    value: function mergeWith(previous) {
+	      if (!previous) {
+	        return this;
+	      } else if (previous instanceof UnsetOp) {
+	        throw new Error('You cannot modify a relation after deleting it.');
+	      } else if (previous instanceof RelationOp) {
+	        if (previous._targetClassName && previous._targetClassName !== this._targetClassName) {
+	          throw new Error('Related object must be of class ' + previous._targetClassName + ', but ' + (this._targetClassName || 'null') + ' was passed in.');
+	        }
+	        var newAdd = previous.relationsToAdd.concat([]);
+	        this.relationsToRemove.forEach(function (r) {
+	          var index = newAdd.indexOf(r);
+	          if (index > -1) {
+	            newAdd.splice(index, 1);
+	          }
+	        });
+	        this.relationsToAdd.forEach(function (r) {
+	          var index = newAdd.indexOf(r);
+	          if (index < 0) {
+	            newAdd.push(r);
+	          }
+	        });
+
+	        var newRemove = previous.relationsToRemove.concat([]);
+	        this.relationsToAdd.forEach(function (r) {
+	          var index = newRemove.indexOf(r);
+	          if (index > -1) {
+	            newRemove.splice(index, 1);
+	          }
+	        });
+	        this.relationsToRemove.forEach(function (r) {
+	          var index = newRemove.indexOf(r);
+	          if (index < 0) {
+	            newRemove.push(r);
+	          }
+	        });
+
+	        var newRelation = new RelationOp(newAdd, newRemove);
+	        newRelation._targetClassName = this._targetClassName;
+	        return newRelation;
+	      }
+	      throw new Error('Cannot merge Relation Op with the previous Op');
+	    }
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      var _this = this;
+
+	      var idToPointer = function idToPointer(id) {
+	        return {
+	          __type: 'Pointer',
+	          className: _this._targetClassName,
+	          objectId: id
+	        };
+	      };
+
+	      var adds = null;
+	      var removes = null;
+	      var pointers = null;
+
+	      if (this.relationsToAdd.length > 0) {
+	        pointers = this.relationsToAdd.map(idToPointer);
+	        adds = { __op: 'AddRelation', objects: pointers };
+	      }
+	      if (this.relationsToRemove.length > 0) {
+	        pointers = this.relationsToRemove.map(idToPointer);
+	        removes = { __op: 'RemoveRelation', objects: pointers };
+	      }
+
+	      if (adds && removes) {
+	        return { __op: 'Batch', ops: [adds, removes] };
+	      }
+
+	      return adds || removes || {};
+	    }
+	  }]);
+
+	  return RelationOp;
+	})(Op);
+
+	exports.RelationOp = RelationOp;
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = arrayContainsObject;
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	function arrayContainsObject(array, object) {
+	  if (array.indexOf(object) > -1) {
+	    return true;
+	  }
+	  for (var i = 0; i < array.length; i++) {
+	    if (array[i] instanceof _ParseObject2['default'] && array[i].className === object.className && array[i]._getId() === object._getId()) {
+	      return true;
+	    }
+	  }
+	  return false;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _Object$keys = __webpack_require__(16)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParseACL = __webpack_require__(10);
+
+	var _ParseACL2 = _interopRequireDefault(_ParseACL);
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseGeoPoint = __webpack_require__(59);
+
+	var _ParseGeoPoint2 = _interopRequireDefault(_ParseGeoPoint);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseOp = __webpack_require__(56);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	var toString = Object.prototype.toString;
+
+	function encode(_x, _x2, _x3, _x4) {
+	  var _again = true;
+
+	  _function: while (_again) {
+	    var value = _x,
+	        disallowObjects = _x2,
+	        forcePointers = _x3,
+	        seen = _x4;
+	    json = output = k = undefined;
+	    _again = false;
+
+	    if (value instanceof _ParseObject2['default']) {
+	      if (disallowObjects) {
+	        throw new Error('Parse Objects not allowed here');
+	      }
+	      if (forcePointers || !seen || seen.indexOf(value) > -1 || value.dirty() || _Object$keys(value._getServerData()).length < 1) {
+	        return value.toPointer();
+	      }
+	      seen = seen.concat(value);
+	      var json = value._toFullJSON(seen);
+	      _x = json;
+	      _x2 = disallowObjects;
+	      _x3 = forcePointers;
+	      _x4 = seen;
+	      _again = true;
+	      continue _function;
+	    }
+	    if (value instanceof _ParseOp.Op || value instanceof _ParseACL2['default'] || value instanceof _ParseGeoPoint2['default'] || value instanceof _ParseRelation2['default']) {
+	      return value.toJSON();
+	    }
+	    if (value instanceof _ParseFile2['default']) {
+	      if (!value.url()) {
+	        throw new Error('Tried to encode an unsaved file.');
+	      }
+	      return value.toJSON();
+	    }
+	    if (toString.call(value) === '[object Date]') {
+	      if (isNaN(value)) {
+	        throw new Error('Tried to encode an invalid date.');
+	      }
+	      return { __type: 'Date', iso: value.toJSON() };
+	    }
+	    if (toString.call(value) === '[object RegExp]' && typeof value.source === 'string') {
+	      return value.source;
+	    }
+
+	    if (Array.isArray(value)) {
+	      return value.map(function (v) {
+	        return encode(v, disallowObjects, forcePointers, seen);
+	      });
+	    }
+
+	    if (value && typeof value === 'object') {
+	      var output = {};
+	      for (var k in value) {
+	        output[k] = encode(value[k], disallowObjects, forcePointers, seen);
+	      }
+	      return output;
+	    }
+
+	    return value;
+	  }
+	}
+
+	exports['default'] = function (value, disallowObjects, forcePointers) {
+	  return encode(value, !!disallowObjects, !!forcePointers, []);
+	};
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	/**
+	 * Creates a new GeoPoint with any of the following forms:<br>
+	 *   <pre>
+	 *   new GeoPoint(otherGeoPoint)
+	 *   new GeoPoint(30, 30)
+	 *   new GeoPoint([30, 30])
+	 *   new GeoPoint({latitude: 30, longitude: 30})
+	 *   new GeoPoint()  // defaults to (0, 0)
+	 *   </pre>
+	 * @class Parse.GeoPoint
+	 * @constructor
+	 *
+	 * <p>Represents a latitude / longitude point that may be associated
+	 * with a key in a ParseObject or used as a reference point for geo queries.
+	 * This allows proximity-based queries on the key.</p>
+	 *
+	 * <p>Only one key in a class may contain a GeoPoint.</p>
+	 *
+	 * <p>Example:<pre>
+	 *   var point = new Parse.GeoPoint(30.0, -20.0);
+	 *   var object = new Parse.Object("PlaceObject");
+	 *   object.set("location", point);
+	 *   object.save();</pre></p>
+	 */
+
+	var ParseGeoPoint = (function () {
+	  function ParseGeoPoint(arg1, arg2) {
+	    _classCallCheck(this, ParseGeoPoint);
+
+	    if (Array.isArray(arg1)) {
+	      ParseGeoPoint._validate(arg1[0], arg1[1]);
+	      this._latitude = arg1[0];
+	      this._longitude = arg1[1];
+	    } else if (typeof arg1 === 'object') {
+	      ParseGeoPoint._validate(arg1.latitude, arg1.longitude);
+	      this._latitude = arg1.latitude;
+	      this._longitude = arg1.longitude;
+	    } else if (typeof arg1 === 'number' && typeof arg2 === 'number') {
+	      ParseGeoPoint._validate(arg1, arg2);
+	      this._latitude = arg1;
+	      this._longitude = arg2;
+	    } else {
+	      this._latitude = 0;
+	      this._longitude = 0;
+	    }
+	  }
+
+	  /**
+	   * North-south portion of the coordinate, in range [-90, 90].
+	   * Throws an exception if set out of range in a modern browser.
+	   * @property latitude
+	   * @type Number
+	   */
+
+	  _createClass(ParseGeoPoint, [{
+	    key: 'toJSON',
+
+	    /**
+	     * Returns a JSON representation of the GeoPoint, suitable for Parse.
+	     * @method toJSON
+	     * @return {Object}
+	     */
+	    value: function toJSON() {
+	      ParseGeoPoint._validate(this._latitude, this._longitude);
+	      return {
+	        __type: 'GeoPoint',
+	        latitude: this._latitude,
+	        longitude: this._longitude
+	      };
+	    }
+	  }, {
+	    key: 'equals',
+	    value: function equals(other) {
+	      return other instanceof ParseGeoPoint && this.latitude === other.latitude && this.longitude === other.longitude;
+	    }
+
+	    /**
+	     * Returns the distance from this GeoPoint to another in radians.
+	     * @method radiansTo
+	     * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
+	     * @return {Number}
+	     */
+	  }, {
+	    key: 'radiansTo',
+	    value: function radiansTo(point) {
+	      var d2r = Math.PI / 180.0;
+	      var lat1rad = this.latitude * d2r;
+	      var long1rad = this.longitude * d2r;
+	      var lat2rad = point.latitude * d2r;
+	      var long2rad = point.longitude * d2r;
+
+	      var sinDeltaLatDiv2 = Math.sin((lat1rad - lat2rad) / 2);
+	      var sinDeltaLongDiv2 = Math.sin((long1rad - long2rad) / 2);
+	      // Square of half the straight line chord distance between both points.
+	      var a = sinDeltaLatDiv2 * sinDeltaLatDiv2 + Math.cos(lat1rad) * Math.cos(lat2rad) * sinDeltaLongDiv2 * sinDeltaLongDiv2;
+	      a = Math.min(1.0, a);
+	      return 2 * Math.asin(Math.sqrt(a));
+	    }
+
+	    /**
+	     * Returns the distance from this GeoPoint to another in kilometers.
+	     * @method kilometersTo
+	     * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
+	     * @return {Number}
+	     */
+	  }, {
+	    key: 'kilometersTo',
+	    value: function kilometersTo(point) {
+	      return this.radiansTo(point) * 6371.0;
+	    }
+
+	    /**
+	     * Returns the distance from this GeoPoint to another in miles.
+	     * @method milesTo
+	     * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
+	     * @return {Number}
+	     */
+	  }, {
+	    key: 'milesTo',
+	    value: function milesTo(point) {
+	      return this.radiansTo(point) * 3958.8;
+	    }
+
+	    /**
+	     * Throws an exception if the given lat-long is out of bounds.
+	     */
+	  }, {
+	    key: 'latitude',
+	    get: function get() {
+	      return this._latitude;
+	    },
+	    set: function set(val) {
+	      ParseGeoPoint._validate(val, this.longitude);
+	      this._latitude = val;
+	    }
+
+	    /**
+	     * East-west portion of the coordinate, in range [-180, 180].
+	     * Throws if set out of range in a modern browser.
+	     * @property longitude
+	     * @type Number
+	     */
+	  }, {
+	    key: 'longitude',
+	    get: function get() {
+	      return this._longitude;
+	    },
+	    set: function set(val) {
+	      ParseGeoPoint._validate(this.latitude, val);
+	      this._longitude = val;
+	    }
+	  }], [{
+	    key: '_validate',
+	    value: function _validate(latitude, longitude) {
+	      if (latitude !== latitude || longitude !== longitude) {
+	        throw new TypeError('GeoPoint latitude and longitude must be valid numbers');
+	      }
+	      if (latitude < -90.0) {
+	        throw new TypeError('GeoPoint latitude out of bounds: ' + latitude + ' < -90.0.');
+	      }
+	      if (latitude > 90.0) {
+	        throw new TypeError('GeoPoint latitude out of bounds: ' + latitude + ' > 90.0.');
+	      }
+	      if (longitude < -180.0) {
+	        throw new TypeError('GeoPoint longitude out of bounds: ' + longitude + ' < -180.0.');
+	      }
+	      if (longitude > 180.0) {
+	        throw new TypeError('GeoPoint longitude out of bounds: ' + longitude + ' > 180.0.');
+	      }
+	    }
+
+	    /**
+	     * Creates a GeoPoint with the user's current location, if available.
+	     * Calls options.success with a new GeoPoint instance or calls options.error.
+	     * @method current
+	     * @param {Object} options An object with success and error callbacks.
+	     * @static
+	     */
+	  }, {
+	    key: 'current',
+	    value: function current(options) {
+	      var promise = new _ParsePromise2['default']();
+	      navigator.geolocation.getCurrentPosition(function (location) {
+	        promise.resolve(new ParseGeoPoint(location.coords.latitude, location.coords.longitude));
+	      }, function (error) {
+	        promise.reject(error);
+	      });
+
+	      return promise._thenRunCallbacks(options);
+	    }
+	  }]);
+
+	  return ParseGeoPoint;
+	})();
+
+	exports['default'] = ParseGeoPoint;
+	module.exports = exports['default'];
+
+/***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = unique;
+
+	var _arrayContainsObject = __webpack_require__(57);
+
+	var _arrayContainsObject2 = _interopRequireDefault(_arrayContainsObject);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	function unique(arr) {
+	  var uniques = [];
+	  arr.forEach(function (value) {
+	    if (value instanceof _ParseObject2['default']) {
+	      if (!(0, _arrayContainsObject2['default'])(uniques, value)) {
+	        uniques.push(value);
+	      }
+	    } else {
+	      if (uniques.indexOf(value) < 0) {
+	        uniques.push(value);
+	      }
+	    }
+	  });
+	  return uniques;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 61 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParseGeoPoint = __webpack_require__(59);
+
+	var _ParseGeoPoint2 = _interopRequireDefault(_ParseGeoPoint);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	/**
+	 * Converts a string into a regex that matches it.
+	 * Surrounding with \Q .. \E does this, we just need to escape any \E's in
+	 * the text separately.
+	 */
+	function quote(s) {
+	  return '\\Q' + s.replace('\\E', '\\E\\\\E\\Q') + '\\E';
+	}
+
+	/**
+	 * Creates a new parse Parse.Query for the given Parse.Object subclass.
+	 * @class Parse.Query
+	 * @constructor
+	 * @param objectClass -
+	 *   An instance of a subclass of Parse.Object, or a Parse className string.
+	 *
+	 * <p>Parse.Query defines a query that is used to fetch Parse.Objects. The
+	 * most common use case is finding all objects that match a query through the
+	 * <code>find</code> method. For example, this sample code fetches all objects
+	 * of class <code>MyClass</code>. It calls a different function depending on
+	 * whether the fetch succeeded or not.
+	 *
+	 * <pre>
+	 * var query = new Parse.Query(MyClass);
+	 * query.find({
+	 *   success: function(results) {
+	 *     // results is an array of Parse.Object.
+	 *   },
+	 *
+	 *   error: function(error) {
+	 *     // error is an instance of Parse.Error.
+	 *   }
+	 * });</pre></p>
+	 *
+	 * <p>A Parse.Query can also be used to retrieve a single object whose id is
+	 * known, through the get method. For example, this sample code fetches an
+	 * object of class <code>MyClass</code> and id <code>myId</code>. It calls a
+	 * different function depending on whether the fetch succeeded or not.
+	 *
+	 * <pre>
+	 * var query = new Parse.Query(MyClass);
+	 * query.get(myId, {
+	 *   success: function(object) {
+	 *     // object is an instance of Parse.Object.
+	 *   },
+	 *
+	 *   error: function(object, error) {
+	 *     // error is an instance of Parse.Error.
+	 *   }
+	 * });</pre></p>
+	 *
+	 * <p>A Parse.Query can also be used to count the number of objects that match
+	 * the query without retrieving all of those objects. For example, this
+	 * sample code counts the number of objects of the class <code>MyClass</code>
+	 * <pre>
+	 * var query = new Parse.Query(MyClass);
+	 * query.count({
+	 *   success: function(number) {
+	 *     // There are number instances of MyClass.
+	 *   },
+	 *
+	 *   error: function(error) {
+	 *     // error is an instance of Parse.Error.
+	 *   }
+	 * });</pre></p>
+	 */
+
+	var ParseQuery = (function () {
+	  function ParseQuery(objectClass) {
+	    _classCallCheck(this, ParseQuery);
+
+	    if (typeof objectClass === 'string') {
+	      if (objectClass === 'User' && _CoreManager2['default'].get('PERFORM_USER_REWRITE')) {
+	        this.className = '_User';
+	      } else {
+	        this.className = objectClass;
+	      }
+	    } else if (objectClass instanceof _ParseObject2['default']) {
+	      this.className = objectClass.className;
+	    } else if (typeof objectClass === 'function') {
+	      if (typeof objectClass.className === 'string') {
+	        this.className = objectClass.className;
+	      } else {
+	        var obj = new objectClass();
+	        this.className = obj.className;
+	      }
+	    } else {
+	      throw new TypeError('A ParseQuery must be constructed with a ParseObject or class name.');
+	    }
+
+	    this._where = {};
+	    this._include = [];
+	    this._limit = -1; // negative limit is not sent in the server request
+	    this._skip = 0;
+	    this._extraOptions = {};
+	  }
+
+	  /**
+	   * Adds constraint that at least one of the passed in queries matches.
+	   * @method _orQuery
+	   * @param {Array} queries
+	   * @return {Parse.Query} Returns the query, so you can chain this call.
+	   */
+
+	  _createClass(ParseQuery, [{
+	    key: '_orQuery',
+	    value: function _orQuery(queries) {
+	      var queryJSON = queries.map(function (q) {
+	        return q.toJSON().where;
+	      });
+
+	      this._where.$or = queryJSON;
+	      return this;
+	    }
+
+	    /**
+	     * Helper for condition queries
+	     */
+	  }, {
+	    key: '_addCondition',
+	    value: function _addCondition(key, condition, value) {
+	      if (!this._where[key] || typeof this._where[key] === 'string') {
+	        this._where[key] = {};
+	      }
+	      this._where[key][condition] = (0, _encode2['default'])(value, false, true);
+	      return this;
+	    }
+
+	    /**
+	     * Returns a JSON representation of this query.
+	     * @method toJSON
+	     * @return {Object} The JSON representation of the query.
+	     */
+	  }, {
+	    key: 'toJSON',
+	    value: function toJSON() {
+	      var params = {
+	        where: this._where
+	      };
+
+	      if (this._include.length) {
+	        params.include = this._include.join(',');
+	      }
+	      if (this._select) {
+	        params.keys = this._select.join(',');
+	      }
+	      if (this._limit >= 0) {
+	        params.limit = this._limit;
+	      }
+	      if (this._skip > 0) {
+	        params.skip = this._skip;
+	      }
+	      if (this._order) {
+	        params.order = this._order.join(',');
+	      }
+	      for (var key in this._extraOptions) {
+	        params[key] = this._extraOptions[key];
+	      }
+
+	      return params;
+	    }
+
+	    /**
+	     * Constructs a Parse.Object whose id is already known by fetching data from
+	     * the server.  Either options.success or options.error is called when the
+	     * find completes.
+	     *
+	     * @method get
+	     * @param {String} objectId The id of the object to be fetched.
+	     * @param {Object} options A Backbone-style options object.
+	     * Valid options are:<ul>
+	     *   <li>success: A Backbone-style success callback
+	     *   <li>error: An Backbone-style error callback.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     *
+	     * @return {Parse.Promise} A promise that is resolved with the result when
+	     * the query completes.
+	     */
+	  }, {
+	    key: 'get',
+	    value: function get(objectId, options) {
+	      this.equalTo('objectId', objectId);
+
+	      var firstOptions = {};
+	      if (options && options.hasOwnProperty('useMasterKey')) {
+	        firstOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options && options.hasOwnProperty('sessionToken')) {
+	        firstOptions.sessionToken = options.sessionToken;
+	      }
+
+	      return this.first(firstOptions).then(function (response) {
+	        if (response) {
+	          return response;
+	        }
+
+	        var errorObject = new _ParseError2['default'](_ParseError2['default'].OBJECT_NOT_FOUND, 'Object not found.');
+	        return _ParsePromise2['default'].error(errorObject);
+	      })._thenRunCallbacks(options, null);
+	    }
+
+	    /**
+	     * Retrieves a list of ParseObjects that satisfy this query.
+	     * Either options.success or options.error is called when the find
+	     * completes.
+	     *
+	     * @method find
+	     * @param {Object} options A Backbone-style options object. Valid options
+	     * are:<ul>
+	     *   <li>success: Function to call when the find completes successfully.
+	     *   <li>error: Function to call when the find fails.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     *
+	     * @return {Parse.Promise} A promise that is resolved with the results when
+	     * the query completes.
+	     */
+	  }, {
+	    key: 'find',
+	    value: function find(options) {
+	      var _this = this;
+
+	      options = options || {};
+
+	      var findOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        findOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        findOptions.sessionToken = options.sessionToken;
+	      }
+
+	      var controller = _CoreManager2['default'].getQueryController();
+
+	      return controller.find(this.className, this.toJSON(), findOptions).then(function (response) {
+	        return response.results.map(function (data) {
+	          data.className = _this.className;
+	          return _ParseObject2['default'].fromJSON(data);
+	        });
+	      })._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Counts the number of objects that match this query.
+	     * Either options.success or options.error is called when the count
+	     * completes.
+	     *
+	     * @method count
+	     * @param {Object} options A Backbone-style options object. Valid options
+	     * are:<ul>
+	     *   <li>success: Function to call when the count completes successfully.
+	     *   <li>error: Function to call when the find fails.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     *
+	     * @return {Parse.Promise} A promise that is resolved with the count when
+	     * the query completes.
+	     */
+	  }, {
+	    key: 'count',
+	    value: function count(options) {
+	      options = options || {};
+
+	      var findOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        findOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        findOptions.sessionToken = options.sessionToken;
+	      }
+
+	      var controller = _CoreManager2['default'].getQueryController();
+
+	      var params = this.toJSON();
+	      params.limit = 0;
+	      params.count = 1;
+
+	      return controller.find(this.className, params, findOptions).then(function (result) {
+	        return result.count;
+	      })._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Retrieves at most one Parse.Object that satisfies this query.
+	     *
+	     * Either options.success or options.error is called when it completes.
+	     * success is passed the object if there is one. otherwise, undefined.
+	     *
+	     * @method first
+	     * @param {Object} options A Backbone-style options object. Valid options
+	     * are:<ul>
+	     *   <li>success: Function to call when the find completes successfully.
+	     *   <li>error: Function to call when the find fails.
+	     *   <li>useMasterKey: In Cloud Code and Node only, causes the Master Key to
+	     *     be used for this request.
+	     *   <li>sessionToken: A valid session token, used for making a request on
+	     *       behalf of a specific user.
+	     * </ul>
+	     *
+	     * @return {Parse.Promise} A promise that is resolved with the object when
+	     * the query completes.
+	     */
+	  }, {
+	    key: 'first',
+	    value: function first(options) {
+	      var _this2 = this;
+
+	      options = options || {};
+
+	      var findOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        findOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        findOptions.sessionToken = options.sessionToken;
+	      }
+
+	      var controller = _CoreManager2['default'].getQueryController();
+
+	      var params = this.toJSON();
+	      params.limit = 1;
+
+	      return controller.find(this.className, params, findOptions).then(function (response) {
+	        var objects = response.results;
+	        if (!objects[0]) {
+	          return undefined;
+	        }
+	        objects[0].className = _this2.className;
+	        return _ParseObject2['default'].fromJSON(objects[0]);
+	      })._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Iterates over each result of a query, calling a callback for each one. If
+	     * the callback returns a promise, the iteration will not continue until
+	     * that promise has been fulfilled. If the callback returns a rejected
+	     * promise, then iteration will stop with that error. The items are
+	     * processed in an unspecified order. The query may not have any sort order,
+	     * and may not use limit or skip.
+	     * @method each
+	     * @param {Function} callback Callback that will be called with each result
+	     *     of the query.
+	     * @param {Object} options An optional Backbone-like options object with
+	     *     success and error callbacks that will be invoked once the iteration
+	     *     has finished.
+	     * @return {Parse.Promise} A promise that will be fulfilled once the
+	     *     iteration has completed.
+	     */
+	  }, {
+	    key: 'each',
+	    value: function each(callback, options) {
+	      options = options || {};
+
+	      if (this._order || this._skip || this._limit >= 0) {
+	        return _ParsePromise2['default'].error('Cannot iterate on a query with sort, skip, or limit.')._thenRunCallbacks(options);
+	      }
+
+	      var promise = new _ParsePromise2['default']();
+
+	      var query = new ParseQuery(this.className);
+	      // We can override the batch size from the options.
+	      // This is undocumented, but useful for testing.
+	      query._limit = options.batchSize || 100;
+	      query._include = this._include.map(function (i) {
+	        return i;
+	      });
+	      if (this._select) {
+	        query._select = this._select.map(function (s) {
+	          return s;
+	        });
+	      }
+
+	      query._where = {};
+	      for (var attr in this._where) {
+	        var val = this._where[attr];
+	        if (Array.isArray(val)) {
+	          query._where[attr] = val.map(function (v) {
+	            return v;
+	          });
+	        } else if (val && typeof val === 'object') {
+	          var conditionMap = {};
+	          query._where[attr] = conditionMap;
+	          for (var cond in val) {
+	            conditionMap[cond] = val[cond];
+	          }
+	        } else {
+	          query._where[attr] = val;
+	        }
+	      }
+
+	      query.ascending('objectId');
+
+	      var findOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        findOptions.useMasterKey = options.useMasterKey;
+	      }
+	      if (options.hasOwnProperty('sessionToken')) {
+	        findOptions.sessionToken = options.sessionToken;
+	      }
+
+	      var finished = false;
+	      return _ParsePromise2['default']._continueWhile(function () {
+	        return !finished;
+	      }, function () {
+	        return query.find(findOptions).then(function (results) {
+	          var callbacksDone = _ParsePromise2['default'].as();
+	          results.forEach(function (result) {
+	            callbacksDone = callbacksDone.then(function () {
+	              return callback(result);
+	            });
+	          });
+
+	          return callbacksDone.then(function () {
+	            if (results.length >= query._limit) {
+	              query.greaterThan('objectId', results[results.length - 1].id);
+	            } else {
+	              finished = true;
+	            }
+	          });
+	        });
+	      })._thenRunCallbacks(options);
+	    }
+
+	    /** Query Conditions **/
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be equal to the provided value.
+	     * @method equalTo
+	     * @param {String} key The key to check.
+	     * @param value The value that the Parse.Object must contain.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'equalTo',
+	    value: function equalTo(key, value) {
+	      if (typeof value === 'undefined') {
+	        return this.doesNotExist(key);
+	      }
+
+	      this._where[key] = (0, _encode2['default'])(value, false, true);
+	      return this;
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be not equal to the provided value.
+	     * @method notEqualTo
+	     * @param {String} key The key to check.
+	     * @param value The value that must not be equalled.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'notEqualTo',
+	    value: function notEqualTo(key, value) {
+	      return this._addCondition(key, '$ne', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be less than the provided value.
+	     * @method lessThan
+	     * @param {String} key The key to check.
+	     * @param value The value that provides an upper bound.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'lessThan',
+	    value: function lessThan(key, value) {
+	      return this._addCondition(key, '$lt', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be greater than the provided value.
+	     * @method greaterThan
+	     * @param {String} key The key to check.
+	     * @param value The value that provides an lower bound.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'greaterThan',
+	    value: function greaterThan(key, value) {
+	      return this._addCondition(key, '$gt', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be less than or equal to the provided value.
+	     * @method lessThanOrEqualTo
+	     * @param {String} key The key to check.
+	     * @param value The value that provides an upper bound.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'lessThanOrEqualTo',
+	    value: function lessThanOrEqualTo(key, value) {
+	      return this._addCondition(key, '$lte', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be greater than or equal to the provided value.
+	     * @method greaterThanOrEqualTo
+	     * @param {String} key The key to check.
+	     * @param value The value that provides an lower bound.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'greaterThanOrEqualTo',
+	    value: function greaterThanOrEqualTo(key, value) {
+	      return this._addCondition(key, '$gte', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * be contained in the provided list of values.
+	     * @method containedIn
+	     * @param {String} key The key to check.
+	     * @param {Array} values The values that will match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'containedIn',
+	    value: function containedIn(key, value) {
+	      return this._addCondition(key, '$in', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * not be contained in the provided list of values.
+	     * @method notContainedIn
+	     * @param {String} key The key to check.
+	     * @param {Array} values The values that will not match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'notContainedIn',
+	    value: function notContainedIn(key, value) {
+	      return this._addCondition(key, '$nin', value);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's value to
+	     * contain each one of the provided list of values.
+	     * @method containsAll
+	     * @param {String} key The key to check.  This key's value must be an array.
+	     * @param {Array} values The values that will match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'containsAll',
+	    value: function containsAll(key, values) {
+	      return this._addCondition(key, '$all', values);
+	    }
+
+	    /**
+	     * Adds a constraint for finding objects that contain the given key.
+	     * @method exists
+	     * @param {String} key The key that should exist.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'exists',
+	    value: function exists(key) {
+	      return this._addCondition(key, '$exists', true);
+	    }
+
+	    /**
+	     * Adds a constraint for finding objects that do not contain a given key.
+	     * @method doesNotExist
+	     * @param {String} key The key that should not exist
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'doesNotExist',
+	    value: function doesNotExist(key) {
+	      return this._addCondition(key, '$exists', false);
+	    }
+
+	    /**
+	     * Adds a regular expression constraint for finding string values that match
+	     * the provided regular expression.
+	     * This may be slow for large datasets.
+	     * @method matches
+	     * @param {String} key The key that the string to match is stored in.
+	     * @param {RegExp} regex The regular expression pattern to match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'matches',
+	    value: function matches(key, regex, modifiers) {
+	      this._addCondition(key, '$regex', regex);
+	      if (!modifiers) {
+	        modifiers = '';
+	      }
+	      if (regex.ignoreCase) {
+	        modifiers += 'i';
+	      }
+	      if (regex.multiline) {
+	        modifiers += 'm';
+	      }
+	      if (modifiers.length) {
+	        this._addCondition(key, '$options', modifiers);
+	      }
+	      return this;
+	    }
+
+	    /**
+	     * Adds a constraint that requires that a key's value matches a Parse.Query
+	     * constraint.
+	     * @method matchesQuery
+	     * @param {String} key The key that the contains the object to match the
+	     *                     query.
+	     * @param {Parse.Query} query The query that should match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'matchesQuery',
+	    value: function matchesQuery(key, query) {
+	      var queryJSON = query.toJSON();
+	      queryJSON.className = query.className;
+	      return this._addCondition(key, '$inQuery', queryJSON);
+	    }
+
+	    /**
+	     * Adds a constraint that requires that a key's value not matches a
+	     * Parse.Query constraint.
+	     * @method doesNotMatchQuery
+	     * @param {String} key The key that the contains the object to match the
+	     *                     query.
+	     * @param {Parse.Query} query The query that should not match.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'doesNotMatchQuery',
+	    value: function doesNotMatchQuery(key, query) {
+	      var queryJSON = query.toJSON();
+	      queryJSON.className = query.className;
+	      return this._addCondition(key, '$notInQuery', queryJSON);
+	    }
+
+	    /**
+	     * Adds a constraint that requires that a key's value matches a value in
+	     * an object returned by a different Parse.Query.
+	     * @method matchesKeyInQuery
+	     * @param {String} key The key that contains the value that is being
+	     *                     matched.
+	     * @param {String} queryKey The key in the objects returned by the query to
+	     *                          match against.
+	     * @param {Parse.Query} query The query to run.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'matchesKeyInQuery',
+	    value: function matchesKeyInQuery(key, queryKey, query) {
+	      var queryJSON = query.toJSON();
+	      queryJSON.className = query.className;
+	      return this._addCondition(key, '$select', {
+	        key: queryKey,
+	        query: queryJSON
+	      });
+	    }
+
+	    /**
+	     * Adds a constraint that requires that a key's value not match a value in
+	     * an object returned by a different Parse.Query.
+	     * @method doesNotMatchKeyInQuery
+	     * @param {String} key The key that contains the value that is being
+	     *                     excluded.
+	     * @param {String} queryKey The key in the objects returned by the query to
+	     *                          match against.
+	     * @param {Parse.Query} query The query to run.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'doesNotMatchKeyInQuery',
+	    value: function doesNotMatchKeyInQuery(key, queryKey, query) {
+	      var queryJSON = query.toJSON();
+	      queryJSON.className = query.className;
+	      return this._addCondition(key, '$dontSelect', {
+	        key: queryKey,
+	        query: queryJSON
+	      });
+	    }
+
+	    /**
+	     * Adds a constraint for finding string values that contain a provided
+	     * string.  This may be slow for large datasets.
+	     * @method contains
+	     * @param {String} key The key that the string to match is stored in.
+	     * @param {String} substring The substring that the value must contain.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'contains',
+	    value: function contains(key, value) {
+	      if (typeof value !== 'string') {
+	        throw new Error('The value being searched for must be a string.');
+	      }
+	      return this._addCondition(key, '$regex', quote(value));
+	    }
+
+	    /**
+	     * Adds a constraint for finding string values that start with a provided
+	     * string.  This query will use the backend index, so it will be fast even
+	     * for large datasets.
+	     * @method startsWith
+	     * @param {String} key The key that the string to match is stored in.
+	     * @param {String} prefix The substring that the value must start with.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'startsWith',
+	    value: function startsWith(key, value) {
+	      if (typeof value !== 'string') {
+	        throw new Error('The value being searched for must be a string.');
+	      }
+	      return this._addCondition(key, '$regex', '^' + quote(value));
+	    }
+
+	    /**
+	     * Adds a constraint for finding string values that end with a provided
+	     * string.  This will be slow for large datasets.
+	     * @method endsWith
+	     * @param {String} key The key that the string to match is stored in.
+	     * @param {String} suffix The substring that the value must end with.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'endsWith',
+	    value: function endsWith(key, value) {
+	      if (typeof value !== 'string') {
+	        throw new Error('The value being searched for must be a string.');
+	      }
+	      return this._addCondition(key, '$regex', quote(value) + '$');
+	    }
+
+	    /**
+	     * Adds a proximity based constraint for finding objects with key point
+	     * values near the point given.
+	     * @method near
+	     * @param {String} key The key that the Parse.GeoPoint is stored in.
+	     * @param {Parse.GeoPoint} point The reference Parse.GeoPoint that is used.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'near',
+	    value: function near(key, point) {
+	      if (!(point instanceof _ParseGeoPoint2['default'])) {
+	        // Try to cast it as a GeoPoint
+	        point = new _ParseGeoPoint2['default'](point);
+	      }
+	      return this._addCondition(key, '$nearSphere', point);
+	    }
+
+	    /**
+	     * Adds a proximity based constraint for finding objects with key point
+	     * values near the point given and within the maximum distance given.
+	     * @method withinRadians
+	     * @param {String} key The key that the Parse.GeoPoint is stored in.
+	     * @param {Parse.GeoPoint} point The reference Parse.GeoPoint that is used.
+	     * @param {Number} maxDistance Maximum distance (in radians) of results to
+	     *   return.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'withinRadians',
+	    value: function withinRadians(key, point, distance) {
+	      this.near(key, point);
+	      return this._addCondition(key, '$maxDistance', distance);
+	    }
+
+	    /**
+	     * Adds a proximity based constraint for finding objects with key point
+	     * values near the point given and within the maximum distance given.
+	     * Radius of earth used is 3958.8 miles.
+	     * @method withinMiles
+	     * @param {String} key The key that the Parse.GeoPoint is stored in.
+	     * @param {Parse.GeoPoint} point The reference Parse.GeoPoint that is used.
+	     * @param {Number} maxDistance Maximum distance (in miles) of results to
+	     *     return.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'withinMiles',
+	    value: function withinMiles(key, point, distance) {
+	      return this.withinRadians(key, point, distance / 3958.8);
+	    }
+
+	    /**
+	     * Adds a proximity based constraint for finding objects with key point
+	     * values near the point given and within the maximum distance given.
+	     * Radius of earth used is 6371.0 kilometers.
+	     * @method withinKilometers
+	     * @param {String} key The key that the Parse.GeoPoint is stored in.
+	     * @param {Parse.GeoPoint} point The reference Parse.GeoPoint that is used.
+	     * @param {Number} maxDistance Maximum distance (in kilometers) of results
+	     *     to return.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'withinKilometers',
+	    value: function withinKilometers(key, point, distance) {
+	      return this.withinRadians(key, point, distance / 6371.0);
+	    }
+
+	    /**
+	     * Adds a constraint to the query that requires a particular key's
+	     * coordinates be contained within a given rectangular geographic bounding
+	     * box.
+	     * @method withinGeoBox
+	     * @param {String} key The key to be constrained.
+	     * @param {Parse.GeoPoint} southwest
+	     *     The lower-left inclusive corner of the box.
+	     * @param {Parse.GeoPoint} northeast
+	     *     The upper-right inclusive corner of the box.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'withinGeoBox',
+	    value: function withinGeoBox(key, southwest, northeast) {
+	      if (!(southwest instanceof _ParseGeoPoint2['default'])) {
+	        southwest = new _ParseGeoPoint2['default'](southwest);
+	      }
+	      if (!(northeast instanceof _ParseGeoPoint2['default'])) {
+	        northeast = new _ParseGeoPoint2['default'](northeast);
+	      }
+	      this._addCondition(key, '$within', { '$box': [southwest, northeast] });
+	      return this;
+	    }
+
+	    /** Query Orderings **/
+
+	    /**
+	     * Sorts the results in ascending order by the given key.
+	     *
+	     * @method ascending
+	     * @param {(String|String[]|...String} key The key to order by, which is a
+	     * string of comma separated values, or an Array of keys, or multiple keys.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'ascending',
+	    value: function ascending() {
+	      this._order = [];
+
+	      for (var _len = arguments.length, keys = Array(_len), _key = 0; _key < _len; _key++) {
+	        keys[_key] = arguments[_key];
+	      }
+
+	      return this.addAscending.apply(this, keys);
+	    }
+
+	    /**
+	     * Sorts the results in ascending order by the given key,
+	     * but can also add secondary sort descriptors without overwriting _order.
+	     *
+	     * @method addAscending
+	     * @param {(String|String[]|...String} key The key to order by, which is a
+	     * string of comma separated values, or an Array of keys, or multiple keys.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'addAscending',
+	    value: function addAscending() {
+	      var _this3 = this;
+
+	      if (!this._order) {
+	        this._order = [];
+	      }
+
+	      for (var _len2 = arguments.length, keys = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	        keys[_key2] = arguments[_key2];
+	      }
+
+	      keys.forEach(function (key) {
+	        if (Array.isArray(key)) {
+	          key = key.join();
+	        }
+	        _this3._order = _this3._order.concat(key.replace(/\s/g, '').split(','));
+	      });
+
+	      return this;
+	    }
+
+	    /**
+	     * Sorts the results in descending order by the given key.
+	     *
+	     * @method descending
+	     * @param {(String|String[]|...String} key The key to order by, which is a
+	     * string of comma separated values, or an Array of keys, or multiple keys.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'descending',
+	    value: function descending() {
+	      this._order = [];
+
+	      for (var _len3 = arguments.length, keys = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	        keys[_key3] = arguments[_key3];
+	      }
+
+	      return this.addDescending.apply(this, keys);
+	    }
+
+	    /**
+	     * Sorts the results in descending order by the given key,
+	     * but can also add secondary sort descriptors without overwriting _order.
+	     *
+	     * @method addDescending
+	     * @param {(String|String[]|...String} key The key to order by, which is a
+	     * string of comma separated values, or an Array of keys, or multiple keys.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'addDescending',
+	    value: function addDescending() {
+	      var _this4 = this;
+
+	      if (!this._order) {
+	        this._order = [];
+	      }
+
+	      for (var _len4 = arguments.length, keys = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	        keys[_key4] = arguments[_key4];
+	      }
+
+	      keys.forEach(function (key) {
+	        if (Array.isArray(key)) {
+	          key = key.join();
+	        }
+	        _this4._order = _this4._order.concat(key.replace(/\s/g, '').split(',').map(function (k) {
+	          return '-' + k;
+	        }));
+	      });
+
+	      return this;
+	    }
+
+	    /** Query Options **/
+
+	    /**
+	     * Sets the number of results to skip before returning any results.
+	     * This is useful for pagination.
+	     * Default is to skip zero results.
+	     * @method skip
+	     * @param {Number} n the number of results to skip.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'skip',
+	    value: function skip(n) {
+	      if (typeof n !== 'number' || n < 0) {
+	        throw new Error('You can only skip by a positive number');
+	      }
+	      this._skip = n;
+	      return this;
+	    }
+
+	    /**
+	     * Sets the limit of the number of results to return. The default limit is
+	     * 100, with a maximum of 1000 results being returned at a time.
+	     * @method limit
+	     * @param {Number} n the number of results to limit to.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'limit',
+	    value: function limit(n) {
+	      if (typeof n !== 'number') {
+	        throw new Error('You can only set the limit to a numeric value');
+	      }
+	      this._limit = n;
+	      return this;
+	    }
+
+	    /**
+	     * Includes nested Parse.Objects for the provided key.  You can use dot
+	     * notation to specify which fields in the included object are also fetched.
+	     * @method include
+	     * @param {String} key The name of the key to include.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'include',
+	    value: function include() {
+	      var _this5 = this;
+
+	      for (var _len5 = arguments.length, keys = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+	        keys[_key5] = arguments[_key5];
+	      }
+
+	      keys.forEach(function (key) {
+	        if (Array.isArray(key)) {
+	          _this5._include = _this5._include.concat(key);
+	        } else {
+	          _this5._include.push(key);
+	        }
+	      });
+	      return this;
+	    }
+
+	    /**
+	     * Restricts the fields of the returned Parse.Objects to include only the
+	     * provided keys.  If this is called multiple times, then all of the keys
+	     * specified in each of the calls will be included.
+	     * @method select
+	     * @param {Array} keys The names of the keys to include.
+	     * @return {Parse.Query} Returns the query, so you can chain this call.
+	     */
+	  }, {
+	    key: 'select',
+	    value: function select() {
+	      var _this6 = this;
+
+	      if (!this._select) {
+	        this._select = [];
+	      }
+
+	      for (var _len6 = arguments.length, keys = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+	        keys[_key6] = arguments[_key6];
+	      }
+
+	      keys.forEach(function (key) {
+	        if (Array.isArray(key)) {
+	          _this6._select = _this6._select.concat(key);
+	        } else {
+	          _this6._select.push(key);
+	        }
+	      });
+	      return this;
+	    }
+
+	    /**
+	     * Constructs a Parse.Query that is the OR of the passed in queries.  For
+	     * example:
+	     * <pre>var compoundQuery = Parse.Query.or(query1, query2, query3);</pre>
+	     *
+	     * will create a compoundQuery that is an or of the query1, query2, and
+	     * query3.
+	     * @method or
+	     * @param {...Parse.Query} var_args The list of queries to OR.
+	     * @static
+	     * @return {Parse.Query} The query that is the OR of the passed in queries.
+	     */
+	  }], [{
+	    key: 'or',
+	    value: function or() {
+	      var className = null;
+
+	      for (var _len7 = arguments.length, queries = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+	        queries[_key7] = arguments[_key7];
+	      }
+
+	      queries.forEach(function (q) {
+	        if (!className) {
+	          className = q.className;
+	        }
+
+	        if (className !== q.className) {
+	          throw new Error('All queries must be for the same class.');
+	        }
+	      });
+
+	      var query = new ParseQuery(className);
+	      query._orQuery(queries);
+	      return query;
+	    }
+	  }]);
+
+	  return ParseQuery;
+	})();
+
+	exports['default'] = ParseQuery;
+
+	_CoreManager2['default'].setQueryController({
+	  find: function find(className, params, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+
+	    return RESTController.request('GET', 'classes/' + className, params, options);
+	  }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	'use strict';
+
+	var _Object$keys = __webpack_require__(16)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = equals;
+
+	var _ParseACL = __webpack_require__(10);
+
+	var _ParseACL2 = _interopRequireDefault(_ParseACL);
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseGeoPoint = __webpack_require__(59);
+
+	var _ParseGeoPoint2 = _interopRequireDefault(_ParseGeoPoint);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	function equals(a, b) {
+	  if (typeof a !== typeof b) {
+	    return false;
+	  }
+
+	  if (!a || typeof a !== 'object') {
+	    // a is a primitive
+	    return a === b;
+	  }
+
+	  if (Array.isArray(a) || Array.isArray(b)) {
+	    if (!Array.isArray(a) || !Array.isArray(b)) {
+	      return false;
+	    }
+	    if (a.length !== b.length) {
+	      return false;
+	    }
+	    for (var i = a.length; i--;) {
+	      if (!equals(a[i], b[i])) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  }
+
+	  if (a instanceof _ParseACL2['default'] || a instanceof _ParseFile2['default'] || a instanceof _ParseGeoPoint2['default'] || a instanceof _ParseObject2['default']) {
+	    return a.equals(b);
+	  }
+
+	  if (_Object$keys(a).length !== _Object$keys(b).length) {
+	    return false;
+	  }
+	  for (var k in a) {
+	    if (!equals(a[k], b[k])) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 63 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = escape;
+
+	function escape(str) {
+	  return str.replace(/[&<>\/'"]/g, function (char) {
+	    return ({
+	      '&': '&amp;',
+	      '<': '&lt;',
+	      '>': '&gt;',
+	      '/': '&#x2F;',
+	      '\'': '&#x27;',
+	      '"': '&quot;'
+	    })[char];
+	  });
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.getState = getState;
+	exports.initializeState = initializeState;
+	exports.removeState = removeState;
+	exports.getServerData = getServerData;
+	exports.setServerData = setServerData;
+	exports.getPendingOps = getPendingOps;
+	exports.setPendingOp = setPendingOp;
+	exports.pushPendingState = pushPendingState;
+	exports.popPendingState = popPendingState;
+	exports.mergeFirstPendingState = mergeFirstPendingState;
+	exports.getObjectCache = getObjectCache;
+	exports.estimateAttribute = estimateAttribute;
+	exports.estimateAttributes = estimateAttributes;
+	exports.commitServerChanges = commitServerChanges;
+	exports.enqueueTask = enqueueTask;
+	exports._clearAllState = _clearAllState;
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	var _TaskQueue = __webpack_require__(65);
+
+	var _TaskQueue2 = _interopRequireDefault(_TaskQueue);
+
+	var _ParseOp = __webpack_require__(56);
+
+	var objectState = {};
+
+	function getState(className, id) {
+	  var classData = objectState[className];
+	  if (classData) {
+	    return classData[id] || null;
+	  }
+	  return null;
+	}
+
+	function initializeState(className, id, initial) {
+	  var state = getState(className, id);
+	  if (state) {
+	    return state;
+	  }
+	  if (!objectState[className]) {
+	    objectState[className] = {};
+	  }
+	  if (!initial) {
+	    initial = {
+	      serverData: {},
+	      pendingOps: [{}],
+	      objectCache: {},
+	      tasks: new _TaskQueue2['default'](),
+	      existed: false
+	    };
+	  }
+	  state = objectState[className][id] = initial;
+	  return state;
+	}
+
+	function removeState(className, id) {
+	  var state = getState(className, id);
+	  if (state === null) {
+	    return null;
+	  }
+	  delete objectState[className][id];
+	  return state;
+	}
+
+	function getServerData(className, id) {
+	  var state = getState(className, id);
+	  if (state) {
+	    return state.serverData;
+	  }
+	  return {};
+	}
+
+	function setServerData(className, id, attributes) {
+	  var data = initializeState(className, id).serverData;
+	  for (var attr in attributes) {
+	    if (typeof attributes[attr] !== 'undefined') {
+	      data[attr] = attributes[attr];
+	    } else {
+	      delete data[attr];
+	    }
+	  }
+	}
+
+	function getPendingOps(className, id) {
+	  var state = getState(className, id);
+	  if (state) {
+	    return state.pendingOps;
+	  }
+	  return [{}];
+	}
+
+	function setPendingOp(className, id, attr, op) {
+	  var pending = initializeState(className, id).pendingOps;
+	  var last = pending.length - 1;
+	  if (op) {
+	    pending[last][attr] = op;
+	  } else {
+	    delete pending[last][attr];
+	  }
+	}
+
+	function pushPendingState(className, id) {
+	  var pending = initializeState(className, id).pendingOps;
+	  pending.push({});
+	}
+
+	function popPendingState(className, id) {
+	  var pending = initializeState(className, id).pendingOps;
+	  var first = pending.shift();
+	  if (!pending.length) {
+	    pending[0] = {};
+	  }
+	  return first;
+	}
+
+	function mergeFirstPendingState(className, id) {
+	  var first = popPendingState(className, id);
+	  var pending = getPendingOps(className, id);
+	  var next = pending[0];
+	  for (var attr in first) {
+	    if (next[attr] && first[attr]) {
+	      var merged = next[attr].mergeWith(first[attr]);
+	      if (merged) {
+	        next[attr] = merged;
+	      }
+	    } else {
+	      next[attr] = first[attr];
+	    }
+	  }
+	}
+
+	function getObjectCache(className, id) {
+	  var state = getState(className, id);
+	  if (state) {
+	    return state.objectCache;
+	  }
+	  return {};
+	}
+
+	function estimateAttribute(className, id, attr) {
+	  var serverData = getServerData(className, id);
+	  var value = serverData[attr];
+	  var pending = getPendingOps(className, id);
+	  for (var i = 0; i < pending.length; i++) {
+	    if (pending[i][attr]) {
+	      if (pending[i][attr] instanceof _ParseOp.RelationOp) {
+	        value = pending[i][attr].applyTo(value, { className: className, id: id }, attr);
+	      } else {
+	        value = pending[i][attr].applyTo(value);
+	      }
+	    }
+	  }
+	  return value;
+	}
+
+	function estimateAttributes(className, id) {
+	  var data = {};
+	  var attr;
+	  var serverData = getServerData(className, id);
+	  for (attr in serverData) {
+	    data[attr] = serverData[attr];
+	  }
+	  var pending = getPendingOps(className, id);
+	  for (var i = 0; i < pending.length; i++) {
+	    for (attr in pending[i]) {
+	      if (pending[i][attr] instanceof _ParseOp.RelationOp) {
+	        data[attr] = pending[i][attr].applyTo(data[attr], { className: className, id: id }, attr);
+	      } else {
+	        data[attr] = pending[i][attr].applyTo(data[attr]);
+	      }
+	    }
+	  }
+	  return data;
+	}
+
+	function commitServerChanges(className, id, changes) {
+	  var state = initializeState(className, id);
+	  for (var attr in changes) {
+	    var val = changes[attr];
+	    state.serverData[attr] = val;
+	    if (val && typeof val === 'object' && !(val instanceof _ParseObject2['default']) && !(val instanceof _ParseFile2['default']) && !(val instanceof _ParseRelation2['default'])) {
+	      var json = (0, _encode2['default'])(val, false, true);
+	      state.objectCache[attr] = JSON.stringify(json);
+	    }
+	  }
+	}
+
+	function enqueueTask(className, id, task) {
+	  var state = initializeState(className, id);
+	  return state.tasks.enqueue(task);
+	}
+
+	function _clearAllState() {
+	  objectState = {};
+	}
+
+/***/ },
+/* 65 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	module.exports = (function () {
+	  function TaskQueue() {
+	    _classCallCheck(this, TaskQueue);
+
+	    this.queue = [];
+	  }
+
+	  _createClass(TaskQueue, [{
+	    key: 'enqueue',
+	    value: function enqueue(task) {
+	      var _this = this;
+
+	      var taskComplete = new _ParsePromise2['default']();
+	      this.queue.push({
+	        task: task,
+	        _completion: taskComplete
+	      });
+	      if (this.queue.length === 1) {
+	        task().then(function () {
+	          _this._dequeue();
+	          taskComplete.resolve();
+	        }, function (error) {
+	          _this._dequeue();
+	          taskComplete.reject(error);
+	        });
+	      }
+	      return taskComplete;
+	    }
+	  }, {
+	    key: '_dequeue',
+	    value: function _dequeue() {
+	      var _this2 = this;
+
+	      this.queue.shift();
+	      if (this.queue.length) {
+	        var next = this.queue[0];
+	        next.task().then(function () {
+	          _this2._dequeue();
+	          next._completion.resolve();
+	        }, function (error) {
+	          _this2._dequeue();
+	          next._completion.reject(error);
+	        });
+	      }
+	    }
+	  }]);
+
+	  return TaskQueue;
+	})();
+
+/***/ },
+/* 66 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = parseDate;
+
+	function parseDate(iso8601) {
+	  var regexp = new RegExp('^([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2})' + 'T' + '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})' + '(.([0-9]+))?' + 'Z$');
+	  var match = regexp.exec(iso8601);
+	  if (!match) {
+	    return null;
+	  }
+
+	  var year = match[1] || 0;
+	  var month = (match[2] || 1) - 1;
+	  var day = match[3] || 0;
+	  var hour = match[4] || 0;
+	  var minute = match[5] || 0;
+	  var second = match[6] || 0;
+	  var milli = match[8] || 0;
+
+	  return new Date(Date.UTC(year, month, day, hour, minute, second, milli));
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 67 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = unsavedChildren;
+
+	var _ParseFile = __webpack_require__(53);
+
+	var _ParseFile2 = _interopRequireDefault(_ParseFile);
+
+	var _ParseObject = __webpack_require__(46);
+
+	var _ParseObject2 = _interopRequireDefault(_ParseObject);
+
+	var _ParseRelation = __webpack_require__(55);
+
+	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
+
+	/**
+	 * Return an array of unsaved children, which are either Parse Objects or Files.
+	 * If it encounters any dirty Objects without Ids, it will throw an exception.
+	 */
+
+	function unsavedChildren(obj, allowDeepUnsaved) {
+	  var encountered = {
+	    objects: {},
+	    files: []
+	  };
+	  var identifier = obj.className + ':' + obj._getId();
+	  encountered.objects[identifier] = obj.dirty() ? obj : true;
+	  var attributes = obj.attributes;
+	  for (var attr in attributes) {
+	    if (typeof attributes[attr] === 'object') {
+	      traverse(attributes[attr], encountered, false, !!allowDeepUnsaved);
+	    }
+	  }
+	  var unsaved = [];
+	  for (var id in encountered.objects) {
+	    if (id !== identifier && encountered.objects[id] !== true) {
+	      unsaved.push(encountered.objects[id]);
+	    }
+	  }
+	  return unsaved.concat(encountered.files);
+	}
+
+	function traverse(obj, encountered, shouldThrow, allowDeepUnsaved) {
+	  if (obj instanceof _ParseObject2['default']) {
+	    if (!obj.id && shouldThrow) {
+	      throw new Error('Cannot create a pointer to an unsaved Object.');
+	    }
+	    var identifier = obj.className + ':' + obj._getId();
+	    if (!encountered.objects[identifier]) {
+	      encountered.objects[identifier] = obj.dirty() ? obj : true;
+	      var attributes = obj.attributes;
+	      for (var attr in attributes) {
+	        if (typeof attributes[attr] === 'object') {
+	          traverse(attributes[attr], encountered, !allowDeepUnsaved, allowDeepUnsaved);
+	        }
+	      }
+	    }
+	    return;
+	  }
+	  if (obj instanceof _ParseFile2['default']) {
+	    if (!obj.url() && encountered.files.indexOf(obj) < 0) {
+	      encountered.files.push(obj);
+	    }
+	    return;
+	  }
+	  if (obj instanceof _ParseRelation2['default']) {
+	    return;
+	  }
+	  if (Array.isArray(obj)) {
+	    obj.forEach(function (el) {
+	      traverse(el, encountered, shouldThrow, allowDeepUnsaved);
+	    });
+	  }
+	  for (var k in obj) {
+	    if (typeof obj[k] === 'object') {
+	      traverse(obj[k], encountered, shouldThrow, allowDeepUnsaved);
+	    }
+	  }
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _get = __webpack_require__(27)['default'];
+
+	var _inherits = __webpack_require__(34)['default'];
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _Object$defineProperty = __webpack_require__(12)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _interopRequireWildcard = __webpack_require__(8)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _isRevocableSession = __webpack_require__(69);
+
+	var _isRevocableSession2 = _interopRequireDefault(_isRevocableSession);
+
+	var _ObjectState = __webpack_require__(64);
+
+	var ObjectState = _interopRequireWildcard(_ObjectState);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParseObject2 = __webpack_require__(46);
+
+	var _ParseObject3 = _interopRequireDefault(_ParseObject2);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _ParseSession = __webpack_require__(70);
+
+	var _ParseSession2 = _interopRequireDefault(_ParseSession);
+
+	var _Storage = __webpack_require__(71);
+
+	var _Storage2 = _interopRequireDefault(_Storage);
+
+	var CURRENT_USER_KEY = 'currentUser';
+	var canUseCurrentUser = !_CoreManager2['default'].get('IS_NODE');
+	var currentUserCacheMatchesDisk = false;
+	var currentUserCache = null;
+
+	var authProviders = {};
+
+	/**
+	 * @class Parse.User
+	 * @constructor
+	 *
+	 * <p>A Parse.User object is a local representation of a user persisted to the
+	 * Parse cloud. This class is a subclass of a Parse.Object, and retains the
+	 * same functionality of a Parse.Object, but also extends it with various
+	 * user specific methods, like authentication, signing up, and validation of
+	 * uniqueness.</p>
+	 */
+
+	var ParseUser = (function (_ParseObject) {
+	  _inherits(ParseUser, _ParseObject);
+
+	  function ParseUser(attributes) {
+	    _classCallCheck(this, ParseUser);
+
+	    _get(Object.getPrototypeOf(ParseUser.prototype), 'constructor', this).call(this, '_User');
+	    if (attributes && typeof attributes === 'object') {
+	      if (!this.set(attributes || {})) {
+	        throw new Error('Can\'t create an invalid Parse User');
+	      }
+	    }
+	  }
+
+	  /**
+	   * Request a revocable session token to replace the older style of token.
+	   * @method _upgradeToRevocableSession
+	   * @param {Object} options A Backbone-style options object.
+	   * @return {Parse.Promise} A promise that is resolved when the replacement
+	   *   token has been fetched.
+	   */
+
+	  _createClass(ParseUser, [{
+	    key: '_upgradeToRevocableSession',
+	    value: function _upgradeToRevocableSession(options) {
+	      options = options || {};
+
+	      var upgradeOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        upgradeOptions.useMasterKey = options.useMasterKey;
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.upgradeToRevocableSession(this, upgradeOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Unlike in the Android/iOS SDKs, logInWith is unnecessary, since you can
+	     * call linkWith on the user (even if it doesn't exist yet on the server).
+	     * @method _linkWith
+	     */
+	  }, {
+	    key: '_linkWith',
+	    value: function _linkWith(provider, options) {
+	      var _this = this;
+
+	      var authType;
+	      if (typeof provider === 'string') {
+	        authType = provider;
+	        provider = authProviders[provider];
+	      } else {
+	        authType = provider.getAuthType();
+	      }
+	      if (options && options.hasOwnProperty('authData')) {
+	        var authData = this.get('authData') || {};
+	        authData[authType] = options.authData;
+
+	        var controller = _CoreManager2['default'].getUserController();
+	        return controller.linkWith(this, authData)._thenRunCallbacks(options, this);
+	      } else {
+	        var promise = new _ParsePromise2['default']();
+	        provider.authenticate({
+	          success: function success(provider, result) {
+	            var opts = {};
+	            opts.authData = result;
+	            if (options.success) {
+	              opts.success = options.success;
+	            }
+	            if (options.error) {
+	              opts.error = options.error;
+	            }
+	            _this._linkWith(provider, opts).then(function () {
+	              promise.resolve(_this);
+	            }, function (error) {
+	              promise.reject(error);
+	            });
+	          },
+	          error: function error(provider, _error) {
+	            if (options.error) {
+	              options.error(_this, _error);
+	            }
+	            promise.reject(_error);
+	          }
+	        });
+	        return promise;
+	      }
+	    }
+
+	    /**
+	     * Synchronizes auth data for a provider (e.g. puts the access token in the
+	     * right place to be used by the Facebook SDK).
+	     * @method _synchronizeAuthData
+	     */
+	  }, {
+	    key: '_synchronizeAuthData',
+	    value: function _synchronizeAuthData(provider) {
+	      if (!this.isCurrent() || !provider) {
+	        return;
+	      }
+	      var authType;
+	      if (typeof provider === 'string') {
+	        authType = provider;
+	        provider = authProviders[authType];
+	      } else {
+	        authType = provider.getAuthType();
+	      }
+	      var authData = this.get('authData');
+	      if (!provider || typeof authData !== 'object') {
+	        return;
+	      }
+	      var success = provider.restoreAuthentication(authData[authType]);
+	      if (!success) {
+	        this._unlinkFrom(provider);
+	      }
+	    }
+
+	    /**
+	     * Synchronizes authData for all providers.
+	     * @method _synchronizeAllAuthData
+	     */
+	  }, {
+	    key: '_synchronizeAllAuthData',
+	    value: function _synchronizeAllAuthData() {
+	      var authData = this.get('authData');
+	      if (typeof authData !== 'object') {
+	        return;
+	      }
+
+	      for (var key in authData) {
+	        this._synchronizeAuthData(key);
+	      }
+	    }
+
+	    /**
+	     * Removes null values from authData (which exist temporarily for
+	     * unlinking)
+	     * @method _cleanupAuthData
+	     */
+	  }, {
+	    key: '_cleanupAuthData',
+	    value: function _cleanupAuthData() {
+	      if (!this.isCurrent()) {
+	        return;
+	      }
+	      var authData = this.get('authData');
+	      if (typeof authData !== 'object') {
+	        return;
+	      }
+
+	      for (var key in authData) {
+	        if (!authData[key]) {
+	          delete authData[key];
+	        }
+	      }
+	    }
+
+	    /**
+	     * Unlinks a user from a service.
+	     * @method _unlinkFrom
+	     */
+	  }, {
+	    key: '_unlinkFrom',
+	    value: function _unlinkFrom(provider, options) {
+	      var _this2 = this;
+
+	      var authType;
+	      if (typeof provider === 'string') {
+	        authType = provider;
+	        provider = authProviders[provider];
+	      } else {
+	        authType = provider.getAuthType();
+	      }
+	      return this._linkWith(provider, { authData: null }).then(function () {
+	        _this2._synchronizeAuthData(provider);
+	        return _ParsePromise2['default'].as(_this2);
+	      })._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Checks whether a user is linked to a service.
+	     * @method _isLinked
+	     */
+	  }, {
+	    key: '_isLinked',
+	    value: function _isLinked(provider) {
+	      var authType;
+	      if (typeof provider === 'string') {
+	        authType = provider;
+	      } else {
+	        authType = provider.getAuthType();
+	      }
+	      var authData = this.get('authData') || {};
+	      return !!authData[authType];
+	    }
+
+	    /**
+	     * Deauthenticates all providers.
+	     * @method _logOutWithAll
+	     */
+	  }, {
+	    key: '_logOutWithAll',
+	    value: function _logOutWithAll() {
+	      var authData = this.get('authData');
+	      if (typeof authData !== 'object') {
+	        return;
+	      }
+
+	      for (var key in authData) {
+	        this._logOutWith(key);
+	      }
+	    }
+
+	    /**
+	     * Deauthenticates a single provider (e.g. removing access tokens from the
+	     * Facebook SDK).
+	     * @method _logOutWith
+	     */
+	  }, {
+	    key: '_logOutWith',
+	    value: function _logOutWith(provider) {
+	      if (!this.isCurrent()) {
+	        return;
+	      }
+	      if (typeof provider === 'string') {
+	        provider = authProviders[provider];
+	      }
+	      if (provider && provider.deauthenticate) {
+	        provider.deauthenticate();
+	      }
+	    }
+
+	    /**
+	     * Returns true if <code>current</code> would return this user.
+	     * @method isCurrent
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'isCurrent',
+	    value: function isCurrent() {
+	      var current = ParseUser.current();
+	      return !!current && current.id === this.id;
+	    }
+
+	    /**
+	     * Returns get("username").
+	     * @method getUsername
+	     * @return {String}
+	     */
+	  }, {
+	    key: 'getUsername',
+	    value: function getUsername() {
+	      return this.get('username');
+	    }
+
+	    /**
+	     * Calls set("username", username, options) and returns the result.
+	     * @method setUsername
+	     * @param {String} username
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'setUsername',
+	    value: function setUsername(username) {
+	      this.set('username', username);
+	    }
+
+	    /**
+	     * Calls set("password", password, options) and returns the result.
+	     * @method setPassword
+	     * @param {String} password
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'setPassword',
+	    value: function setPassword(password) {
+	      this.set('password', password);
+	    }
+
+	    /**
+	     * Returns get("email").
+	     * @method getEmail
+	     * @return {String}
+	     */
+	  }, {
+	    key: 'getEmail',
+	    value: function getEmail() {
+	      return this.get('email');
+	    }
+
+	    /**
+	     * Calls set("email", email, options) and returns the result.
+	     * @method setEmail
+	     * @param {String} email
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'setEmail',
+	    value: function setEmail(email) {
+	      this.set('email', email);
+	    }
+
+	    /**
+	     * Returns the session token for this user, if the user has been logged in,
+	     * or if it is the result of a query with the master key. Otherwise, returns
+	     * undefined.
+	     * @method getSessionToken
+	     * @return {String} the session token, or undefined
+	     */
+	  }, {
+	    key: 'getSessionToken',
+	    value: function getSessionToken() {
+	      return this.get('sessionToken');
+	    }
+
+	    /**
+	     * Checks whether this user is the current user and has been authenticated.
+	     * @method authenticated
+	     * @return (Boolean) whether this user is the current user and is logged in.
+	     */
+	  }, {
+	    key: 'authenticated',
+	    value: function authenticated() {
+	      var current = ParseUser.current();
+	      return !!this.get('sessionToken') && !!current && current.id === this.id;
+	    }
+
+	    /**
+	     * Signs up a new user. You should call this instead of save for
+	     * new Parse.Users. This will create a new Parse.User on the server, and
+	     * also persist the session on disk so that you can access the user using
+	     * <code>current</code>.
+	     *
+	     * <p>A username and password must be set before calling signUp.</p>
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method signUp
+	     * @param {Object} attrs Extra fields to set on the new user, or null.
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Parse.Promise} A promise that is fulfilled when the signup
+	     *     finishes.
+	     */
+	  }, {
+	    key: 'signUp',
+	    value: function signUp(attrs, options) {
+	      options = options || {};
+
+	      var signupOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        signupOptions.useMasterKey = options.useMasterKey;
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.signUp(this, attrs, signupOptions)._thenRunCallbacks(options, this);
+	    }
+
+	    /**
+	     * Logs in a Parse.User. On success, this saves the session to disk,
+	     * so you can retrieve the currently logged in user using
+	     * <code>current</code>.
+	     *
+	     * <p>A username and password must be set before calling logIn.</p>
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method logIn
+	     * @param {Object} options A Backbone-style options object.
+	     * @return {Parse.Promise} A promise that is fulfilled with the user when
+	     *     the login is complete.
+	     */
+	  }, {
+	    key: 'logIn',
+	    value: function logIn(options) {
+	      options = options || {};
+
+	      var loginOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        loginOptions.useMasterKey = options.useMasterKey;
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.logIn(this, loginOptions)._thenRunCallbacks(options, this);
+	    }
+	  }], [{
+	    key: 'readOnlyAttributes',
+	    value: function readOnlyAttributes() {
+	      return ['sessionToken'];
+	    }
+
+	    /**
+	     * Adds functionality to the existing Parse.User class
+	     * @method extend
+	     * @param {Object} protoProps A set of properties to add to the prototype
+	     * @param {Object} classProps A set of static properties to add to the class
+	     * @static
+	     * @return {Class} The newly extended Parse.User class
+	     */
+	  }, {
+	    key: 'extend',
+	    value: function extend(protoProps, classProps) {
+	      if (protoProps) {
+	        for (var prop in protoProps) {
+	          if (prop !== 'className') {
+	            _Object$defineProperty(ParseUser.prototype, prop, {
+	              value: protoProps[prop],
+	              enumerable: false,
+	              writable: true,
+	              configurable: true
+	            });
+	          }
+	        }
+	      }
+
+	      if (classProps) {
+	        for (var prop in classProps) {
+	          if (prop !== 'className') {
+	            _Object$defineProperty(ParseUser, prop, {
+	              value: classProps[prop],
+	              enumerable: false,
+	              writable: true,
+	              configurable: true
+	            });
+	          }
+	        }
+	      }
+
+	      return ParseUser;
+	    }
+
+	    /**
+	     * Retrieves the currently logged in ParseUser with a valid session,
+	     * either from memory or localStorage, if necessary.
+	     * @method current
+	     * @static
+	     * @return {Parse.Object} The currently logged in Parse.User.
+	     */
+	  }, {
+	    key: 'current',
+	    value: function current() {
+	      if (!canUseCurrentUser) {
+	        return null;
+	      }
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.currentUser();
+	    }
+
+	    /**
+	     * Retrieves the currently logged in ParseUser from asynchronous Storage.
+	     * @method currentAsync
+	     * @static
+	     * @return {Parse.Promise} A Promise that is resolved with the currently
+	     *   logged in Parse User
+	     */
+	  }, {
+	    key: 'currentAsync',
+	    value: function currentAsync() {
+	      if (!canUseCurrentUser) {
+	        return _ParsePromise2['default'].as(null);
+	      }
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.currentUserAsync();
+	    }
+
+	    /**
+	     * Signs up a new user with a username (or email) and password.
+	     * This will create a new Parse.User on the server, and also persist the
+	     * session in localStorage so that you can access the user using
+	     * {@link #current}.
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method signUp
+	     * @param {String} username The username (or email) to sign up with.
+	     * @param {String} password The password to sign up with.
+	     * @param {Object} attrs Extra fields to set on the new user.
+	     * @param {Object} options A Backbone-style options object.
+	     * @static
+	     * @return {Parse.Promise} A promise that is fulfilled with the user when
+	     *     the signup completes.
+	     */
+	  }, {
+	    key: 'signUp',
+	    value: function signUp(username, password, attrs, options) {
+	      attrs = attrs || {};
+	      attrs.username = username;
+	      attrs.password = password;
+	      var user = new ParseUser(attrs);
+	      return user.signUp({}, options);
+	    }
+
+	    /**
+	     * Logs in a user with a username (or email) and password. On success, this
+	     * saves the session to disk, so you can retrieve the currently logged in
+	     * user using <code>current</code>.
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method logIn
+	     * @param {String} username The username (or email) to log in with.
+	     * @param {String} password The password to log in with.
+	     * @param {Object} options A Backbone-style options object.
+	     * @static
+	     * @return {Parse.Promise} A promise that is fulfilled with the user when
+	     *     the login completes.
+	     */
+	  }, {
+	    key: 'logIn',
+	    value: function logIn(username, password, options) {
+	      var user = new ParseUser();
+	      user._finishFetch({ username: username, password: password });
+	      return user.logIn(options);
+	    }
+
+	    /**
+	     * Logs in a user with a session token. On success, this saves the session
+	     * to disk, so you can retrieve the currently logged in user using
+	     * <code>current</code>.
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method become
+	     * @param {String} sessionToken The sessionToken to log in with.
+	     * @param {Object} options A Backbone-style options object.
+	     * @static
+	     * @return {Parse.Promise} A promise that is fulfilled with the user when
+	     *     the login completes.
+	     */
+	  }, {
+	    key: 'become',
+	    value: function become(sessionToken, options) {
+	      if (!canUseCurrentUser) {
+	        throw new Error('It is not memory-safe to become a user in a server environment');
+	      }
+	      options = options || {};
+
+	      var becomeOptions = {
+	        sessionToken: sessionToken
+	      };
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        becomeOptions.useMasterKey = options.useMasterKey;
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.become(becomeOptions)._thenRunCallbacks(options);
+	    }
+	  }, {
+	    key: 'logInWith',
+	    value: function logInWith(provider, options) {
+	      return ParseUser._logInWith(provider, options);
+	    }
+
+	    /**
+	     * Logs out the currently logged in user session. This will remove the
+	     * session from disk, log out of linked services, and future calls to
+	     * <code>current</code> will return <code>null</code>.
+	     * @method logOut
+	     * @static
+	     * @return {Parse.Promise} A promise that is resolved when the session is
+	     *   destroyed on the server.
+	     */
+	  }, {
+	    key: 'logOut',
+	    value: function logOut() {
+	      if (!canUseCurrentUser) {
+	        throw new Error('There is no current user user on a node.js server environment.');
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.logOut();
+	    }
+
+	    /**
+	     * Requests a password reset email to be sent to the specified email address
+	     * associated with the user account. This email allows the user to securely
+	     * reset their password on the Parse site.
+	     *
+	     * <p>Calls options.success or options.error on completion.</p>
+	     *
+	     * @method requestPasswordReset
+	     * @param {String} email The email address associated with the user that
+	     *     forgot their password.
+	     * @param {Object} options A Backbone-style options object.
+	     * @static
+	     */
+	  }, {
+	    key: 'requestPasswordReset',
+	    value: function requestPasswordReset(email, options) {
+	      options = options || {};
+
+	      var requestOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        requestOptions.useMasterKey = options.useMasterKey;
+	      }
+
+	      var controller = _CoreManager2['default'].getUserController();
+	      return controller.requestPasswordReset(email, requestOptions)._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Allow someone to define a custom User class without className
+	     * being rewritten to _User. The default behavior is to rewrite
+	     * User to _User for legacy reasons. This allows developers to
+	     * override that behavior.
+	     *
+	     * @method allowCustomUserClass
+	     * @param {Boolean} isAllowed Whether or not to allow custom User class
+	     * @static
+	     */
+	  }, {
+	    key: 'allowCustomUserClass',
+	    value: function allowCustomUserClass(isAllowed) {
+	      _CoreManager2['default'].set('PERFORM_USER_REWRITE', !isAllowed);
+	    }
+
+	    /**
+	     * Allows a legacy application to start using revocable sessions. If the
+	     * current session token is not revocable, a request will be made for a new,
+	     * revocable session.
+	     * It is not necessary to call this method from cloud code unless you are
+	     * handling user signup or login from the server side. In a cloud code call,
+	     * this function will not attempt to upgrade the current token.
+	     * @method enableRevocableSession
+	     * @param {Object} options A Backbone-style options object.
+	     * @static
+	     * @return {Parse.Promise} A promise that is resolved when the process has
+	     *   completed. If a replacement session token is requested, the promise
+	     *   will be resolved after a new token has been fetched.
+	     */
+	  }, {
+	    key: 'enableRevocableSession',
+	    value: function enableRevocableSession(options) {
+	      options = options || {};
+	      _CoreManager2['default'].set('FORCE_REVOCABLE_SESSION', true);
+	      if (canUseCurrentUser) {
+	        var current = ParseUser.current();
+	        if (current) {
+	          return current._upgradeToRevocableSession(options);
+	        }
+	      }
+	      return _ParsePromise2['default'].as()._thenRunCallbacks(options);
+	    }
+
+	    /**
+	     * Enables the use of become or the current user in a server
+	     * environment. These features are disabled by default, since they depend on
+	     * global objects that are not memory-safe for most servers.
+	     * @method enableUnsafeCurrentUser
+	     * @static
+	     */
+	  }, {
+	    key: 'enableUnsafeCurrentUser',
+	    value: function enableUnsafeCurrentUser() {
+	      canUseCurrentUser = true;
+	    }
+
+	    /**
+	     * Disables the use of become or the current user in any environment.
+	     * These features are disabled on servers by default, since they depend on
+	     * global objects that are not memory-safe for most servers.
+	     * @method disableUnsafeCurrentUser
+	     * @static
+	     */
+	  }, {
+	    key: 'disableUnsafeCurrentUser',
+	    value: function disableUnsafeCurrentUser() {
+	      canUseCurrentUser = false;
+	    }
+	  }, {
+	    key: '_registerAuthenticationProvider',
+	    value: function _registerAuthenticationProvider(provider) {
+	      authProviders[provider.getAuthType()] = provider;
+	      // Synchronize the current user with the auth provider.
+	      var current = ParseUser.current();
+	      if (current) {
+	        current._synchronizeAuthData(provider.getAuthType());
+	      }
+	    }
+	  }, {
+	    key: '_logInWith',
+	    value: function _logInWith(provider, options) {
+	      var user = new ParseUser();
+	      return user._linkWith(provider, options);
+	    }
+	  }, {
+	    key: '_clearCache',
+	    value: function _clearCache() {
+	      currentUserCache = null;
+	      currentUserCacheMatchesDisk = false;
+	    }
+	  }, {
+	    key: '_setCurrentUserCache',
+	    value: function _setCurrentUserCache(user) {
+	      currentUserCache = user;
+	    }
+	  }]);
+
+	  return ParseUser;
+	})(_ParseObject3['default']);
+
+	exports['default'] = ParseUser;
+
+	_ParseObject3['default'].registerSubclass('_User', ParseUser);
+
+	var DefaultController = {
+	  setCurrentUser: function setCurrentUser(user) {
+	    currentUserCache = user;
+	    user._cleanupAuthData();
+	    user._synchronizeAllAuthData();
+	    var path = _Storage2['default'].generatePath(CURRENT_USER_KEY);
+	    var json = user.toJSON();
+	    json.className = '_User';
+	    return _Storage2['default'].setItemAsync(path, JSON.stringify(json)).then(function () {
+	      return user;
+	    });
+	  },
+
+	  currentUser: function currentUser() {
+	    if (currentUserCache) {
+	      return currentUserCache;
+	    }
+	    if (currentUserCacheMatchesDisk) {
+	      return null;
+	    }
+	    if (_Storage2['default'].async()) {
+	      throw new Error('Cannot call currentUser() when using a platform with an async ' + 'storage system. Call currentUserAsync() instead.');
+	    }
+	    var path = _Storage2['default'].generatePath(CURRENT_USER_KEY);
+	    var userData = _Storage2['default'].getItem(path);
+	    currentUserCacheMatchesDisk = true;
+	    if (!userData) {
+	      currentUserCache = null;
+	      return null;
+	    }
+	    userData = JSON.parse(userData);
+	    if (!userData.className) {
+	      userData.className = '_User';
+	    }
+	    if (userData._id) {
+	      if (userData.objectId !== userData._id) {
+	        userData.objectId = userData._id;
+	      }
+	      delete userData._id;
+	    }
+	    if (userData._sessionToken) {
+	      userData.sessionToken = userData._sessionToken;
+	      delete userData._sessionToken;
+	    }
+	    var current = ParseUser.fromJSON(userData);
+	    currentUserCache = current;
+	    current._synchronizeAllAuthData();
+	    return current;
+	  },
+
+	  currentUserAsync: function currentUserAsync() {
+	    if (currentUserCache) {
+	      return _ParsePromise2['default'].as(currentUserCache);
+	    }
+	    if (currentUserCacheMatchesDisk) {
+	      return _ParsePromise2['default'].as(null);
+	    }
+	    var path = _Storage2['default'].generatePath(CURRENT_USER_KEY);
+	    return _Storage2['default'].getItemAsync(path).then(function (userData) {
+	      currentUserCacheMatchesDisk = true;
+	      if (!userData) {
+	        currentUserCache = null;
+	        return _ParsePromise2['default'].as(null);
+	      }
+	      userData = JSON.parse(userData);
+	      if (!userData.className) {
+	        userData.className = '_User';
+	      }
+	      if (userData._id) {
+	        if (userData.objectId !== userData._id) {
+	          userData.objectId = userData._id;
+	        }
+	        delete userData._id;
+	      }
+	      if (userData._sessionToken) {
+	        userData.sessionToken = userData._sessionToken;
+	        delete userData._sessionToken;
+	      }
+	      var current = ParseUser.fromJSON(userData);
+	      currentUserCache = current;
+	      current._synchronizeAllAuthData();
+	      return _ParsePromise2['default'].as(current);
+	    });
+	  },
+
+	  signUp: function signUp(user, attrs, options) {
+	    var username = attrs && attrs.username || user.get('username');
+	    var password = attrs && attrs.password || user.get('password');
+
+	    if (!username || !username.length) {
+	      return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'Cannot sign up user with an empty name.'));
+	    }
+	    if (!password || !password.length) {
+	      return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].OTHER_CAUSE, 'Cannot sign up user with an empty password.'));
+	    }
+
+	    return user.save(attrs, options).then(function () {
+	      // Clear the password field
+	      user._finishFetch({ password: undefined });
+
+	      if (canUseCurrentUser) {
+	        return DefaultController.setCurrentUser(user);
+	      }
+	      return user;
+	    });
+	  },
+
+	  logIn: function logIn(user, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    var auth = {
+	      username: user.get('username'),
+	      password: user.get('password')
+	    };
+	    return RESTController.request('GET', 'login', auth, options).then(function (response, status) {
+	      user._migrateId(response.objectId);
+	      user._setExisted(true);
+	      ObjectState.setPendingOp(user.className, user._getId(), 'username', undefined);
+	      ObjectState.setPendingOp(user.className, user._getId(), 'password', undefined);
+	      response.password = undefined;
+	      user._finishFetch(response);
+	      if (!canUseCurrentUser) {
+	        // We can't set the current user, so just return the one we logged in
+	        return _ParsePromise2['default'].as(user);
+	      }
+	      return DefaultController.setCurrentUser(user);
+	    });
+	  },
+
+	  become: function become(options) {
+	    var user = new ParseUser();
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    return RESTController.request('GET', 'users/me', {}, options).then(function (response, status) {
+	      user._finishFetch(response);
+	      user._setExisted(true);
+	      return DefaultController.setCurrentUser(user);
+	    });
+	  },
+
+	  logOut: function logOut() {
+	    return DefaultController.currentUserAsync().then(function (currentUser) {
+	      var path = _Storage2['default'].generatePath(CURRENT_USER_KEY);
+	      var promise = _Storage2['default'].removeItemAsync(path);
+	      var RESTController = _CoreManager2['default'].getRESTController();
+	      if (currentUser !== null) {
+	        var currentSession = currentUser.getSessionToken();
+	        if (currentSession && (0, _isRevocableSession2['default'])(currentSession)) {
+	          promise.then(function () {
+	            return RESTController.request('POST', 'logout', {}, { sessionToken: currentSession });
+	          });
+	        }
+	        currentUser._logOutWithAll();
+	        currentUser._finishFetch({ sessionToken: undefined });
+	      }
+	      currentUserCacheMatchesDisk = true;
+	      currentUserCache = null;
+
+	      return promise;
+	    });
+	  },
+
+	  requestPasswordReset: function requestPasswordReset(email, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    return RESTController.request('POST', 'requestPasswordReset', { email: email }, options);
+	  },
+
+	  upgradeToRevocableSession: function upgradeToRevocableSession(user, options) {
+	    var token = user.getSessionToken();
+	    if (!token) {
+	      return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].SESSION_MISSING, 'Cannot upgrade a user with no session token'));
+	    }
+
+	    options.sessionToken = token;
+
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    return RESTController.request('POST', 'upgradeToRevocableSession', {}, options).then(function (result) {
+	      var session = new _ParseSession2['default']();
+	      session._finishFetch(result);
+	      user._finishFetch({ sessionToken: session.getSessionToken() });
+	      if (user.isCurrent()) {
+	        return DefaultController.setCurrentUser(user);
+	      }
+	      return _ParsePromise2['default'].as(user);
+	    });
+	  },
+
+	  linkWith: function linkWith(user, authData) {
+	    return user.save({ authData: authData }).then(function () {
+	      if (canUseCurrentUser) {
+	        return DefaultController.setCurrentUser(user);
+	      }
+	      return user;
+	    });
+	  }
+	};
+
+	_CoreManager2['default'].setUserController(DefaultController);
+	module.exports = exports['default'];
+
+/***/ },
+/* 69 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = isRevocableSession;
+
+	function isRevocableSession(token) {
+	  return token.indexOf('r:') > -1;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 70 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	/**
+	 * @class Parse.Session
+	 * @constructor
+	 *
+	 * <p>A Parse.Session object is a local representation of a revocable session.
+	 * This class is a subclass of a Parse.Object, and retains the same
+	 * functionality of a Parse.Object.</p>
+	 */
+	'use strict';
+
+	var _get = __webpack_require__(27)['default'];
+
+	var _inherits = __webpack_require__(34)['default'];
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _isRevocableSession = __webpack_require__(69);
+
+	var _isRevocableSession2 = _interopRequireDefault(_isRevocableSession);
+
+	var _ParseObject2 = __webpack_require__(46);
+
+	var _ParseObject3 = _interopRequireDefault(_ParseObject2);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _ParseUser = __webpack_require__(68);
+
+	var _ParseUser2 = _interopRequireDefault(_ParseUser);
+
+	var ParseSession = (function (_ParseObject) {
+	  _inherits(ParseSession, _ParseObject);
+
+	  function ParseSession(attributes) {
+	    _classCallCheck(this, ParseSession);
+
+	    _get(Object.getPrototypeOf(ParseSession.prototype), 'constructor', this).call(this, '_Session');
+	    if (attributes && typeof attributes === 'object') {
+	      if (!this.set(attributes || {})) {
+	        throw new Error('Can\'t create an invalid Session');
+	      }
+	    }
+	  }
+
+	  /**
+	   * Returns the session token string.
+	   * @method getSessionToken
+	   * @return {String}
+	   */
+
+	  _createClass(ParseSession, [{
+	    key: 'getSessionToken',
+	    value: function getSessionToken() {
+	      return this.get('sessionToken');
+	    }
+	  }], [{
+	    key: 'readOnlyAttributes',
+	    value: function readOnlyAttributes() {
+	      return ['createdWith', 'expiresAt', 'installationId', 'restricted', 'sessionToken', 'user'];
+	    }
+
+	    /**
+	     * Retrieves the Session object for the currently logged in session.
+	     * @method current
+	     * @static
+	     * @return {Parse.Promise} A promise that is resolved with the Parse.Session
+	     *   object after it has been fetched. If there is no current user, the
+	     *   promise will be rejected.
+	     */
+	  }, {
+	    key: 'current',
+	    value: function current(options) {
+	      options = options || {};
+	      var controller = _CoreManager2['default'].getSessionController();
+
+	      var sessionOptions = {};
+	      if (options.hasOwnProperty('useMasterKey')) {
+	        sessionOptions.useMasterKey = options.useMasterKey;
+	      }
+	      return _ParseUser2['default'].currentAsync().then(function (user) {
+	        if (!user) {
+	          return _ParsePromise2['default'].error('There is no current user.');
+	        }
+	        var token = user.getSessionToken();
+	        sessionOptions.sessionToken = user.getSessionToken();
+	        return controller.getSession(sessionOptions);
+	      });
+	    }
+
+	    /**
+	     * Determines whether the current session token is revocable.
+	     * This method is useful for migrating Express.js or Node.js web apps to
+	     * use revocable sessions. If you are migrating an app that uses the Parse
+	     * SDK in the browser only, please use Parse.User.enableRevocableSession()
+	     * instead, so that sessions can be automatically upgraded.
+	     * @method isCurrentSessionRevocable
+	     * @static
+	     * @return {Boolean}
+	     */
+	  }, {
+	    key: 'isCurrentSessionRevocable',
+	    value: function isCurrentSessionRevocable() {
+	      var currentUser = _ParseUser2['default'].current();
+	      if (currentUser) {
+	        return (0, _isRevocableSession2['default'])(currentUser.getSessionToken() || '');
+	      }
+	      return false;
+	    }
+	  }]);
+
+	  return ParseSession;
+	})(_ParseObject3['default']);
+
+	exports['default'] = ParseSession;
+
+	_ParseObject3['default'].registerSubclass('_Session', ParseSession);
+
+	_CoreManager2['default'].setSessionController({
+	  getSession: function getSession(options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    var session = new ParseSession();
+
+	    return RESTController.request('GET', 'sessions/me', {}, options).then(function (sessionData) {
+	      session._finishFetch(sessionData);
+	      session._setExisted(true);
+	      return session;
+	    });
+	  }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 71 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	module.exports = {
+	  async: function async() {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    return !!controller.async;
+	  },
+
+	  getItem: function getItem(path) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      throw new Error('Synchronous storage is not supported by the current storage controller');
+	    }
+	    return controller.getItem(path);
+	  },
+
+	  getItemAsync: function getItemAsync(path) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      return controller.getItemAsync(path);
+	    }
+	    return _ParsePromise2['default'].as(controller.getItem(path));
+	  },
+
+	  setItem: function setItem(path, value) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      throw new Error('Synchronous storage is not supported by the current storage controller');
+	    }
+	    return controller.setItem(path, value);
+	  },
+
+	  setItemAsync: function setItemAsync(path, value) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      return controller.setItemAsync(path, value);
+	    }
+	    return _ParsePromise2['default'].as(controller.setItem(path, value));
+	  },
+
+	  removeItem: function removeItem(path) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      throw new Error('Synchronous storage is not supported by the current storage controller');
+	    }
+	    return controller.removeItem(path);
+	  },
+
+	  removeItemAsync: function removeItemAsync(path) {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.async === 1) {
+	      return controller.removeItemAsync(path);
+	    }
+	    return _ParsePromise2['default'].as(controller.removeItem(path));
+	  },
+
+	  generatePath: function generatePath(path) {
+	    if (!_CoreManager2['default'].get('APPLICATION_ID')) {
+	      throw new Error('You need to call Parse.initialize before using Parse.');
+	    }
+	    if (typeof path !== 'string') {
+	      throw new Error('Tried to get a Storage path that was not a String.');
+	    }
+	    if (path[0] === '/') {
+	      path = path.substr(1);
+	    }
+	    return 'Parse/' + _CoreManager2['default'].get('APPLICATION_ID') + '/' + path;
+	  },
+
+	  _clear: function _clear() {
+	    var controller = _CoreManager2['default'].getStorageController();
+	    if (controller.hasOwnProperty('clear')) {
+	      controller.clear();
+	    }
+	  }
+	};
+
+	_CoreManager2['default'].setStorageController(__webpack_require__(72));
+
+/***/ },
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	module.exports = {
+	  async: 0,
+
+	  getItem: function getItem(path) {
+	    return localStorage.getItem(path);
+	  },
+
+	  setItem: function setItem(path, value) {
+	    localStorage.setItem(path, value);
+	  },
+
+	  removeItem: function removeItem(path) {
+	    localStorage.removeItem(path);
+	  },
+
+	  clear: function clear() {
+	    localStorage.clear();
+	  }
+	};
+
+/***/ },
+/* 73 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _Storage = __webpack_require__(71);
+
+	var _Storage2 = _interopRequireDefault(_Storage);
+
+	var iidCache = null;
+
+	function hexOctet() {
+	  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	};
+
+	function generateId() {
+	  return hexOctet() + hexOctet() + '-' + hexOctet() + '-' + hexOctet() + '-' + hexOctet() + '-' + hexOctet() + hexOctet() + hexOctet();
+	}
+
+	module.exports = {
+	  currentInstallationId: function currentInstallationId() {
+	    if (typeof iidCache === 'string') {
+	      return _ParsePromise2['default'].as(iidCache);
+	    }
+	    var path = _Storage2['default'].generatePath('installationId');
+	    return _Storage2['default'].getItemAsync(path).then(function (iid) {
+	      if (!iid) {
+	        iid = generateId();
+	        return _Storage2['default'].setItemAsync(path, iid).then(function () {
+	          iidCache = iid;
+	          return iid;
+	        });
+	      }
+	      iidCache = iid;
+	      return iid;
+	    });
+	  },
+
+	  _clearCache: function _clearCache() {
+	    iidCache = null;
+	  },
+
+	  _setInstallationIdCache: function _setInstallationIdCache(iid) {
+	    iidCache = iid;
+	  }
+	};
+
+/***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _Storage = __webpack_require__(71);
+
+	var _Storage2 = _interopRequireDefault(_Storage);
+
+	var XHR = null;
+	if (typeof XMLHttpRequest !== 'undefined') {
+	  XHR = XMLHttpRequest;
+	}
+
+	var useXDomainRequest = false;
+	if (typeof XDomainRequest !== 'undefined' && !('withCredentials' in new XMLHttpRequest())) {
+	  useXDomainRequest = true;
+	}
+
+	function ajaxIE9(method, url, data) {
+	  var promise = new _ParsePromise2['default']();
+	  var xdr = new XDomainRequest();
+	  xdr.onload = function () {
+	    var response;
+	    try {
+	      response = JSON.parse(xdr.responseText);
+	    } catch (e) {
+	      promise.reject(e);
+	    }
+	    promise.resolve(response);
+	  };
+	  xdr.onerror = xdr.ontimeout = function () {
+	    // Let's fake a real error message.
+	    var fakeResponse = {
+	      responseText: JSON.stringify({
+	        code: _ParseError2['default'].X_DOMAIN_REQUEST,
+	        error: 'IE\'s XDomainRequest does not supply error info.'
+	      })
+	    };
+	    promise.reject(fakeResponse);
+	  };
+	  xdr.onprogress = function () {};
+	  xdr.open(method, url);
+	  xdr.send(data);
+	  return promise;
+	}
+
+	var RESTController = {
+	  ajax: function ajax(method, url, data, headers) {
+	    if (useXDomainRequest) {
+	      return ajaxIE9(method, url, data, headers);
+	    }
+
+	    var promise = new _ParsePromise2['default']();
+	    var attempts = 0;
+
+	    var dispatch = function dispatch() {
+	      if (XHR == null) {
+	        throw new Error('Cannot make a request: No definition of XMLHttpRequest was found.');
+	      }
+	      var handled = false;
+	      var xhr = new XHR();
+
+	      xhr.onreadystatechange = function () {
+	        if (xhr.readyState !== 4 || handled) {
+	          return;
+	        }
+	        handled = true;
+
+	        if (xhr.status >= 200 && xhr.status < 300) {
+	          var response;
+	          try {
+	            response = JSON.parse(xhr.responseText);
+	          } catch (e) {
+	            promise.reject(e);
+	          }
+	          promise.resolve(response, xhr.status, xhr);
+	        } else if (xhr.status >= 500) {
+	          // retry on 5XX
+	          if (++attempts < _CoreManager2['default'].get('REQUEST_ATTEMPT_LIMIT')) {
+	            // Exponentially-growing random delay
+	            var delay = Math.round(Math.random() * 125 * Math.pow(2, attempts));
+	            setTimeout(dispatch, delay);
+	          } else {
+	            // After the retry limit is reached, fail
+	            promise.reject(xhr);
+	          }
+	        } else {
+	          promise.reject(xhr);
+	        }
+	      };
+
+	      headers = headers || {};
+	      headers['Content-Type'] = 'text/plain'; // Avoid pre-flight
+	      if (_CoreManager2['default'].get('IS_NODE')) {
+	        headers['User-Agent'] = 'Parse/' + _CoreManager2['default'].get('VERSION') + ' (NodeJS ' + process.versions.node + ')';
+	      }
+
+	      xhr.open(method, url, true);
+	      for (var h in headers) {
+	        xhr.setRequestHeader(h, headers[h]);
+	      }
+	      xhr.send(data);
+	    };
+	    dispatch();
+
+	    return promise;
+	  },
+
+	  request: function request(method, path, data, options) {
+	    options = options || {};
+	    var url = _CoreManager2['default'].get('SERVER_URL');
+	    url += '/1/' + path;
+
+	    var payload = {};
+	    if (data && typeof data === 'object') {
+	      for (var k in data) {
+	        payload[k] = data[k];
+	      }
+	    }
+
+	    if (method !== 'POST') {
+	      payload._method = method;
+	      method = 'POST';
+	    }
+
+	    payload._ApplicationId = _CoreManager2['default'].get('APPLICATION_ID');
+	    payload._JavaScriptKey = _CoreManager2['default'].get('JAVASCRIPT_KEY');
+	    payload._ClientVersion = 'js' + _CoreManager2['default'].get('VERSION');
+
+	    var useMasterKey = options.useMasterKey;
+	    if (typeof useMasterKey === 'undefined') {
+	      useMasterKey = _CoreManager2['default'].get('USE_MASTER_KEY');
+	    }
+	    if (useMasterKey) {
+	      if (_CoreManager2['default'].get('MASTER_KEY')) {
+	        delete payload._JavaScriptKey;
+	        payload._MasterKey = _CoreManager2['default'].get('MASTER_KEY');
+	      } else {
+	        throw new Error('Cannot use the Master Key, it has not been provided.');
+	      }
+	    }
+
+	    if (_CoreManager2['default'].get('FORCE_REVOCABLE_SESSION')) {
+	      payload._RevocableSession = '1';
+	    }
+
+	    var installationController = _CoreManager2['default'].getInstallationController();
+
+	    return installationController.currentInstallationId().then(function (iid) {
+	      payload._InstallationId = iid;
+	      var userController = _CoreManager2['default'].getUserController();
+	      if (options && typeof options.sessionToken === 'string') {
+	        return _ParsePromise2['default'].as(options.sessionToken);
+	      } else if (userController) {
+	        return userController.currentUserAsync().then(function (user) {
+	          if (user) {
+	            return _ParsePromise2['default'].as(user.getSessionToken());
+	          }
+	          return _ParsePromise2['default'].as(null);
+	        });
+	      }
+	      return _ParsePromise2['default'].as(null);
+	    }).then(function (token) {
+	      if (token) {
+	        payload._SessionToken = token;
+	      }
+
+	      var payloadString = JSON.stringify(payload);
+
+	      return RESTController.ajax(method, url, payloadString);
+	    }).then(null, function (response) {
+	      // Transform the error into an instance of ParseError by trying to parse
+	      // the error string as JSON
+	      var error;
+	      if (response && response.responseText) {
+	        try {
+	          var errorJSON = JSON.parse(response.responseText);
+	          error = new _ParseError2['default'](errorJSON.code, errorJSON.error);
+	        } catch (e) {
+	          // If we fail to parse the error text, that's okay.
+	          error = new _ParseError2['default'](_ParseError2['default'].INVALID_JSON, 'Received an error with invalid JSON from Parse: ' + response.responseText);
+	        }
+	      } else {
+	        error = new _ParseError2['default'](_ParseError2['default'].CONNECTION_FAILED, 'XMLHttpRequest failed: ' + JSON.stringify(response));
+	      }
+
+	      return _ParsePromise2['default'].error(error);
+	    });
+	  },
+
+	  _setXHR: function _setXHR(xhr) {
+	    XHR = xhr;
+	  }
+	};
+
+	module.exports = RESTController;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	/**
+	 * Parse.Analytics provides an interface to Parse's logging and analytics
+	 * backend.
+	 *
+	 * @class Parse.Analytics
+	 * @static
+	 */
+
+	/**
+	 * Tracks the occurrence of a custom event with additional dimensions.
+	 * Parse will store a data point at the time of invocation with the given
+	 * event name.
+	 *
+	 * Dimensions will allow segmentation of the occurrences of this custom
+	 * event. Keys and values should be {@code String}s, and will throw
+	 * otherwise.
+	 *
+	 * To track a user signup along with additional metadata, consider the
+	 * following:
+	 * <pre>
+	 * var dimensions = {
+	 *  gender: 'm',
+	 *  source: 'web',
+	 *  dayType: 'weekend'
+	 * };
+	 * Parse.Analytics.track('signup', dimensions);
+	 * </pre>
+	 *
+	 * There is a default limit of 8 dimensions per event tracked.
+	 *
+	 * @method track
+	 * @param {String} name The name of the custom event to report to Parse as
+	 * having happened.
+	 * @param {Object} dimensions The dictionary of information by which to
+	 * segment this event.
+	 * @param {Object} options A Backbone-style callback object.
+	 * @return {Parse.Promise} A promise that is resolved when the round-trip
+	 * to the server completes.
+	 */
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.track = track;
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	function track(name, dimensions, options) {
+	  name = name || '';
+	  name = name.replace(/^\s*/, '');
+	  name = name.replace(/\s*$/, '');
+	  if (name.length === 0) {
+	    throw new TypeError('A name for the custom event must be provided');
+	  }
+
+	  for (var key in dimensions) {
+	    if (typeof key !== 'string' || typeof dimensions[key] !== 'string') {
+	      throw new TypeError('track() dimensions expects keys and values of type "string".');
+	    }
+	  }
+
+	  options = options || {};
+	  return _CoreManager2['default'].getAnalyticsController().track(name, dimensions)._thenRunCallbacks(options);
+	}
+
+	_CoreManager2['default'].setAnalyticsController({
+	  track: function track(name, dimensions) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+	    return RESTController.request('POST', 'events/' + name, { dimensions: dimensions });
+	  }
+	});
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.run = run;
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _decode = __webpack_require__(9);
+
+	var _decode2 = _interopRequireDefault(_decode);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	/**
+	 * Contains functions for calling and declaring
+	 * <a href="/docs/cloud_code_guide#functions">cloud functions</a>.
+	 * <p><strong><em>
+	 *   Some functions are only available from Cloud Code.
+	 * </em></strong></p>
+	 *
+	 * @class Parse.Cloud
+	 * @static
+	 */
+
+	/**
+	 * Makes a call to a cloud function.
+	 * @method run
+	 * @param {String} name The function name.
+	 * @param {Object} data The parameters to send to the cloud function.
+	 * @param {Object} options A Backbone-style options object
+	 * options.success, if set, should be a function to handle a successful
+	 * call to a cloud function.  options.error should be a function that
+	 * handles an error running the cloud function.  Both functions are
+	 * optional.  Both functions take a single argument.
+	 * @return {Parse.Promise} A promise that will be resolved with the result
+	 * of the function.
+	 */
+
+	function run(name, data, options) {
+	  options = options || {};
+
+	  if (typeof name !== 'string' || name.length === 0) {
+	    throw new TypeError('Cloud function name must be a string.');
+	  }
+
+	  return _CoreManager2['default'].getCloudController().run(name, data, {
+	    useMasterKey: options.useMasterKey
+	  })._thenRunCallbacks(options);
+	}
+
+	_CoreManager2['default'].setCloudController({
+	  run: function run(name, data, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+
+	    var payload = (0, _encode2['default'])(data, true);
+
+	    var request = RESTController.request('POST', 'functions/' + name, payload, { useMasterKey: !!options.useMasterKey });
+
+	    return request.then(function (res) {
+	      var decoded = (0, _decode2['default'])(res);
+	      if (decoded && decoded.hasOwnProperty('result')) {
+	        return _ParsePromise2['default'].as(decoded.result);
+	      }
+	      return _ParsePromise2['default'].error(new _ParseError2['default'](_ParseError2['default'].INVALID_JSON, 'The server returned an invalid response.'));
+	    })._thenRunCallbacks(options);
+	  }
+	});
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _createClass = __webpack_require__(11)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _decode = __webpack_require__(9);
+
+	var _decode2 = _interopRequireDefault(_decode);
+
+	var _encode = __webpack_require__(58);
+
+	var _encode2 = _interopRequireDefault(_encode);
+
+	var _escape2 = __webpack_require__(63);
+
+	var _escape3 = _interopRequireDefault(_escape2);
+
+	var _ParseError = __webpack_require__(45);
+
+	var _ParseError2 = _interopRequireDefault(_ParseError);
+
+	var _ParsePromise = __webpack_require__(54);
+
+	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
+
+	var _Storage = __webpack_require__(71);
+
+	var _Storage2 = _interopRequireDefault(_Storage);
+
+	/**
+	 * Parse.Config is a local representation of configuration data that
+	 * can be set from the Parse dashboard.
+	 *
+	 * @class Parse.Config
+	 * @constructor
+	 */
+
+	var ParseConfig = (function () {
+	  function ParseConfig() {
+	    _classCallCheck(this, ParseConfig);
+
+	    this.attributes = {};
+	    this._escapedAttributes = {};
+	  }
+
+	  /**
+	   * Gets the value of an attribute.
+	   * @method get
+	   * @param {String} attr The name of an attribute.
+	   */
+
+	  _createClass(ParseConfig, [{
+	    key: 'get',
+	    value: function get(attr) {
+	      return this.attributes[attr];
+	    }
+
+	    /**
+	     * Gets the HTML-escaped value of an attribute.
+	     * @method escape
+	     * @param {String} attr The name of an attribute.
+	     */
+	  }, {
+	    key: 'escape',
+	    value: function escape(attr) {
+	      var html = this._escapedAttributes[attr];
+	      if (html) {
+	        return html;
+	      }
+	      var val = this.attributes[attr];
+	      var escaped = '';
+	      if (val != null) {
+	        escaped = (0, _escape3['default'])(val.toString());
+	      }
+	      this._escapedAttributes[attr] = escaped;
+	      return escaped;
+	    }
+
+	    /**
+	     * Retrieves the most recently-fetched configuration object, either from
+	     * memory or from local storage if necessary.
+	     *
+	     * @method current
+	     * @static
+	     * @return {Config} The most recently-fetched Parse.Config if it
+	     *     exists, else an empty Parse.Config.
+	     */
+	  }], [{
+	    key: 'current',
+	    value: function current() {
+	      var controller = _CoreManager2['default'].getConfigController();
+	      return controller.current();
+	    }
+
+	    /**
+	     * Gets a new configuration object from the server.
+	     * @method get
+	     * @static
+	     * @param {Object} options A Backbone-style options object.
+	     * Valid options are:<ul>
+	     *   <li>success: Function to call when the get completes successfully.
+	     *   <li>error: Function to call when the get fails.
+	     * </ul>
+	     * @return {Parse.Promise} A promise that is resolved with a newly-created
+	     *     configuration object when the get completes.
+	     */
+	  }, {
+	    key: 'get',
+	    value: function get(options) {
+	      options = options || {};
+
+	      var controller = _CoreManager2['default'].getConfigController();
+	      return controller.get()._thenRunCallbacks(options);
+	    }
+	  }]);
+
+	  return ParseConfig;
+	})();
+
+	exports['default'] = ParseConfig;
+
+	var currentConfig = null;
+
+	var CURRENT_CONFIG_KEY = 'currentConfig';
+
+	function decodePayload(data) {
+	  try {
+	    var json = JSON.parse(data);
+	    if (json && typeof json === 'object') {
+	      return (0, _decode2['default'])(json);
+	    }
+	  } catch (e) {
+	    return null;
+	  }
+	}
+
+	_CoreManager2['default'].setConfigController({
+	  current: function current() {
+	    if (currentConfig) {
+	      return currentConfig;
+	    }
+
+	    var config = new ParseConfig();
+	    var storagePath = _Storage2['default'].generatePath(CURRENT_CONFIG_KEY);
+	    var configData;
+	    if (!_Storage2['default'].async()) {
+	      configData = _Storage2['default'].getItem(storagePath);
+
+	      if (configData) {
+	        var attributes = decodePayload(configData);
+	        if (attributes) {
+	          config.attributes = attributes;
+	          currentConfig = config;
+	        }
+	      }
+	      return config;
+	    }
+	    // Return a promise for async storage controllers
+	    return _Storage2['default'].getItemAsync(storagePath).then(function (configData) {
+	      if (configData) {
+	        var attributes = decodePayload(configData);
+	        if (attributes) {
+	          config.attributes = attributes;
+	          currentConfig = config;
+	        }
+	      }
+	      return config;
+	    });
+	  },
+
+	  get: function get() {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+
+	    return RESTController.request('GET', 'config', {}, {}).then(function (response) {
+	      if (!response || !response.params) {
+	        var error = new _ParseError2['default'](_ParseError2['default'].INVALID_JSON, 'Config JSON response invalid.');
+	        return _ParsePromise2['default'].error(error);
+	      }
+
+	      var config = new ParseConfig();
+	      config.attributes = {};
+	      for (var attr in response.params) {
+	        config.attributes[attr] = (0, _decode2['default'])(response.params[attr]);
+	      }
+	      currentConfig = config;
+	      return _Storage2['default'].setItemAsync(_Storage2['default'].generatePath(CURRENT_CONFIG_KEY), JSON.stringify(response.params)).then(function () {
+	        return config;
+	      });
+	    });
+	  }
+	});
+	module.exports = exports['default'];
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * -weak
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _parseDate = __webpack_require__(66);
+
+	var _parseDate2 = _interopRequireDefault(_parseDate);
+
+	var _ParseUser = __webpack_require__(68);
+
+	var _ParseUser2 = _interopRequireDefault(_ParseUser);
+
+	var initialized = false;
+	var requestedPermissions;
+	var initOptions;
+
+	/**
+	 * Provides a set of utilities for using Parse with Facebook.
+	 * @class Parse.FacebookUtils
+	 * @static
+	 */
+	exports['default'] = {
+	  /**
+	   * Initializes Parse Facebook integration.  Call this function after you
+	   * have loaded the Facebook Javascript SDK with the same parameters
+	   * as you would pass to<code>
+	   * <a href=
+	   * "https://developers.facebook.com/docs/reference/javascript/FB.init/">
+	   * FB.init()</a></code>.  Parse.FacebookUtils will invoke FB.init() for you
+	   * with these arguments.
+	   *
+	   * @method init
+	   * @param {Object} options Facebook options argument as described here:
+	   *   <a href=
+	   *   "https://developers.facebook.com/docs/reference/javascript/FB.init/">
+	   *   FB.init()</a>. The status flag will be coerced to 'false' because it
+	   *   interferes with Parse Facebook integration. Call FB.getLoginStatus()
+	   *   explicitly if this behavior is required by your application.
+	   */
+	  init: function init(options) {
+	    if (typeof FB === 'undefined') {
+	      throw new Error('The Facebook JavaScript SDK must be loaded before calling init.');
+	    }
+	    initOptions = {};
+	    if (options) {
+	      for (var key in options) {
+	        initOptions[key] = options[key];
+	      }
+	    }
+	    if (initOptions.status && typeof console !== 'undefined') {
+	      var warn = console.warn || console.log || function () {};
+	      warn.call(console, 'The "status" flag passed into' + ' FB.init, when set to true, can interfere with Parse Facebook' + ' integration, so it has been suppressed. Please call' + ' FB.getLoginStatus() explicitly if you require this behavior.');
+	    }
+	    initOptions.status = false;
+	    FB.init(initOptions);
+	    _ParseUser2['default']._registerAuthenticationProvider({
+	      authenticate: function authenticate(options) {
+	        var _this = this;
+
+	        if (typeof FB === 'undefined') {
+	          options.error(this, 'Facebook SDK not found.');
+	        }
+	        FB.login(function (response) {
+	          if (response.authResponse) {
+	            if (options.success) {
+	              options.success(_this, {
+	                id: response.authResponse.userID,
+	                access_token: response.authResponse.accessToken,
+	                expiration_date: new Date(response.authResponse.expiresIn * 1000 + new Date().getTime()).toJSON()
+	              });
+	            }
+	          } else {
+	            if (options.error) {
+	              options.error(_this, response);
+	            }
+	          }
+	        }, {
+	          scope: requestedPermissions
+	        });
+	      },
+
+	      restoreAuthentication: function restoreAuthentication(authData) {
+	        if (authData) {
+	          var expiration = (0, _parseDate2['default'])(authData.expiration_date);
+	          var expiresIn = expiration ? (expiration.getTime() - new Date().getTime()) / 1000 : 0;
+
+	          var authResponse = {
+	            userID: authData.id,
+	            accessToken: authData.access_token,
+	            expiresIn: expiresIn
+	          };
+	          var newOptions = {};
+	          if (initOptions) {
+	            for (var key in initOptions) {
+	              newOptions[key] = initOptions[key];
+	            }
+	          }
+	          newOptions.authResponse = authResponse;
+
+	          // Suppress checks for login status from the browser.
+	          newOptions.status = false;
+
+	          // If the user doesn't match the one known by the FB SDK, log out.
+	          // Most of the time, the users will match -- it's only in cases where
+	          // the FB SDK knows of a different user than the one being restored
+	          // from a Parse User that logged in with username/password.
+	          var existingResponse = FB.getAuthResponse();
+	          if (existingResponse && existingResponse.userID !== authResponse.userID) {
+	            FB.logout();
+	          }
+
+	          FB.init(newOptions);
+	        }
+	        return true;
+	      },
+
+	      getAuthType: function getAuthType() {
+	        return 'facebook';
+	      },
+
+	      deauthenticate: function deauthenticate() {
+	        this.restoreAuthentication(null);
+	      }
+	    });
+	    initialized = true;
+	  },
+
+	  /**
+	   * Gets whether the user has their account linked to Facebook.
+	   *
+	   * @method isLinked
+	   * @param {Parse.User} user User to check for a facebook link.
+	   *     The user must be logged in on this device.
+	   * @return {Boolean} <code>true</code> if the user has their account
+	   *     linked to Facebook.
+	   */
+	  isLinked: function isLinked(user) {
+	    return user._isLinked('facebook');
+	  },
+
+	  /**
+	   * Logs in a user using Facebook. This method delegates to the Facebook
+	   * SDK to authenticate the user, and then automatically logs in (or
+	   * creates, in the case where it is a new user) a Parse.User.
+	   *
+	   * @method logIn
+	   * @param {String, Object} permissions The permissions required for Facebook
+	   *    log in.  This is a comma-separated string of permissions.
+	   *    Alternatively, supply a Facebook authData object as described in our
+	   *    REST API docs if you want to handle getting facebook auth tokens
+	   *    yourself.
+	   * @param {Object} options Standard options object with success and error
+	   *    callbacks.
+	   */
+	  logIn: function logIn(permissions, options) {
+	    if (!permissions || typeof permissions === 'string') {
+	      if (!initialized) {
+	        throw new Error('You must initialize FacebookUtils before calling logIn.');
+	      }
+	      requestedPermissions = permissions;
+	      return _ParseUser2['default']._logInWith('facebook', options);
+	    } else {
+	      var newOptions = {};
+	      if (options) {
+	        for (var key in options) {
+	          newOptions[key] = options[key];
+	        }
+	      }
+	      newOptions.authData = permissions;
+	      return _ParseUser2['default']._logInWith('facebook', newOptions);
+	    }
+	  },
+
+	  /**
+	   * Links Facebook to an existing PFUser. This method delegates to the
+	   * Facebook SDK to authenticate the user, and then automatically links
+	   * the account to the Parse.User.
+	   *
+	   * @method link
+	   * @param {Parse.User} user User to link to Facebook. This must be the
+	   *     current user.
+	   * @param {String, Object} permissions The permissions required for Facebook
+	   *    log in.  This is a comma-separated string of permissions.
+	   *    Alternatively, supply a Facebook authData object as described in our
+	   *    REST API docs if you want to handle getting facebook auth tokens
+	   *    yourself.
+	   * @param {Object} options Standard options object with success and error
+	   *    callbacks.
+	   */
+	  link: function link(user, permissions, options) {
+	    if (!permissions || typeof permissions === 'string') {
+	      if (!initialized) {
+	        throw new Error('You must initialize FacebookUtils before calling link.');
+	      }
+	      requestedPermissions = permissions;
+	      return user._linkWith('facebook', options);
+	    } else {
+	      var newOptions = {};
+	      if (options) {
+	        for (var key in options) {
+	          newOptions[key] = options[key];
+	        }
+	      }
+	      newOptions.authData = permissions;
+	      return user._linkWith('facebook', newOptions);
+	    }
+	  },
+
+	  /**
+	   * Unlinks the Parse.User from a Facebook account.
+	   *
+	   * @method unlink
+	   * @param {Parse.User} user User to unlink from Facebook. This must be the
+	   *     current user.
+	   * @param {Object} options Standard options object with success and error
+	   *    callbacks.
+	   */
+	  unlink: function unlink(user, options) {
+	    if (!initialized) {
+	      throw new Error('You must initialize FacebookUtils before calling unlink.');
+	    }
+	    return user._unlinkFrom('facebook', options);
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 79 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _get = __webpack_require__(27)['default'];
+
+	var _inherits = __webpack_require__(34)['default'];
+
+	var _classCallCheck = __webpack_require__(15)['default'];
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _ParseObject2 = __webpack_require__(46);
+
+	var _ParseObject3 = _interopRequireDefault(_ParseObject2);
+
+	var Installation = (function (_ParseObject) {
+	  _inherits(Installation, _ParseObject);
+
+	  function Installation(attributes) {
+	    _classCallCheck(this, Installation);
+
+	    _get(Object.getPrototypeOf(Installation.prototype), 'constructor', this).call(this, '_Installation');
+	    if (attributes && typeof attributes === 'object') {
+	      if (!this.set(attributes || {})) {
+	        throw new Error('Can\'t create an invalid Session');
+	      }
+	    }
+	  }
+
+	  return Installation;
+	})(_ParseObject3['default']);
+
+	exports['default'] = Installation;
+
+	_ParseObject3['default'].registerSubclass('_Installation', Installation);
+	module.exports = exports['default'];
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(7)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.send = send;
+
+	var _CoreManager = __webpack_require__(50);
+
+	var _CoreManager2 = _interopRequireDefault(_CoreManager);
+
+	var _ParseQuery = __webpack_require__(61);
+
+	var _ParseQuery2 = _interopRequireDefault(_ParseQuery);
+
+	/**
+	 * Contains functions to deal with Push in Parse.
+	 * @class Parse.Push
+	 * @static
+	 */
+
+	/**
+	 * Sends a push notification.
+	 * @method send
+	 * @param {Object} data -  The data of the push notification.  Valid fields
+	 * are:
+	 *   <ol>
+	 *     <li>channels - An Array of channels to push to.</li>
+	 *     <li>push_time - A Date object for when to send the push.</li>
+	 *     <li>expiration_time -  A Date object for when to expire
+	 *         the push.</li>
+	 *     <li>expiration_interval - The seconds from now to expire the push.</li>
+	 *     <li>where - A Parse.Query over Parse.Installation that is used to match
+	 *         a set of installations to push to.</li>
+	 *     <li>data - The data to send as part of the push</li>
+	 *   <ol>
+	 * @param {Object} options An object that has an optional success function,
+	 * that takes no arguments and will be called on a successful push, and
+	 * an error function that takes a Parse.Error and will be called if the push
+	 * failed.
+	 * @return {Parse.Promise} A promise that is fulfilled when the push request
+	 *     completes.
+	 */
+
+	function send(data, options) {
+	  options = options || {};
+
+	  if (data.where && data.where instanceof _ParseQuery2['default']) {
+	    data.where = data.where.toJSON().where;
+	  }
+
+	  if (data.push_time && typeof data.push_time === 'object') {
+	    data.push_time = data.push_time.toJSON();
+	  }
+
+	  if (data.expiration_time && typeof data.expiration_time === 'object') {
+	    data.expiration_time = data.expiration_time.toJSON();
+	  }
+
+	  if (data.expiration_time && data.expiration_interval) {
+	    throw new Error('expiration_time and expiration_interval cannot both be set.');
+	  }
+
+	  return _CoreManager2['default'].getPushController().send(data, {
+	    useMasterKey: options.useMasterKey
+	  })._thenRunCallbacks(options);
+	}
+
+	_CoreManager2['default'].setPushController({
+	  send: function send(data, options) {
+	    var RESTController = _CoreManager2['default'].getRESTController();
+
+	    var request = RESTController.request('POST', 'push', data, { useMasterKey: !!options.useMasterKey });
+
+	    return request._thenRunCallbacks(options);
+	  }
+	});
+
+/***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {//     Backbone.js 1.2.3
 
 	//     (c) 2010-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -12764,16 +22983,16 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 6 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(7);
+	var content = __webpack_require__(83);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(90)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -12790,21 +23009,21 @@
 	}
 
 /***/ },
-/* 7 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(8)();
+	exports = module.exports = __webpack_require__(84)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "/*!\n * Bootstrap v3.3.5 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  -webkit-text-size-adjust: 100%;\n      -ms-text-size-adjust: 100%;\n}\nbody {\n  margin: 0;\n}\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nhgroup,\nmain,\nmenu,\nnav,\nsection,\nsummary {\n  display: block;\n}\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n  vertical-align: baseline;\n}\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n[hidden],\ntemplate {\n  display: none;\n}\na {\n  background-color: transparent;\n}\na:active,\na:hover {\n  outline: 0;\n}\nabbr[title] {\n  border-bottom: 1px dotted;\n}\nb,\nstrong {\n  font-weight: bold;\n}\ndfn {\n  font-style: italic;\n}\nh1 {\n  margin: .67em 0;\n  font-size: 2em;\n}\nmark {\n  color: #000;\n  background: #ff0;\n}\nsmall {\n  font-size: 80%;\n}\nsub,\nsup {\n  position: relative;\n  font-size: 75%;\n  line-height: 0;\n  vertical-align: baseline;\n}\nsup {\n  top: -.5em;\n}\nsub {\n  bottom: -.25em;\n}\nimg {\n  border: 0;\n}\nsvg:not(:root) {\n  overflow: hidden;\n}\nfigure {\n  margin: 1em 40px;\n}\nhr {\n  height: 0;\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n}\npre {\n  overflow: auto;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  margin: 0;\n  font: inherit;\n  color: inherit;\n}\nbutton {\n  overflow: visible;\n}\nbutton,\nselect {\n  text-transform: none;\n}\nbutton,\nhtml input[type=\"button\"],\ninput[type=\"reset\"],\ninput[type=\"submit\"] {\n  -webkit-appearance: button;\n  cursor: pointer;\n}\nbutton[disabled],\nhtml input[disabled] {\n  cursor: default;\n}\nbutton::-moz-focus-inner,\ninput::-moz-focus-inner {\n  padding: 0;\n  border: 0;\n}\ninput {\n  line-height: normal;\n}\ninput[type=\"checkbox\"],\ninput[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\ninput[type=\"number\"]::-webkit-inner-spin-button,\ninput[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n  -webkit-appearance: textfield;\n}\ninput[type=\"search\"]::-webkit-search-cancel-button,\ninput[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\nfieldset {\n  padding: .35em .625em .75em;\n  margin: 0 2px;\n  border: 1px solid #c0c0c0;\n}\nlegend {\n  padding: 0;\n  border: 0;\n}\ntextarea {\n  overflow: auto;\n}\noptgroup {\n  font-weight: bold;\n}\ntable {\n  border-spacing: 0;\n  border-collapse: collapse;\n}\ntd,\nth {\n  padding: 0;\n}\n/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */\n@media print {\n  *,\n  *:before,\n  *:after {\n    color: #000 !important;\n    text-shadow: none !important;\n    background: transparent !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  a[href]:after {\n    content: \" (\" attr(href) \")\";\n  }\n  abbr[title]:after {\n    content: \" (\" attr(title) \")\";\n  }\n  a[href^=\"#\"]:after,\n  a[href^=\"javascript:\"]:after {\n    content: \"\";\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  img {\n    max-width: 100% !important;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .btn > .caret,\n  .dropup > .btn > .caret {\n    border-top-color: #000 !important;\n  }\n  .label {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n@font-face {\n  font-family: 'Glyphicons Halflings';\n\n  src: url(" + __webpack_require__(9) + ");\n  src: url(" + __webpack_require__(9) + "?#iefix) format('embedded-opentype'), url(" + __webpack_require__(10) + ") format('woff2'), url(" + __webpack_require__(11) + ") format('woff'), url(" + __webpack_require__(12) + ") format('truetype'), url(" + __webpack_require__(13) + "#glyphicons_halflingsregular) format('svg');\n}\n.glyphicon {\n  position: relative;\n  top: 1px;\n  display: inline-block;\n  font-family: 'Glyphicons Halflings';\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1;\n\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n.glyphicon-asterisk:before {\n  content: \"*\";\n}\n.glyphicon-plus:before {\n  content: \"+\";\n}\n.glyphicon-euro:before,\n.glyphicon-eur:before {\n  content: \"\\20AC\";\n}\n.glyphicon-minus:before {\n  content: \"\\2212\";\n}\n.glyphicon-cloud:before {\n  content: \"\\2601\";\n}\n.glyphicon-envelope:before {\n  content: \"\\2709\";\n}\n.glyphicon-pencil:before {\n  content: \"\\270F\";\n}\n.glyphicon-glass:before {\n  content: \"\\E001\";\n}\n.glyphicon-music:before {\n  content: \"\\E002\";\n}\n.glyphicon-search:before {\n  content: \"\\E003\";\n}\n.glyphicon-heart:before {\n  content: \"\\E005\";\n}\n.glyphicon-star:before {\n  content: \"\\E006\";\n}\n.glyphicon-star-empty:before {\n  content: \"\\E007\";\n}\n.glyphicon-user:before {\n  content: \"\\E008\";\n}\n.glyphicon-film:before {\n  content: \"\\E009\";\n}\n.glyphicon-th-large:before {\n  content: \"\\E010\";\n}\n.glyphicon-th:before {\n  content: \"\\E011\";\n}\n.glyphicon-th-list:before {\n  content: \"\\E012\";\n}\n.glyphicon-ok:before {\n  content: \"\\E013\";\n}\n.glyphicon-remove:before {\n  content: \"\\E014\";\n}\n.glyphicon-zoom-in:before {\n  content: \"\\E015\";\n}\n.glyphicon-zoom-out:before {\n  content: \"\\E016\";\n}\n.glyphicon-off:before {\n  content: \"\\E017\";\n}\n.glyphicon-signal:before {\n  content: \"\\E018\";\n}\n.glyphicon-cog:before {\n  content: \"\\E019\";\n}\n.glyphicon-trash:before {\n  content: \"\\E020\";\n}\n.glyphicon-home:before {\n  content: \"\\E021\";\n}\n.glyphicon-file:before {\n  content: \"\\E022\";\n}\n.glyphicon-time:before {\n  content: \"\\E023\";\n}\n.glyphicon-road:before {\n  content: \"\\E024\";\n}\n.glyphicon-download-alt:before {\n  content: \"\\E025\";\n}\n.glyphicon-download:before {\n  content: \"\\E026\";\n}\n.glyphicon-upload:before {\n  content: \"\\E027\";\n}\n.glyphicon-inbox:before {\n  content: \"\\E028\";\n}\n.glyphicon-play-circle:before {\n  content: \"\\E029\";\n}\n.glyphicon-repeat:before {\n  content: \"\\E030\";\n}\n.glyphicon-refresh:before {\n  content: \"\\E031\";\n}\n.glyphicon-list-alt:before {\n  content: \"\\E032\";\n}\n.glyphicon-lock:before {\n  content: \"\\E033\";\n}\n.glyphicon-flag:before {\n  content: \"\\E034\";\n}\n.glyphicon-headphones:before {\n  content: \"\\E035\";\n}\n.glyphicon-volume-off:before {\n  content: \"\\E036\";\n}\n.glyphicon-volume-down:before {\n  content: \"\\E037\";\n}\n.glyphicon-volume-up:before {\n  content: \"\\E038\";\n}\n.glyphicon-qrcode:before {\n  content: \"\\E039\";\n}\n.glyphicon-barcode:before {\n  content: \"\\E040\";\n}\n.glyphicon-tag:before {\n  content: \"\\E041\";\n}\n.glyphicon-tags:before {\n  content: \"\\E042\";\n}\n.glyphicon-book:before {\n  content: \"\\E043\";\n}\n.glyphicon-bookmark:before {\n  content: \"\\E044\";\n}\n.glyphicon-print:before {\n  content: \"\\E045\";\n}\n.glyphicon-camera:before {\n  content: \"\\E046\";\n}\n.glyphicon-font:before {\n  content: \"\\E047\";\n}\n.glyphicon-bold:before {\n  content: \"\\E048\";\n}\n.glyphicon-italic:before {\n  content: \"\\E049\";\n}\n.glyphicon-text-height:before {\n  content: \"\\E050\";\n}\n.glyphicon-text-width:before {\n  content: \"\\E051\";\n}\n.glyphicon-align-left:before {\n  content: \"\\E052\";\n}\n.glyphicon-align-center:before {\n  content: \"\\E053\";\n}\n.glyphicon-align-right:before {\n  content: \"\\E054\";\n}\n.glyphicon-align-justify:before {\n  content: \"\\E055\";\n}\n.glyphicon-list:before {\n  content: \"\\E056\";\n}\n.glyphicon-indent-left:before {\n  content: \"\\E057\";\n}\n.glyphicon-indent-right:before {\n  content: \"\\E058\";\n}\n.glyphicon-facetime-video:before {\n  content: \"\\E059\";\n}\n.glyphicon-picture:before {\n  content: \"\\E060\";\n}\n.glyphicon-map-marker:before {\n  content: \"\\E062\";\n}\n.glyphicon-adjust:before {\n  content: \"\\E063\";\n}\n.glyphicon-tint:before {\n  content: \"\\E064\";\n}\n.glyphicon-edit:before {\n  content: \"\\E065\";\n}\n.glyphicon-share:before {\n  content: \"\\E066\";\n}\n.glyphicon-check:before {\n  content: \"\\E067\";\n}\n.glyphicon-move:before {\n  content: \"\\E068\";\n}\n.glyphicon-step-backward:before {\n  content: \"\\E069\";\n}\n.glyphicon-fast-backward:before {\n  content: \"\\E070\";\n}\n.glyphicon-backward:before {\n  content: \"\\E071\";\n}\n.glyphicon-play:before {\n  content: \"\\E072\";\n}\n.glyphicon-pause:before {\n  content: \"\\E073\";\n}\n.glyphicon-stop:before {\n  content: \"\\E074\";\n}\n.glyphicon-forward:before {\n  content: \"\\E075\";\n}\n.glyphicon-fast-forward:before {\n  content: \"\\E076\";\n}\n.glyphicon-step-forward:before {\n  content: \"\\E077\";\n}\n.glyphicon-eject:before {\n  content: \"\\E078\";\n}\n.glyphicon-chevron-left:before {\n  content: \"\\E079\";\n}\n.glyphicon-chevron-right:before {\n  content: \"\\E080\";\n}\n.glyphicon-plus-sign:before {\n  content: \"\\E081\";\n}\n.glyphicon-minus-sign:before {\n  content: \"\\E082\";\n}\n.glyphicon-remove-sign:before {\n  content: \"\\E083\";\n}\n.glyphicon-ok-sign:before {\n  content: \"\\E084\";\n}\n.glyphicon-question-sign:before {\n  content: \"\\E085\";\n}\n.glyphicon-info-sign:before {\n  content: \"\\E086\";\n}\n.glyphicon-screenshot:before {\n  content: \"\\E087\";\n}\n.glyphicon-remove-circle:before {\n  content: \"\\E088\";\n}\n.glyphicon-ok-circle:before {\n  content: \"\\E089\";\n}\n.glyphicon-ban-circle:before {\n  content: \"\\E090\";\n}\n.glyphicon-arrow-left:before {\n  content: \"\\E091\";\n}\n.glyphicon-arrow-right:before {\n  content: \"\\E092\";\n}\n.glyphicon-arrow-up:before {\n  content: \"\\E093\";\n}\n.glyphicon-arrow-down:before {\n  content: \"\\E094\";\n}\n.glyphicon-share-alt:before {\n  content: \"\\E095\";\n}\n.glyphicon-resize-full:before {\n  content: \"\\E096\";\n}\n.glyphicon-resize-small:before {\n  content: \"\\E097\";\n}\n.glyphicon-exclamation-sign:before {\n  content: \"\\E101\";\n}\n.glyphicon-gift:before {\n  content: \"\\E102\";\n}\n.glyphicon-leaf:before {\n  content: \"\\E103\";\n}\n.glyphicon-fire:before {\n  content: \"\\E104\";\n}\n.glyphicon-eye-open:before {\n  content: \"\\E105\";\n}\n.glyphicon-eye-close:before {\n  content: \"\\E106\";\n}\n.glyphicon-warning-sign:before {\n  content: \"\\E107\";\n}\n.glyphicon-plane:before {\n  content: \"\\E108\";\n}\n.glyphicon-calendar:before {\n  content: \"\\E109\";\n}\n.glyphicon-random:before {\n  content: \"\\E110\";\n}\n.glyphicon-comment:before {\n  content: \"\\E111\";\n}\n.glyphicon-magnet:before {\n  content: \"\\E112\";\n}\n.glyphicon-chevron-up:before {\n  content: \"\\E113\";\n}\n.glyphicon-chevron-down:before {\n  content: \"\\E114\";\n}\n.glyphicon-retweet:before {\n  content: \"\\E115\";\n}\n.glyphicon-shopping-cart:before {\n  content: \"\\E116\";\n}\n.glyphicon-folder-close:before {\n  content: \"\\E117\";\n}\n.glyphicon-folder-open:before {\n  content: \"\\E118\";\n}\n.glyphicon-resize-vertical:before {\n  content: \"\\E119\";\n}\n.glyphicon-resize-horizontal:before {\n  content: \"\\E120\";\n}\n.glyphicon-hdd:before {\n  content: \"\\E121\";\n}\n.glyphicon-bullhorn:before {\n  content: \"\\E122\";\n}\n.glyphicon-bell:before {\n  content: \"\\E123\";\n}\n.glyphicon-certificate:before {\n  content: \"\\E124\";\n}\n.glyphicon-thumbs-up:before {\n  content: \"\\E125\";\n}\n.glyphicon-thumbs-down:before {\n  content: \"\\E126\";\n}\n.glyphicon-hand-right:before {\n  content: \"\\E127\";\n}\n.glyphicon-hand-left:before {\n  content: \"\\E128\";\n}\n.glyphicon-hand-up:before {\n  content: \"\\E129\";\n}\n.glyphicon-hand-down:before {\n  content: \"\\E130\";\n}\n.glyphicon-circle-arrow-right:before {\n  content: \"\\E131\";\n}\n.glyphicon-circle-arrow-left:before {\n  content: \"\\E132\";\n}\n.glyphicon-circle-arrow-up:before {\n  content: \"\\E133\";\n}\n.glyphicon-circle-arrow-down:before {\n  content: \"\\E134\";\n}\n.glyphicon-globe:before {\n  content: \"\\E135\";\n}\n.glyphicon-wrench:before {\n  content: \"\\E136\";\n}\n.glyphicon-tasks:before {\n  content: \"\\E137\";\n}\n.glyphicon-filter:before {\n  content: \"\\E138\";\n}\n.glyphicon-briefcase:before {\n  content: \"\\E139\";\n}\n.glyphicon-fullscreen:before {\n  content: \"\\E140\";\n}\n.glyphicon-dashboard:before {\n  content: \"\\E141\";\n}\n.glyphicon-paperclip:before {\n  content: \"\\E142\";\n}\n.glyphicon-heart-empty:before {\n  content: \"\\E143\";\n}\n.glyphicon-link:before {\n  content: \"\\E144\";\n}\n.glyphicon-phone:before {\n  content: \"\\E145\";\n}\n.glyphicon-pushpin:before {\n  content: \"\\E146\";\n}\n.glyphicon-usd:before {\n  content: \"\\E148\";\n}\n.glyphicon-gbp:before {\n  content: \"\\E149\";\n}\n.glyphicon-sort:before {\n  content: \"\\E150\";\n}\n.glyphicon-sort-by-alphabet:before {\n  content: \"\\E151\";\n}\n.glyphicon-sort-by-alphabet-alt:before {\n  content: \"\\E152\";\n}\n.glyphicon-sort-by-order:before {\n  content: \"\\E153\";\n}\n.glyphicon-sort-by-order-alt:before {\n  content: \"\\E154\";\n}\n.glyphicon-sort-by-attributes:before {\n  content: \"\\E155\";\n}\n.glyphicon-sort-by-attributes-alt:before {\n  content: \"\\E156\";\n}\n.glyphicon-unchecked:before {\n  content: \"\\E157\";\n}\n.glyphicon-expand:before {\n  content: \"\\E158\";\n}\n.glyphicon-collapse-down:before {\n  content: \"\\E159\";\n}\n.glyphicon-collapse-up:before {\n  content: \"\\E160\";\n}\n.glyphicon-log-in:before {\n  content: \"\\E161\";\n}\n.glyphicon-flash:before {\n  content: \"\\E162\";\n}\n.glyphicon-log-out:before {\n  content: \"\\E163\";\n}\n.glyphicon-new-window:before {\n  content: \"\\E164\";\n}\n.glyphicon-record:before {\n  content: \"\\E165\";\n}\n.glyphicon-save:before {\n  content: \"\\E166\";\n}\n.glyphicon-open:before {\n  content: \"\\E167\";\n}\n.glyphicon-saved:before {\n  content: \"\\E168\";\n}\n.glyphicon-import:before {\n  content: \"\\E169\";\n}\n.glyphicon-export:before {\n  content: \"\\E170\";\n}\n.glyphicon-send:before {\n  content: \"\\E171\";\n}\n.glyphicon-floppy-disk:before {\n  content: \"\\E172\";\n}\n.glyphicon-floppy-saved:before {\n  content: \"\\E173\";\n}\n.glyphicon-floppy-remove:before {\n  content: \"\\E174\";\n}\n.glyphicon-floppy-save:before {\n  content: \"\\E175\";\n}\n.glyphicon-floppy-open:before {\n  content: \"\\E176\";\n}\n.glyphicon-credit-card:before {\n  content: \"\\E177\";\n}\n.glyphicon-transfer:before {\n  content: \"\\E178\";\n}\n.glyphicon-cutlery:before {\n  content: \"\\E179\";\n}\n.glyphicon-header:before {\n  content: \"\\E180\";\n}\n.glyphicon-compressed:before {\n  content: \"\\E181\";\n}\n.glyphicon-earphone:before {\n  content: \"\\E182\";\n}\n.glyphicon-phone-alt:before {\n  content: \"\\E183\";\n}\n.glyphicon-tower:before {\n  content: \"\\E184\";\n}\n.glyphicon-stats:before {\n  content: \"\\E185\";\n}\n.glyphicon-sd-video:before {\n  content: \"\\E186\";\n}\n.glyphicon-hd-video:before {\n  content: \"\\E187\";\n}\n.glyphicon-subtitles:before {\n  content: \"\\E188\";\n}\n.glyphicon-sound-stereo:before {\n  content: \"\\E189\";\n}\n.glyphicon-sound-dolby:before {\n  content: \"\\E190\";\n}\n.glyphicon-sound-5-1:before {\n  content: \"\\E191\";\n}\n.glyphicon-sound-6-1:before {\n  content: \"\\E192\";\n}\n.glyphicon-sound-7-1:before {\n  content: \"\\E193\";\n}\n.glyphicon-copyright-mark:before {\n  content: \"\\E194\";\n}\n.glyphicon-registration-mark:before {\n  content: \"\\E195\";\n}\n.glyphicon-cloud-download:before {\n  content: \"\\E197\";\n}\n.glyphicon-cloud-upload:before {\n  content: \"\\E198\";\n}\n.glyphicon-tree-conifer:before {\n  content: \"\\E199\";\n}\n.glyphicon-tree-deciduous:before {\n  content: \"\\E200\";\n}\n.glyphicon-cd:before {\n  content: \"\\E201\";\n}\n.glyphicon-save-file:before {\n  content: \"\\E202\";\n}\n.glyphicon-open-file:before {\n  content: \"\\E203\";\n}\n.glyphicon-level-up:before {\n  content: \"\\E204\";\n}\n.glyphicon-copy:before {\n  content: \"\\E205\";\n}\n.glyphicon-paste:before {\n  content: \"\\E206\";\n}\n.glyphicon-alert:before {\n  content: \"\\E209\";\n}\n.glyphicon-equalizer:before {\n  content: \"\\E210\";\n}\n.glyphicon-king:before {\n  content: \"\\E211\";\n}\n.glyphicon-queen:before {\n  content: \"\\E212\";\n}\n.glyphicon-pawn:before {\n  content: \"\\E213\";\n}\n.glyphicon-bishop:before {\n  content: \"\\E214\";\n}\n.glyphicon-knight:before {\n  content: \"\\E215\";\n}\n.glyphicon-baby-formula:before {\n  content: \"\\E216\";\n}\n.glyphicon-tent:before {\n  content: \"\\26FA\";\n}\n.glyphicon-blackboard:before {\n  content: \"\\E218\";\n}\n.glyphicon-bed:before {\n  content: \"\\E219\";\n}\n.glyphicon-apple:before {\n  content: \"\\F8FF\";\n}\n.glyphicon-erase:before {\n  content: \"\\E221\";\n}\n.glyphicon-hourglass:before {\n  content: \"\\231B\";\n}\n.glyphicon-lamp:before {\n  content: \"\\E223\";\n}\n.glyphicon-duplicate:before {\n  content: \"\\E224\";\n}\n.glyphicon-piggy-bank:before {\n  content: \"\\E225\";\n}\n.glyphicon-scissors:before {\n  content: \"\\E226\";\n}\n.glyphicon-bitcoin:before {\n  content: \"\\E227\";\n}\n.glyphicon-btc:before {\n  content: \"\\E227\";\n}\n.glyphicon-xbt:before {\n  content: \"\\E227\";\n}\n.glyphicon-yen:before {\n  content: \"\\A5\";\n}\n.glyphicon-jpy:before {\n  content: \"\\A5\";\n}\n.glyphicon-ruble:before {\n  content: \"\\20BD\";\n}\n.glyphicon-rub:before {\n  content: \"\\20BD\";\n}\n.glyphicon-scale:before {\n  content: \"\\E230\";\n}\n.glyphicon-ice-lolly:before {\n  content: \"\\E231\";\n}\n.glyphicon-ice-lolly-tasted:before {\n  content: \"\\E232\";\n}\n.glyphicon-education:before {\n  content: \"\\E233\";\n}\n.glyphicon-option-horizontal:before {\n  content: \"\\E234\";\n}\n.glyphicon-option-vertical:before {\n  content: \"\\E235\";\n}\n.glyphicon-menu-hamburger:before {\n  content: \"\\E236\";\n}\n.glyphicon-modal-window:before {\n  content: \"\\E237\";\n}\n.glyphicon-oil:before {\n  content: \"\\E238\";\n}\n.glyphicon-grain:before {\n  content: \"\\E239\";\n}\n.glyphicon-sunglasses:before {\n  content: \"\\E240\";\n}\n.glyphicon-text-size:before {\n  content: \"\\E241\";\n}\n.glyphicon-text-color:before {\n  content: \"\\E242\";\n}\n.glyphicon-text-background:before {\n  content: \"\\E243\";\n}\n.glyphicon-object-align-top:before {\n  content: \"\\E244\";\n}\n.glyphicon-object-align-bottom:before {\n  content: \"\\E245\";\n}\n.glyphicon-object-align-horizontal:before {\n  content: \"\\E246\";\n}\n.glyphicon-object-align-left:before {\n  content: \"\\E247\";\n}\n.glyphicon-object-align-vertical:before {\n  content: \"\\E248\";\n}\n.glyphicon-object-align-right:before {\n  content: \"\\E249\";\n}\n.glyphicon-triangle-right:before {\n  content: \"\\E250\";\n}\n.glyphicon-triangle-left:before {\n  content: \"\\E251\";\n}\n.glyphicon-triangle-bottom:before {\n  content: \"\\E252\";\n}\n.glyphicon-triangle-top:before {\n  content: \"\\E253\";\n}\n.glyphicon-console:before {\n  content: \"\\E254\";\n}\n.glyphicon-superscript:before {\n  content: \"\\E255\";\n}\n.glyphicon-subscript:before {\n  content: \"\\E256\";\n}\n.glyphicon-menu-left:before {\n  content: \"\\E257\";\n}\n.glyphicon-menu-right:before {\n  content: \"\\E258\";\n}\n.glyphicon-menu-down:before {\n  content: \"\\E259\";\n}\n.glyphicon-menu-up:before {\n  content: \"\\E260\";\n}\n* {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n*:before,\n*:after {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\nhtml {\n  font-size: 10px;\n\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n}\nbody {\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #333;\n  background-color: #fff;\n}\ninput,\nbutton,\nselect,\ntextarea {\n  font-family: inherit;\n  font-size: inherit;\n  line-height: inherit;\n}\na {\n  color: #337ab7;\n  text-decoration: none;\n}\na:hover,\na:focus {\n  color: #23527c;\n  text-decoration: underline;\n}\na:focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\nfigure {\n  margin: 0;\n}\nimg {\n  vertical-align: middle;\n}\n.img-responsive,\n.thumbnail > img,\n.thumbnail a > img,\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  display: block;\n  max-width: 100%;\n  height: auto;\n}\n.img-rounded {\n  border-radius: 6px;\n}\n.img-thumbnail {\n  display: inline-block;\n  max-width: 100%;\n  height: auto;\n  padding: 4px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: all .2s ease-in-out;\n       -o-transition: all .2s ease-in-out;\n          transition: all .2s ease-in-out;\n}\n.img-circle {\n  border-radius: 50%;\n}\nhr {\n  margin-top: 20px;\n  margin-bottom: 20px;\n  border: 0;\n  border-top: 1px solid #eee;\n}\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n.sr-only-focusable:active,\n.sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n[role=\"button\"] {\n  cursor: pointer;\n}\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\n.h1,\n.h2,\n.h3,\n.h4,\n.h5,\n.h6 {\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\nh1 small,\nh2 small,\nh3 small,\nh4 small,\nh5 small,\nh6 small,\n.h1 small,\n.h2 small,\n.h3 small,\n.h4 small,\n.h5 small,\n.h6 small,\nh1 .small,\nh2 .small,\nh3 .small,\nh4 .small,\nh5 .small,\nh6 .small,\n.h1 .small,\n.h2 .small,\n.h3 .small,\n.h4 .small,\n.h5 .small,\n.h6 .small {\n  font-weight: normal;\n  line-height: 1;\n  color: #777;\n}\nh1,\n.h1,\nh2,\n.h2,\nh3,\n.h3 {\n  margin-top: 20px;\n  margin-bottom: 10px;\n}\nh1 small,\n.h1 small,\nh2 small,\n.h2 small,\nh3 small,\n.h3 small,\nh1 .small,\n.h1 .small,\nh2 .small,\n.h2 .small,\nh3 .small,\n.h3 .small {\n  font-size: 65%;\n}\nh4,\n.h4,\nh5,\n.h5,\nh6,\n.h6 {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\nh4 small,\n.h4 small,\nh5 small,\n.h5 small,\nh6 small,\n.h6 small,\nh4 .small,\n.h4 .small,\nh5 .small,\n.h5 .small,\nh6 .small,\n.h6 .small {\n  font-size: 75%;\n}\nh1,\n.h1 {\n  font-size: 36px;\n}\nh2,\n.h2 {\n  font-size: 30px;\n}\nh3,\n.h3 {\n  font-size: 24px;\n}\nh4,\n.h4 {\n  font-size: 18px;\n}\nh5,\n.h5 {\n  font-size: 14px;\n}\nh6,\n.h6 {\n  font-size: 12px;\n}\np {\n  margin: 0 0 10px;\n}\n.lead {\n  margin-bottom: 20px;\n  font-size: 16px;\n  font-weight: 300;\n  line-height: 1.4;\n}\n@media (min-width: 768px) {\n  .lead {\n    font-size: 21px;\n  }\n}\nsmall,\n.small {\n  font-size: 85%;\n}\nmark,\n.mark {\n  padding: .2em;\n  background-color: #fcf8e3;\n}\n.text-left {\n  text-align: left;\n}\n.text-right {\n  text-align: right;\n}\n.text-center {\n  text-align: center;\n}\n.text-justify {\n  text-align: justify;\n}\n.text-nowrap {\n  white-space: nowrap;\n}\n.text-lowercase {\n  text-transform: lowercase;\n}\n.text-uppercase {\n  text-transform: uppercase;\n}\n.text-capitalize {\n  text-transform: capitalize;\n}\n.text-muted {\n  color: #777;\n}\n.text-primary {\n  color: #337ab7;\n}\na.text-primary:hover,\na.text-primary:focus {\n  color: #286090;\n}\n.text-success {\n  color: #3c763d;\n}\na.text-success:hover,\na.text-success:focus {\n  color: #2b542c;\n}\n.text-info {\n  color: #31708f;\n}\na.text-info:hover,\na.text-info:focus {\n  color: #245269;\n}\n.text-warning {\n  color: #8a6d3b;\n}\na.text-warning:hover,\na.text-warning:focus {\n  color: #66512c;\n}\n.text-danger {\n  color: #a94442;\n}\na.text-danger:hover,\na.text-danger:focus {\n  color: #843534;\n}\n.bg-primary {\n  color: #fff;\n  background-color: #337ab7;\n}\na.bg-primary:hover,\na.bg-primary:focus {\n  background-color: #286090;\n}\n.bg-success {\n  background-color: #dff0d8;\n}\na.bg-success:hover,\na.bg-success:focus {\n  background-color: #c1e2b3;\n}\n.bg-info {\n  background-color: #d9edf7;\n}\na.bg-info:hover,\na.bg-info:focus {\n  background-color: #afd9ee;\n}\n.bg-warning {\n  background-color: #fcf8e3;\n}\na.bg-warning:hover,\na.bg-warning:focus {\n  background-color: #f7ecb5;\n}\n.bg-danger {\n  background-color: #f2dede;\n}\na.bg-danger:hover,\na.bg-danger:focus {\n  background-color: #e4b9b9;\n}\n.page-header {\n  padding-bottom: 9px;\n  margin: 40px 0 20px;\n  border-bottom: 1px solid #eee;\n}\nul,\nol {\n  margin-top: 0;\n  margin-bottom: 10px;\n}\nul ul,\nol ul,\nul ol,\nol ol {\n  margin-bottom: 0;\n}\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n.list-inline {\n  padding-left: 0;\n  margin-left: -5px;\n  list-style: none;\n}\n.list-inline > li {\n  display: inline-block;\n  padding-right: 5px;\n  padding-left: 5px;\n}\ndl {\n  margin-top: 0;\n  margin-bottom: 20px;\n}\ndt,\ndd {\n  line-height: 1.42857143;\n}\ndt {\n  font-weight: bold;\n}\ndd {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .dl-horizontal dt {\n    float: left;\n    width: 160px;\n    overflow: hidden;\n    clear: left;\n    text-align: right;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n  .dl-horizontal dd {\n    margin-left: 180px;\n  }\n}\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n  border-bottom: 1px dotted #777;\n}\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\nblockquote {\n  padding: 10px 20px;\n  margin: 0 0 20px;\n  font-size: 17.5px;\n  border-left: 5px solid #eee;\n}\nblockquote p:last-child,\nblockquote ul:last-child,\nblockquote ol:last-child {\n  margin-bottom: 0;\n}\nblockquote footer,\nblockquote small,\nblockquote .small {\n  display: block;\n  font-size: 80%;\n  line-height: 1.42857143;\n  color: #777;\n}\nblockquote footer:before,\nblockquote small:before,\nblockquote .small:before {\n  content: '\\2014   \\A0';\n}\n.blockquote-reverse,\nblockquote.pull-right {\n  padding-right: 15px;\n  padding-left: 0;\n  text-align: right;\n  border-right: 5px solid #eee;\n  border-left: 0;\n}\n.blockquote-reverse footer:before,\nblockquote.pull-right footer:before,\n.blockquote-reverse small:before,\nblockquote.pull-right small:before,\n.blockquote-reverse .small:before,\nblockquote.pull-right .small:before {\n  content: '';\n}\n.blockquote-reverse footer:after,\nblockquote.pull-right footer:after,\n.blockquote-reverse small:after,\nblockquote.pull-right small:after,\n.blockquote-reverse .small:after,\nblockquote.pull-right .small:after {\n  content: '\\A0   \\2014';\n}\naddress {\n  margin-bottom: 20px;\n  font-style: normal;\n  line-height: 1.42857143;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n}\ncode {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #c7254e;\n  background-color: #f9f2f4;\n  border-radius: 4px;\n}\nkbd {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #fff;\n  background-color: #333;\n  border-radius: 3px;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n}\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\npre {\n  display: block;\n  padding: 9.5px;\n  margin: 0 0 10px;\n  font-size: 13px;\n  line-height: 1.42857143;\n  color: #333;\n  word-break: break-all;\n  word-wrap: break-word;\n  background-color: #f5f5f5;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  white-space: pre-wrap;\n  background-color: transparent;\n  border-radius: 0;\n}\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n.container {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n@media (min-width: 768px) {\n  .container {\n    width: 750px;\n  }\n}\n@media (min-width: 992px) {\n  .container {\n    width: 970px;\n  }\n}\n@media (min-width: 1200px) {\n  .container {\n    width: 1170px;\n  }\n}\n.container-fluid {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n.row {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left;\n}\n.col-xs-12 {\n  width: 100%;\n}\n.col-xs-11 {\n  width: 91.66666667%;\n}\n.col-xs-10 {\n  width: 83.33333333%;\n}\n.col-xs-9 {\n  width: 75%;\n}\n.col-xs-8 {\n  width: 66.66666667%;\n}\n.col-xs-7 {\n  width: 58.33333333%;\n}\n.col-xs-6 {\n  width: 50%;\n}\n.col-xs-5 {\n  width: 41.66666667%;\n}\n.col-xs-4 {\n  width: 33.33333333%;\n}\n.col-xs-3 {\n  width: 25%;\n}\n.col-xs-2 {\n  width: 16.66666667%;\n}\n.col-xs-1 {\n  width: 8.33333333%;\n}\n.col-xs-pull-12 {\n  right: 100%;\n}\n.col-xs-pull-11 {\n  right: 91.66666667%;\n}\n.col-xs-pull-10 {\n  right: 83.33333333%;\n}\n.col-xs-pull-9 {\n  right: 75%;\n}\n.col-xs-pull-8 {\n  right: 66.66666667%;\n}\n.col-xs-pull-7 {\n  right: 58.33333333%;\n}\n.col-xs-pull-6 {\n  right: 50%;\n}\n.col-xs-pull-5 {\n  right: 41.66666667%;\n}\n.col-xs-pull-4 {\n  right: 33.33333333%;\n}\n.col-xs-pull-3 {\n  right: 25%;\n}\n.col-xs-pull-2 {\n  right: 16.66666667%;\n}\n.col-xs-pull-1 {\n  right: 8.33333333%;\n}\n.col-xs-pull-0 {\n  right: auto;\n}\n.col-xs-push-12 {\n  left: 100%;\n}\n.col-xs-push-11 {\n  left: 91.66666667%;\n}\n.col-xs-push-10 {\n  left: 83.33333333%;\n}\n.col-xs-push-9 {\n  left: 75%;\n}\n.col-xs-push-8 {\n  left: 66.66666667%;\n}\n.col-xs-push-7 {\n  left: 58.33333333%;\n}\n.col-xs-push-6 {\n  left: 50%;\n}\n.col-xs-push-5 {\n  left: 41.66666667%;\n}\n.col-xs-push-4 {\n  left: 33.33333333%;\n}\n.col-xs-push-3 {\n  left: 25%;\n}\n.col-xs-push-2 {\n  left: 16.66666667%;\n}\n.col-xs-push-1 {\n  left: 8.33333333%;\n}\n.col-xs-push-0 {\n  left: auto;\n}\n.col-xs-offset-12 {\n  margin-left: 100%;\n}\n.col-xs-offset-11 {\n  margin-left: 91.66666667%;\n}\n.col-xs-offset-10 {\n  margin-left: 83.33333333%;\n}\n.col-xs-offset-9 {\n  margin-left: 75%;\n}\n.col-xs-offset-8 {\n  margin-left: 66.66666667%;\n}\n.col-xs-offset-7 {\n  margin-left: 58.33333333%;\n}\n.col-xs-offset-6 {\n  margin-left: 50%;\n}\n.col-xs-offset-5 {\n  margin-left: 41.66666667%;\n}\n.col-xs-offset-4 {\n  margin-left: 33.33333333%;\n}\n.col-xs-offset-3 {\n  margin-left: 25%;\n}\n.col-xs-offset-2 {\n  margin-left: 16.66666667%;\n}\n.col-xs-offset-1 {\n  margin-left: 8.33333333%;\n}\n.col-xs-offset-0 {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left;\n  }\n  .col-sm-12 {\n    width: 100%;\n  }\n  .col-sm-11 {\n    width: 91.66666667%;\n  }\n  .col-sm-10 {\n    width: 83.33333333%;\n  }\n  .col-sm-9 {\n    width: 75%;\n  }\n  .col-sm-8 {\n    width: 66.66666667%;\n  }\n  .col-sm-7 {\n    width: 58.33333333%;\n  }\n  .col-sm-6 {\n    width: 50%;\n  }\n  .col-sm-5 {\n    width: 41.66666667%;\n  }\n  .col-sm-4 {\n    width: 33.33333333%;\n  }\n  .col-sm-3 {\n    width: 25%;\n  }\n  .col-sm-2 {\n    width: 16.66666667%;\n  }\n  .col-sm-1 {\n    width: 8.33333333%;\n  }\n  .col-sm-pull-12 {\n    right: 100%;\n  }\n  .col-sm-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-sm-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-sm-pull-9 {\n    right: 75%;\n  }\n  .col-sm-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-sm-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-sm-pull-6 {\n    right: 50%;\n  }\n  .col-sm-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-sm-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-sm-pull-3 {\n    right: 25%;\n  }\n  .col-sm-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-sm-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-sm-pull-0 {\n    right: auto;\n  }\n  .col-sm-push-12 {\n    left: 100%;\n  }\n  .col-sm-push-11 {\n    left: 91.66666667%;\n  }\n  .col-sm-push-10 {\n    left: 83.33333333%;\n  }\n  .col-sm-push-9 {\n    left: 75%;\n  }\n  .col-sm-push-8 {\n    left: 66.66666667%;\n  }\n  .col-sm-push-7 {\n    left: 58.33333333%;\n  }\n  .col-sm-push-6 {\n    left: 50%;\n  }\n  .col-sm-push-5 {\n    left: 41.66666667%;\n  }\n  .col-sm-push-4 {\n    left: 33.33333333%;\n  }\n  .col-sm-push-3 {\n    left: 25%;\n  }\n  .col-sm-push-2 {\n    left: 16.66666667%;\n  }\n  .col-sm-push-1 {\n    left: 8.33333333%;\n  }\n  .col-sm-push-0 {\n    left: auto;\n  }\n  .col-sm-offset-12 {\n    margin-left: 100%;\n  }\n  .col-sm-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-sm-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-sm-offset-9 {\n    margin-left: 75%;\n  }\n  .col-sm-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-sm-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-sm-offset-6 {\n    margin-left: 50%;\n  }\n  .col-sm-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-sm-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-sm-offset-3 {\n    margin-left: 25%;\n  }\n  .col-sm-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-sm-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-sm-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left;\n  }\n  .col-md-12 {\n    width: 100%;\n  }\n  .col-md-11 {\n    width: 91.66666667%;\n  }\n  .col-md-10 {\n    width: 83.33333333%;\n  }\n  .col-md-9 {\n    width: 75%;\n  }\n  .col-md-8 {\n    width: 66.66666667%;\n  }\n  .col-md-7 {\n    width: 58.33333333%;\n  }\n  .col-md-6 {\n    width: 50%;\n  }\n  .col-md-5 {\n    width: 41.66666667%;\n  }\n  .col-md-4 {\n    width: 33.33333333%;\n  }\n  .col-md-3 {\n    width: 25%;\n  }\n  .col-md-2 {\n    width: 16.66666667%;\n  }\n  .col-md-1 {\n    width: 8.33333333%;\n  }\n  .col-md-pull-12 {\n    right: 100%;\n  }\n  .col-md-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-md-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-md-pull-9 {\n    right: 75%;\n  }\n  .col-md-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-md-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-md-pull-6 {\n    right: 50%;\n  }\n  .col-md-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-md-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-md-pull-3 {\n    right: 25%;\n  }\n  .col-md-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-md-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-md-pull-0 {\n    right: auto;\n  }\n  .col-md-push-12 {\n    left: 100%;\n  }\n  .col-md-push-11 {\n    left: 91.66666667%;\n  }\n  .col-md-push-10 {\n    left: 83.33333333%;\n  }\n  .col-md-push-9 {\n    left: 75%;\n  }\n  .col-md-push-8 {\n    left: 66.66666667%;\n  }\n  .col-md-push-7 {\n    left: 58.33333333%;\n  }\n  .col-md-push-6 {\n    left: 50%;\n  }\n  .col-md-push-5 {\n    left: 41.66666667%;\n  }\n  .col-md-push-4 {\n    left: 33.33333333%;\n  }\n  .col-md-push-3 {\n    left: 25%;\n  }\n  .col-md-push-2 {\n    left: 16.66666667%;\n  }\n  .col-md-push-1 {\n    left: 8.33333333%;\n  }\n  .col-md-push-0 {\n    left: auto;\n  }\n  .col-md-offset-12 {\n    margin-left: 100%;\n  }\n  .col-md-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-md-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-md-offset-9 {\n    margin-left: 75%;\n  }\n  .col-md-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-md-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-md-offset-6 {\n    margin-left: 50%;\n  }\n  .col-md-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-md-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-md-offset-3 {\n    margin-left: 25%;\n  }\n  .col-md-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-md-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-md-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left;\n  }\n  .col-lg-12 {\n    width: 100%;\n  }\n  .col-lg-11 {\n    width: 91.66666667%;\n  }\n  .col-lg-10 {\n    width: 83.33333333%;\n  }\n  .col-lg-9 {\n    width: 75%;\n  }\n  .col-lg-8 {\n    width: 66.66666667%;\n  }\n  .col-lg-7 {\n    width: 58.33333333%;\n  }\n  .col-lg-6 {\n    width: 50%;\n  }\n  .col-lg-5 {\n    width: 41.66666667%;\n  }\n  .col-lg-4 {\n    width: 33.33333333%;\n  }\n  .col-lg-3 {\n    width: 25%;\n  }\n  .col-lg-2 {\n    width: 16.66666667%;\n  }\n  .col-lg-1 {\n    width: 8.33333333%;\n  }\n  .col-lg-pull-12 {\n    right: 100%;\n  }\n  .col-lg-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-lg-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-lg-pull-9 {\n    right: 75%;\n  }\n  .col-lg-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-lg-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-lg-pull-6 {\n    right: 50%;\n  }\n  .col-lg-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-lg-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-lg-pull-3 {\n    right: 25%;\n  }\n  .col-lg-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-lg-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-lg-pull-0 {\n    right: auto;\n  }\n  .col-lg-push-12 {\n    left: 100%;\n  }\n  .col-lg-push-11 {\n    left: 91.66666667%;\n  }\n  .col-lg-push-10 {\n    left: 83.33333333%;\n  }\n  .col-lg-push-9 {\n    left: 75%;\n  }\n  .col-lg-push-8 {\n    left: 66.66666667%;\n  }\n  .col-lg-push-7 {\n    left: 58.33333333%;\n  }\n  .col-lg-push-6 {\n    left: 50%;\n  }\n  .col-lg-push-5 {\n    left: 41.66666667%;\n  }\n  .col-lg-push-4 {\n    left: 33.33333333%;\n  }\n  .col-lg-push-3 {\n    left: 25%;\n  }\n  .col-lg-push-2 {\n    left: 16.66666667%;\n  }\n  .col-lg-push-1 {\n    left: 8.33333333%;\n  }\n  .col-lg-push-0 {\n    left: auto;\n  }\n  .col-lg-offset-12 {\n    margin-left: 100%;\n  }\n  .col-lg-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-lg-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-lg-offset-9 {\n    margin-left: 75%;\n  }\n  .col-lg-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-lg-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-lg-offset-6 {\n    margin-left: 50%;\n  }\n  .col-lg-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-lg-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-lg-offset-3 {\n    margin-left: 25%;\n  }\n  .col-lg-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-lg-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-lg-offset-0 {\n    margin-left: 0;\n  }\n}\ntable {\n  background-color: transparent;\n}\ncaption {\n  padding-top: 8px;\n  padding-bottom: 8px;\n  color: #777;\n  text-align: left;\n}\nth {\n  text-align: left;\n}\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 20px;\n}\n.table > thead > tr > th,\n.table > tbody > tr > th,\n.table > tfoot > tr > th,\n.table > thead > tr > td,\n.table > tbody > tr > td,\n.table > tfoot > tr > td {\n  padding: 8px;\n  line-height: 1.42857143;\n  vertical-align: top;\n  border-top: 1px solid #ddd;\n}\n.table > thead > tr > th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #ddd;\n}\n.table > caption + thead > tr:first-child > th,\n.table > colgroup + thead > tr:first-child > th,\n.table > thead:first-child > tr:first-child > th,\n.table > caption + thead > tr:first-child > td,\n.table > colgroup + thead > tr:first-child > td,\n.table > thead:first-child > tr:first-child > td {\n  border-top: 0;\n}\n.table > tbody + tbody {\n  border-top: 2px solid #ddd;\n}\n.table .table {\n  background-color: #fff;\n}\n.table-condensed > thead > tr > th,\n.table-condensed > tbody > tr > th,\n.table-condensed > tfoot > tr > th,\n.table-condensed > thead > tr > td,\n.table-condensed > tbody > tr > td,\n.table-condensed > tfoot > tr > td {\n  padding: 5px;\n}\n.table-bordered {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > tbody > tr > th,\n.table-bordered > tfoot > tr > th,\n.table-bordered > thead > tr > td,\n.table-bordered > tbody > tr > td,\n.table-bordered > tfoot > tr > td {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > thead > tr > td {\n  border-bottom-width: 2px;\n}\n.table-striped > tbody > tr:nth-of-type(odd) {\n  background-color: #f9f9f9;\n}\n.table-hover > tbody > tr:hover {\n  background-color: #f5f5f5;\n}\ntable col[class*=\"col-\"] {\n  position: static;\n  display: table-column;\n  float: none;\n}\ntable td[class*=\"col-\"],\ntable th[class*=\"col-\"] {\n  position: static;\n  display: table-cell;\n  float: none;\n}\n.table > thead > tr > td.active,\n.table > tbody > tr > td.active,\n.table > tfoot > tr > td.active,\n.table > thead > tr > th.active,\n.table > tbody > tr > th.active,\n.table > tfoot > tr > th.active,\n.table > thead > tr.active > td,\n.table > tbody > tr.active > td,\n.table > tfoot > tr.active > td,\n.table > thead > tr.active > th,\n.table > tbody > tr.active > th,\n.table > tfoot > tr.active > th {\n  background-color: #f5f5f5;\n}\n.table-hover > tbody > tr > td.active:hover,\n.table-hover > tbody > tr > th.active:hover,\n.table-hover > tbody > tr.active:hover > td,\n.table-hover > tbody > tr:hover > .active,\n.table-hover > tbody > tr.active:hover > th {\n  background-color: #e8e8e8;\n}\n.table > thead > tr > td.success,\n.table > tbody > tr > td.success,\n.table > tfoot > tr > td.success,\n.table > thead > tr > th.success,\n.table > tbody > tr > th.success,\n.table > tfoot > tr > th.success,\n.table > thead > tr.success > td,\n.table > tbody > tr.success > td,\n.table > tfoot > tr.success > td,\n.table > thead > tr.success > th,\n.table > tbody > tr.success > th,\n.table > tfoot > tr.success > th {\n  background-color: #dff0d8;\n}\n.table-hover > tbody > tr > td.success:hover,\n.table-hover > tbody > tr > th.success:hover,\n.table-hover > tbody > tr.success:hover > td,\n.table-hover > tbody > tr:hover > .success,\n.table-hover > tbody > tr.success:hover > th {\n  background-color: #d0e9c6;\n}\n.table > thead > tr > td.info,\n.table > tbody > tr > td.info,\n.table > tfoot > tr > td.info,\n.table > thead > tr > th.info,\n.table > tbody > tr > th.info,\n.table > tfoot > tr > th.info,\n.table > thead > tr.info > td,\n.table > tbody > tr.info > td,\n.table > tfoot > tr.info > td,\n.table > thead > tr.info > th,\n.table > tbody > tr.info > th,\n.table > tfoot > tr.info > th {\n  background-color: #d9edf7;\n}\n.table-hover > tbody > tr > td.info:hover,\n.table-hover > tbody > tr > th.info:hover,\n.table-hover > tbody > tr.info:hover > td,\n.table-hover > tbody > tr:hover > .info,\n.table-hover > tbody > tr.info:hover > th {\n  background-color: #c4e3f3;\n}\n.table > thead > tr > td.warning,\n.table > tbody > tr > td.warning,\n.table > tfoot > tr > td.warning,\n.table > thead > tr > th.warning,\n.table > tbody > tr > th.warning,\n.table > tfoot > tr > th.warning,\n.table > thead > tr.warning > td,\n.table > tbody > tr.warning > td,\n.table > tfoot > tr.warning > td,\n.table > thead > tr.warning > th,\n.table > tbody > tr.warning > th,\n.table > tfoot > tr.warning > th {\n  background-color: #fcf8e3;\n}\n.table-hover > tbody > tr > td.warning:hover,\n.table-hover > tbody > tr > th.warning:hover,\n.table-hover > tbody > tr.warning:hover > td,\n.table-hover > tbody > tr:hover > .warning,\n.table-hover > tbody > tr.warning:hover > th {\n  background-color: #faf2cc;\n}\n.table > thead > tr > td.danger,\n.table > tbody > tr > td.danger,\n.table > tfoot > tr > td.danger,\n.table > thead > tr > th.danger,\n.table > tbody > tr > th.danger,\n.table > tfoot > tr > th.danger,\n.table > thead > tr.danger > td,\n.table > tbody > tr.danger > td,\n.table > tfoot > tr.danger > td,\n.table > thead > tr.danger > th,\n.table > tbody > tr.danger > th,\n.table > tfoot > tr.danger > th {\n  background-color: #f2dede;\n}\n.table-hover > tbody > tr > td.danger:hover,\n.table-hover > tbody > tr > th.danger:hover,\n.table-hover > tbody > tr.danger:hover > td,\n.table-hover > tbody > tr:hover > .danger,\n.table-hover > tbody > tr.danger:hover > th {\n  background-color: #ebcccc;\n}\n.table-responsive {\n  min-height: .01%;\n  overflow-x: auto;\n}\n@media screen and (max-width: 767px) {\n  .table-responsive {\n    width: 100%;\n    margin-bottom: 15px;\n    overflow-y: hidden;\n    -ms-overflow-style: -ms-autohiding-scrollbar;\n    border: 1px solid #ddd;\n  }\n  .table-responsive > .table {\n    margin-bottom: 0;\n  }\n  .table-responsive > .table > thead > tr > th,\n  .table-responsive > .table > tbody > tr > th,\n  .table-responsive > .table > tfoot > tr > th,\n  .table-responsive > .table > thead > tr > td,\n  .table-responsive > .table > tbody > tr > td,\n  .table-responsive > .table > tfoot > tr > td {\n    white-space: nowrap;\n  }\n  .table-responsive > .table-bordered {\n    border: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:first-child,\n  .table-responsive > .table-bordered > tbody > tr > th:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n  .table-responsive > .table-bordered > thead > tr > td:first-child,\n  .table-responsive > .table-bordered > tbody > tr > td:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n    border-left: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:last-child,\n  .table-responsive > .table-bordered > tbody > tr > th:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n  .table-responsive > .table-bordered > thead > tr > td:last-child,\n  .table-responsive > .table-bordered > tbody > tr > td:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n    border-right: 0;\n  }\n  .table-responsive > .table-bordered > tbody > tr:last-child > th,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > th,\n  .table-responsive > .table-bordered > tbody > tr:last-child > td,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > td {\n    border-bottom: 0;\n  }\n}\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: 20px;\n  font-size: 21px;\n  line-height: inherit;\n  color: #333;\n  border: 0;\n  border-bottom: 1px solid #e5e5e5;\n}\nlabel {\n  display: inline-block;\n  max-width: 100%;\n  margin-bottom: 5px;\n  font-weight: bold;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\ninput[type=\"radio\"],\ninput[type=\"checkbox\"] {\n  margin: 4px 0 0;\n  margin-top: 1px \\9;\n  line-height: normal;\n}\ninput[type=\"file\"] {\n  display: block;\n}\ninput[type=\"range\"] {\n  display: block;\n  width: 100%;\n}\nselect[multiple],\nselect[size] {\n  height: auto;\n}\ninput[type=\"file\"]:focus,\ninput[type=\"radio\"]:focus,\ninput[type=\"checkbox\"]:focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\noutput {\n  display: block;\n  padding-top: 7px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n}\n.form-control {\n  display: block;\n  width: 100%;\n  height: 34px;\n  padding: 6px 12px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n  background-color: #fff;\n  background-image: none;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.form-control:focus {\n  border-color: #66afe9;\n  outline: 0;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n}\n.form-control::-moz-placeholder {\n  color: #999;\n  opacity: 1;\n}\n.form-control:-ms-input-placeholder {\n  color: #999;\n}\n.form-control::-webkit-input-placeholder {\n  color: #999;\n}\n.form-control[disabled],\n.form-control[readonly],\nfieldset[disabled] .form-control {\n  background-color: #eee;\n  opacity: 1;\n}\n.form-control[disabled],\nfieldset[disabled] .form-control {\n  cursor: not-allowed;\n}\ntextarea.form-control {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n@media screen and (-webkit-min-device-pixel-ratio: 0) {\n  input[type=\"date\"].form-control,\n  input[type=\"time\"].form-control,\n  input[type=\"datetime-local\"].form-control,\n  input[type=\"month\"].form-control {\n    line-height: 34px;\n  }\n  input[type=\"date\"].input-sm,\n  input[type=\"time\"].input-sm,\n  input[type=\"datetime-local\"].input-sm,\n  input[type=\"month\"].input-sm,\n  .input-group-sm input[type=\"date\"],\n  .input-group-sm input[type=\"time\"],\n  .input-group-sm input[type=\"datetime-local\"],\n  .input-group-sm input[type=\"month\"] {\n    line-height: 30px;\n  }\n  input[type=\"date\"].input-lg,\n  input[type=\"time\"].input-lg,\n  input[type=\"datetime-local\"].input-lg,\n  input[type=\"month\"].input-lg,\n  .input-group-lg input[type=\"date\"],\n  .input-group-lg input[type=\"time\"],\n  .input-group-lg input[type=\"datetime-local\"],\n  .input-group-lg input[type=\"month\"] {\n    line-height: 46px;\n  }\n}\n.form-group {\n  margin-bottom: 15px;\n}\n.radio,\n.checkbox {\n  position: relative;\n  display: block;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.radio label,\n.checkbox label {\n  min-height: 20px;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  cursor: pointer;\n}\n.radio input[type=\"radio\"],\n.radio-inline input[type=\"radio\"],\n.checkbox input[type=\"checkbox\"],\n.checkbox-inline input[type=\"checkbox\"] {\n  position: absolute;\n  margin-top: 4px \\9;\n  margin-left: -20px;\n}\n.radio + .radio,\n.checkbox + .checkbox {\n  margin-top: -5px;\n}\n.radio-inline,\n.checkbox-inline {\n  position: relative;\n  display: inline-block;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  vertical-align: middle;\n  cursor: pointer;\n}\n.radio-inline + .radio-inline,\n.checkbox-inline + .checkbox-inline {\n  margin-top: 0;\n  margin-left: 10px;\n}\ninput[type=\"radio\"][disabled],\ninput[type=\"checkbox\"][disabled],\ninput[type=\"radio\"].disabled,\ninput[type=\"checkbox\"].disabled,\nfieldset[disabled] input[type=\"radio\"],\nfieldset[disabled] input[type=\"checkbox\"] {\n  cursor: not-allowed;\n}\n.radio-inline.disabled,\n.checkbox-inline.disabled,\nfieldset[disabled] .radio-inline,\nfieldset[disabled] .checkbox-inline {\n  cursor: not-allowed;\n}\n.radio.disabled label,\n.checkbox.disabled label,\nfieldset[disabled] .radio label,\nfieldset[disabled] .checkbox label {\n  cursor: not-allowed;\n}\n.form-control-static {\n  min-height: 34px;\n  padding-top: 7px;\n  padding-bottom: 7px;\n  margin-bottom: 0;\n}\n.form-control-static.input-lg,\n.form-control-static.input-sm {\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-sm {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-sm {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-sm,\nselect[multiple].input-sm {\n  height: auto;\n}\n.form-group-sm .form-control {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.form-group-sm select.form-control {\n  height: 30px;\n  line-height: 30px;\n}\n.form-group-sm textarea.form-control,\n.form-group-sm select[multiple].form-control {\n  height: auto;\n}\n.form-group-sm .form-control-static {\n  height: 30px;\n  min-height: 32px;\n  padding: 6px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.input-lg {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-lg {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-lg,\nselect[multiple].input-lg {\n  height: auto;\n}\n.form-group-lg .form-control {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.form-group-lg select.form-control {\n  height: 46px;\n  line-height: 46px;\n}\n.form-group-lg textarea.form-control,\n.form-group-lg select[multiple].form-control {\n  height: auto;\n}\n.form-group-lg .form-control-static {\n  height: 46px;\n  min-height: 38px;\n  padding: 11px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.has-feedback {\n  position: relative;\n}\n.has-feedback .form-control {\n  padding-right: 42.5px;\n}\n.form-control-feedback {\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: 2;\n  display: block;\n  width: 34px;\n  height: 34px;\n  line-height: 34px;\n  text-align: center;\n  pointer-events: none;\n}\n.input-lg + .form-control-feedback,\n.input-group-lg + .form-control-feedback,\n.form-group-lg .form-control + .form-control-feedback {\n  width: 46px;\n  height: 46px;\n  line-height: 46px;\n}\n.input-sm + .form-control-feedback,\n.input-group-sm + .form-control-feedback,\n.form-group-sm .form-control + .form-control-feedback {\n  width: 30px;\n  height: 30px;\n  line-height: 30px;\n}\n.has-success .help-block,\n.has-success .control-label,\n.has-success .radio,\n.has-success .checkbox,\n.has-success .radio-inline,\n.has-success .checkbox-inline,\n.has-success.radio label,\n.has-success.checkbox label,\n.has-success.radio-inline label,\n.has-success.checkbox-inline label {\n  color: #3c763d;\n}\n.has-success .form-control {\n  border-color: #3c763d;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-success .form-control:focus {\n  border-color: #2b542c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n}\n.has-success .input-group-addon {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #3c763d;\n}\n.has-success .form-control-feedback {\n  color: #3c763d;\n}\n.has-warning .help-block,\n.has-warning .control-label,\n.has-warning .radio,\n.has-warning .checkbox,\n.has-warning .radio-inline,\n.has-warning .checkbox-inline,\n.has-warning.radio label,\n.has-warning.checkbox label,\n.has-warning.radio-inline label,\n.has-warning.checkbox-inline label {\n  color: #8a6d3b;\n}\n.has-warning .form-control {\n  border-color: #8a6d3b;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-warning .form-control:focus {\n  border-color: #66512c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n}\n.has-warning .input-group-addon {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #8a6d3b;\n}\n.has-warning .form-control-feedback {\n  color: #8a6d3b;\n}\n.has-error .help-block,\n.has-error .control-label,\n.has-error .radio,\n.has-error .checkbox,\n.has-error .radio-inline,\n.has-error .checkbox-inline,\n.has-error.radio label,\n.has-error.checkbox label,\n.has-error.radio-inline label,\n.has-error.checkbox-inline label {\n  color: #a94442;\n}\n.has-error .form-control {\n  border-color: #a94442;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-error .form-control:focus {\n  border-color: #843534;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n}\n.has-error .input-group-addon {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #a94442;\n}\n.has-error .form-control-feedback {\n  color: #a94442;\n}\n.has-feedback label ~ .form-control-feedback {\n  top: 25px;\n}\n.has-feedback label.sr-only ~ .form-control-feedback {\n  top: 0;\n}\n.help-block {\n  display: block;\n  margin-top: 5px;\n  margin-bottom: 10px;\n  color: #737373;\n}\n@media (min-width: 768px) {\n  .form-inline .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .form-inline .input-group .input-group-addon,\n  .form-inline .input-group .input-group-btn,\n  .form-inline .input-group .form-control {\n    width: auto;\n  }\n  .form-inline .input-group > .form-control {\n    width: 100%;\n  }\n  .form-inline .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio,\n  .form-inline .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio label,\n  .form-inline .checkbox label {\n    padding-left: 0;\n  }\n  .form-inline .radio input[type=\"radio\"],\n  .form-inline .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox,\n.form-horizontal .radio-inline,\n.form-horizontal .checkbox-inline {\n  padding-top: 7px;\n  margin-top: 0;\n  margin-bottom: 0;\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox {\n  min-height: 27px;\n}\n.form-horizontal .form-group {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .control-label {\n    padding-top: 7px;\n    margin-bottom: 0;\n    text-align: right;\n  }\n}\n.form-horizontal .has-feedback .form-control-feedback {\n  right: 15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-lg .control-label {\n    padding-top: 14.333333px;\n    font-size: 18px;\n  }\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-sm .control-label {\n    padding-top: 6px;\n    font-size: 12px;\n  }\n}\n.btn {\n  display: inline-block;\n  padding: 6px 12px;\n  margin-bottom: 0;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.btn:focus,\n.btn:active:focus,\n.btn.active:focus,\n.btn.focus,\n.btn:active.focus,\n.btn.active.focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n.btn:hover,\n.btn:focus,\n.btn.focus {\n  color: #333;\n  text-decoration: none;\n}\n.btn:active,\n.btn.active {\n  background-image: none;\n  outline: 0;\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn.disabled,\n.btn[disabled],\nfieldset[disabled] .btn {\n  cursor: not-allowed;\n  filter: alpha(opacity=65);\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  opacity: .65;\n}\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n.btn-default {\n  color: #333;\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default:focus,\n.btn-default.focus {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #8c8c8c;\n}\n.btn-default:hover {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active:hover,\n.btn-default.active:hover,\n.open > .dropdown-toggle.btn-default:hover,\n.btn-default:active:focus,\n.btn-default.active:focus,\n.open > .dropdown-toggle.btn-default:focus,\n.btn-default:active.focus,\n.btn-default.active.focus,\n.open > .dropdown-toggle.btn-default.focus {\n  color: #333;\n  background-color: #d4d4d4;\n  border-color: #8c8c8c;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  background-image: none;\n}\n.btn-default.disabled,\n.btn-default[disabled],\nfieldset[disabled] .btn-default,\n.btn-default.disabled:hover,\n.btn-default[disabled]:hover,\nfieldset[disabled] .btn-default:hover,\n.btn-default.disabled:focus,\n.btn-default[disabled]:focus,\nfieldset[disabled] .btn-default:focus,\n.btn-default.disabled.focus,\n.btn-default[disabled].focus,\nfieldset[disabled] .btn-default.focus,\n.btn-default.disabled:active,\n.btn-default[disabled]:active,\nfieldset[disabled] .btn-default:active,\n.btn-default.disabled.active,\n.btn-default[disabled].active,\nfieldset[disabled] .btn-default.active {\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default .badge {\n  color: #fff;\n  background-color: #333;\n}\n.btn-primary {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary:focus,\n.btn-primary.focus {\n  color: #fff;\n  background-color: #286090;\n  border-color: #122b40;\n}\n.btn-primary:hover {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active:hover,\n.btn-primary.active:hover,\n.open > .dropdown-toggle.btn-primary:hover,\n.btn-primary:active:focus,\n.btn-primary.active:focus,\n.open > .dropdown-toggle.btn-primary:focus,\n.btn-primary:active.focus,\n.btn-primary.active.focus,\n.open > .dropdown-toggle.btn-primary.focus {\n  color: #fff;\n  background-color: #204d74;\n  border-color: #122b40;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  background-image: none;\n}\n.btn-primary.disabled,\n.btn-primary[disabled],\nfieldset[disabled] .btn-primary,\n.btn-primary.disabled:hover,\n.btn-primary[disabled]:hover,\nfieldset[disabled] .btn-primary:hover,\n.btn-primary.disabled:focus,\n.btn-primary[disabled]:focus,\nfieldset[disabled] .btn-primary:focus,\n.btn-primary.disabled.focus,\n.btn-primary[disabled].focus,\nfieldset[disabled] .btn-primary.focus,\n.btn-primary.disabled:active,\n.btn-primary[disabled]:active,\nfieldset[disabled] .btn-primary:active,\n.btn-primary.disabled.active,\n.btn-primary[disabled].active,\nfieldset[disabled] .btn-primary.active {\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success:focus,\n.btn-success.focus {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #255625;\n}\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active:hover,\n.btn-success.active:hover,\n.open > .dropdown-toggle.btn-success:hover,\n.btn-success:active:focus,\n.btn-success.active:focus,\n.open > .dropdown-toggle.btn-success:focus,\n.btn-success:active.focus,\n.btn-success.active.focus,\n.open > .dropdown-toggle.btn-success.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #255625;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  background-image: none;\n}\n.btn-success.disabled,\n.btn-success[disabled],\nfieldset[disabled] .btn-success,\n.btn-success.disabled:hover,\n.btn-success[disabled]:hover,\nfieldset[disabled] .btn-success:hover,\n.btn-success.disabled:focus,\n.btn-success[disabled]:focus,\nfieldset[disabled] .btn-success:focus,\n.btn-success.disabled.focus,\n.btn-success[disabled].focus,\nfieldset[disabled] .btn-success.focus,\n.btn-success.disabled:active,\n.btn-success[disabled]:active,\nfieldset[disabled] .btn-success:active,\n.btn-success.disabled.active,\n.btn-success[disabled].active,\nfieldset[disabled] .btn-success.active {\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success .badge {\n  color: #5cb85c;\n  background-color: #fff;\n}\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info:focus,\n.btn-info.focus {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #1b6d85;\n}\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active:hover,\n.btn-info.active:hover,\n.open > .dropdown-toggle.btn-info:hover,\n.btn-info:active:focus,\n.btn-info.active:focus,\n.open > .dropdown-toggle.btn-info:focus,\n.btn-info:active.focus,\n.btn-info.active.focus,\n.open > .dropdown-toggle.btn-info.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1b6d85;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  background-image: none;\n}\n.btn-info.disabled,\n.btn-info[disabled],\nfieldset[disabled] .btn-info,\n.btn-info.disabled:hover,\n.btn-info[disabled]:hover,\nfieldset[disabled] .btn-info:hover,\n.btn-info.disabled:focus,\n.btn-info[disabled]:focus,\nfieldset[disabled] .btn-info:focus,\n.btn-info.disabled.focus,\n.btn-info[disabled].focus,\nfieldset[disabled] .btn-info.focus,\n.btn-info.disabled:active,\n.btn-info[disabled]:active,\nfieldset[disabled] .btn-info:active,\n.btn-info.disabled.active,\n.btn-info[disabled].active,\nfieldset[disabled] .btn-info.active {\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info .badge {\n  color: #5bc0de;\n  background-color: #fff;\n}\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning:focus,\n.btn-warning.focus {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #985f0d;\n}\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active:hover,\n.btn-warning.active:hover,\n.open > .dropdown-toggle.btn-warning:hover,\n.btn-warning:active:focus,\n.btn-warning.active:focus,\n.open > .dropdown-toggle.btn-warning:focus,\n.btn-warning:active.focus,\n.btn-warning.active.focus,\n.open > .dropdown-toggle.btn-warning.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #985f0d;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  background-image: none;\n}\n.btn-warning.disabled,\n.btn-warning[disabled],\nfieldset[disabled] .btn-warning,\n.btn-warning.disabled:hover,\n.btn-warning[disabled]:hover,\nfieldset[disabled] .btn-warning:hover,\n.btn-warning.disabled:focus,\n.btn-warning[disabled]:focus,\nfieldset[disabled] .btn-warning:focus,\n.btn-warning.disabled.focus,\n.btn-warning[disabled].focus,\nfieldset[disabled] .btn-warning.focus,\n.btn-warning.disabled:active,\n.btn-warning[disabled]:active,\nfieldset[disabled] .btn-warning:active,\n.btn-warning.disabled.active,\n.btn-warning[disabled].active,\nfieldset[disabled] .btn-warning.active {\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning .badge {\n  color: #f0ad4e;\n  background-color: #fff;\n}\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger:focus,\n.btn-danger.focus {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #761c19;\n}\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active:hover,\n.btn-danger.active:hover,\n.open > .dropdown-toggle.btn-danger:hover,\n.btn-danger:active:focus,\n.btn-danger.active:focus,\n.open > .dropdown-toggle.btn-danger:focus,\n.btn-danger:active.focus,\n.btn-danger.active.focus,\n.open > .dropdown-toggle.btn-danger.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #761c19;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  background-image: none;\n}\n.btn-danger.disabled,\n.btn-danger[disabled],\nfieldset[disabled] .btn-danger,\n.btn-danger.disabled:hover,\n.btn-danger[disabled]:hover,\nfieldset[disabled] .btn-danger:hover,\n.btn-danger.disabled:focus,\n.btn-danger[disabled]:focus,\nfieldset[disabled] .btn-danger:focus,\n.btn-danger.disabled.focus,\n.btn-danger[disabled].focus,\nfieldset[disabled] .btn-danger.focus,\n.btn-danger.disabled:active,\n.btn-danger[disabled]:active,\nfieldset[disabled] .btn-danger:active,\n.btn-danger.disabled.active,\n.btn-danger[disabled].active,\nfieldset[disabled] .btn-danger.active {\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger .badge {\n  color: #d9534f;\n  background-color: #fff;\n}\n.btn-link {\n  font-weight: normal;\n  color: #337ab7;\n  border-radius: 0;\n}\n.btn-link,\n.btn-link:active,\n.btn-link.active,\n.btn-link[disabled],\nfieldset[disabled] .btn-link {\n  background-color: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn-link,\n.btn-link:hover,\n.btn-link:focus,\n.btn-link:active {\n  border-color: transparent;\n}\n.btn-link:hover,\n.btn-link:focus {\n  color: #23527c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n.btn-link[disabled]:hover,\nfieldset[disabled] .btn-link:hover,\n.btn-link[disabled]:focus,\nfieldset[disabled] .btn-link:focus {\n  color: #777;\n  text-decoration: none;\n}\n.btn-lg,\n.btn-group-lg > .btn {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.btn-sm,\n.btn-group-sm > .btn {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-xs,\n.btn-group-xs > .btn {\n  padding: 1px 5px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-block + .btn-block {\n  margin-top: 5px;\n}\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity .15s linear;\n       -o-transition: opacity .15s linear;\n          transition: opacity .15s linear;\n}\n.fade.in {\n  opacity: 1;\n}\n.collapse {\n  display: none;\n}\n.collapse.in {\n  display: block;\n}\ntr.collapse.in {\n  display: table-row;\n}\ntbody.collapse.in {\n  display: table-row-group;\n}\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition-timing-function: ease;\n       -o-transition-timing-function: ease;\n          transition-timing-function: ease;\n  -webkit-transition-duration: .35s;\n       -o-transition-duration: .35s;\n          transition-duration: .35s;\n  -webkit-transition-property: height, visibility;\n       -o-transition-property: height, visibility;\n          transition-property: height, visibility;\n}\n.caret {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 2px;\n  vertical-align: middle;\n  border-top: 4px dashed;\n  border-top: 4px solid \\9;\n  border-right: 4px solid transparent;\n  border-left: 4px solid transparent;\n}\n.dropup,\n.dropdown {\n  position: relative;\n}\n.dropdown-toggle:focus {\n  outline: 0;\n}\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 160px;\n  padding: 5px 0;\n  margin: 2px 0 0;\n  font-size: 14px;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .15);\n  border-radius: 4px;\n  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n}\n.dropdown-menu.pull-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu .divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.dropdown-menu > li > a {\n  display: block;\n  padding: 3px 20px;\n  clear: both;\n  font-weight: normal;\n  line-height: 1.42857143;\n  color: #333;\n  white-space: nowrap;\n}\n.dropdown-menu > li > a:hover,\n.dropdown-menu > li > a:focus {\n  color: #262626;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n.dropdown-menu > .active > a,\n.dropdown-menu > .active > a:hover,\n.dropdown-menu > .active > a:focus {\n  color: #fff;\n  text-decoration: none;\n  background-color: #337ab7;\n  outline: 0;\n}\n.dropdown-menu > .disabled > a,\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  color: #777;\n}\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n  background-image: none;\n  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);\n}\n.open > .dropdown-menu {\n  display: block;\n}\n.open > a {\n  outline: 0;\n}\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n.dropdown-header {\n  display: block;\n  padding: 3px 20px;\n  font-size: 12px;\n  line-height: 1.42857143;\n  color: #777;\n  white-space: nowrap;\n}\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n.pull-right > .dropdown-menu {\n  right: 0;\n  left: auto;\n}\n.dropup .caret,\n.navbar-fixed-bottom .dropdown .caret {\n  content: \"\";\n  border-top: 0;\n  border-bottom: 4px dashed;\n  border-bottom: 4px solid \\9;\n}\n.dropup .dropdown-menu,\n.navbar-fixed-bottom .dropdown .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 2px;\n}\n@media (min-width: 768px) {\n  .navbar-right .dropdown-menu {\n    right: 0;\n    left: auto;\n  }\n  .navbar-right .dropdown-menu-left {\n    right: auto;\n    left: 0;\n  }\n}\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: inline-block;\n  vertical-align: middle;\n}\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  float: left;\n}\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover,\n.btn-group > .btn:focus,\n.btn-group-vertical > .btn:focus,\n.btn-group > .btn:active,\n.btn-group-vertical > .btn:active,\n.btn-group > .btn.active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group {\n  margin-left: -1px;\n}\n.btn-toolbar {\n  margin-left: -5px;\n}\n.btn-toolbar .btn,\n.btn-toolbar .btn-group,\n.btn-toolbar .input-group {\n  float: left;\n}\n.btn-toolbar > .btn,\n.btn-toolbar > .btn-group,\n.btn-toolbar > .input-group {\n  margin-left: 5px;\n}\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group > .btn-group {\n  float: left;\n}\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n.btn-group > .btn + .dropdown-toggle {\n  padding-right: 8px;\n  padding-left: 8px;\n}\n.btn-group > .btn-lg + .dropdown-toggle {\n  padding-right: 12px;\n  padding-left: 12px;\n}\n.btn-group.open .dropdown-toggle {\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn-group.open .dropdown-toggle.btn-link {\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn .caret {\n  margin-left: 0;\n}\n.btn-lg .caret {\n  border-width: 5px 5px 0;\n  border-bottom-width: 0;\n}\n.dropup .btn-lg .caret {\n  border-width: 0 5px 5px;\n}\n.btn-group-vertical > .btn,\n.btn-group-vertical > .btn-group,\n.btn-group-vertical > .btn-group > .btn {\n  display: block;\n  float: none;\n  width: 100%;\n  max-width: 100%;\n}\n.btn-group-vertical > .btn-group > .btn {\n  float: none;\n}\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-left-radius: 4px;\n}\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.btn-group-justified {\n  display: table;\n  width: 100%;\n  table-layout: fixed;\n  border-collapse: separate;\n}\n.btn-group-justified > .btn,\n.btn-group-justified > .btn-group {\n  display: table-cell;\n  float: none;\n  width: 1%;\n}\n.btn-group-justified > .btn-group .btn {\n  width: 100%;\n}\n.btn-group-justified > .btn-group .dropdown-menu {\n  left: auto;\n}\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n.input-group {\n  position: relative;\n  display: table;\n  border-collapse: separate;\n}\n.input-group[class*=\"col-\"] {\n  float: none;\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  float: left;\n  width: 100%;\n  margin-bottom: 0;\n}\n.input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-group-lg > .form-control,\nselect.input-group-lg > .input-group-addon,\nselect.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-group-lg > .form-control,\ntextarea.input-group-lg > .input-group-addon,\ntextarea.input-group-lg > .input-group-btn > .btn,\nselect[multiple].input-group-lg > .form-control,\nselect[multiple].input-group-lg > .input-group-addon,\nselect[multiple].input-group-lg > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-group-sm > .form-control,\nselect.input-group-sm > .input-group-addon,\nselect.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-group-sm > .form-control,\ntextarea.input-group-sm > .input-group-addon,\ntextarea.input-group-sm > .input-group-btn > .btn,\nselect[multiple].input-group-sm > .form-control,\nselect[multiple].input-group-sm > .input-group-addon,\nselect[multiple].input-group-sm > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: table-cell;\n}\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.input-group-addon,\n.input-group-btn {\n  width: 1%;\n  white-space: nowrap;\n  vertical-align: middle;\n}\n.input-group-addon {\n  padding: 6px 12px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1;\n  color: #555;\n  text-align: center;\n  background-color: #eee;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\n.input-group-addon.input-sm {\n  padding: 5px 10px;\n  font-size: 12px;\n  border-radius: 3px;\n}\n.input-group-addon.input-lg {\n  padding: 10px 16px;\n  font-size: 18px;\n  border-radius: 6px;\n}\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n.input-group .form-control:first-child,\n.input-group-addon:first-child,\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group > .btn,\n.input-group-btn:first-child > .dropdown-toggle,\n.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:last-child > .btn-group:not(:last-child) > .btn {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.input-group-addon:first-child {\n  border-right: 0;\n}\n.input-group .form-control:last-child,\n.input-group-addon:last-child,\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group > .btn,\n.input-group-btn:last-child > .dropdown-toggle,\n.input-group-btn:first-child > .btn:not(:first-child),\n.input-group-btn:first-child > .btn-group:not(:first-child) > .btn {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.input-group-addon:last-child {\n  border-left: 0;\n}\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n.input-group-btn > .btn {\n  position: relative;\n}\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n.input-group-btn > .btn:hover,\n.input-group-btn > .btn:focus,\n.input-group-btn > .btn:active {\n  z-index: 2;\n}\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group {\n  margin-right: -1px;\n}\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n.nav {\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n.nav > li {\n  position: relative;\n  display: block;\n}\n.nav > li > a {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n}\n.nav > li > a:hover,\n.nav > li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.nav > li.disabled > a {\n  color: #777;\n}\n.nav > li.disabled > a:hover,\n.nav > li.disabled > a:focus {\n  color: #777;\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n.nav .open > a,\n.nav .open > a:hover,\n.nav .open > a:focus {\n  background-color: #eee;\n  border-color: #337ab7;\n}\n.nav .nav-divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.nav > li > a > img {\n  max-width: none;\n}\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n.nav-tabs > li {\n  float: left;\n  margin-bottom: -1px;\n}\n.nav-tabs > li > a {\n  margin-right: 2px;\n  line-height: 1.42857143;\n  border: 1px solid transparent;\n  border-radius: 4px 4px 0 0;\n}\n.nav-tabs > li > a:hover {\n  border-color: #eee #eee #ddd;\n}\n.nav-tabs > li.active > a,\n.nav-tabs > li.active > a:hover,\n.nav-tabs > li.active > a:focus {\n  color: #555;\n  cursor: default;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-bottom-color: transparent;\n}\n.nav-tabs.nav-justified {\n  width: 100%;\n  border-bottom: 0;\n}\n.nav-tabs.nav-justified > li {\n  float: none;\n}\n.nav-tabs.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-tabs.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-tabs.nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs.nav-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs.nav-justified > .active > a,\n.nav-tabs.nav-justified > .active > a:hover,\n.nav-tabs.nav-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs.nav-justified > .active > a,\n  .nav-tabs.nav-justified > .active > a:hover,\n  .nav-tabs.nav-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.nav-pills > li {\n  float: left;\n}\n.nav-pills > li > a {\n  border-radius: 4px;\n}\n.nav-pills > li + li {\n  margin-left: 2px;\n}\n.nav-pills > li.active > a,\n.nav-pills > li.active > a:hover,\n.nav-pills > li.active > a:focus {\n  color: #fff;\n  background-color: #337ab7;\n}\n.nav-stacked > li {\n  float: none;\n}\n.nav-stacked > li + li {\n  margin-top: 2px;\n  margin-left: 0;\n}\n.nav-justified {\n  width: 100%;\n}\n.nav-justified > li {\n  float: none;\n}\n.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs-justified {\n  border-bottom: 0;\n}\n.nav-tabs-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs-justified > .active > a,\n.nav-tabs-justified > .active > a:hover,\n.nav-tabs-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs-justified > .active > a,\n  .nav-tabs-justified > .active > a:hover,\n  .nav-tabs-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.tab-content > .tab-pane {\n  display: none;\n}\n.tab-content > .active {\n  display: block;\n}\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar {\n  position: relative;\n  min-height: 50px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n}\n@media (min-width: 768px) {\n  .navbar {\n    border-radius: 4px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-header {\n    float: left;\n  }\n}\n.navbar-collapse {\n  padding-right: 15px;\n  padding-left: 15px;\n  overflow-x: visible;\n  -webkit-overflow-scrolling: touch;\n  border-top: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n}\n.navbar-collapse.in {\n  overflow-y: auto;\n}\n@media (min-width: 768px) {\n  .navbar-collapse {\n    width: auto;\n    border-top: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-collapse.collapse {\n    display: block !important;\n    height: auto !important;\n    padding-bottom: 0;\n    overflow: visible !important;\n  }\n  .navbar-collapse.in {\n    overflow-y: visible;\n  }\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-static-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n.navbar-fixed-top .navbar-collapse,\n.navbar-fixed-bottom .navbar-collapse {\n  max-height: 340px;\n}\n@media (max-device-width: 480px) and (orientation: landscape) {\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    max-height: 200px;\n  }\n}\n.container > .navbar-header,\n.container-fluid > .navbar-header,\n.container > .navbar-collapse,\n.container-fluid > .navbar-collapse {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .container > .navbar-header,\n  .container-fluid > .navbar-header,\n  .container > .navbar-collapse,\n  .container-fluid > .navbar-collapse {\n    margin-right: 0;\n    margin-left: 0;\n  }\n}\n.navbar-static-top {\n  z-index: 1000;\n  border-width: 0 0 1px;\n}\n@media (min-width: 768px) {\n  .navbar-static-top {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top,\n.navbar-fixed-bottom {\n  position: fixed;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n@media (min-width: 768px) {\n  .navbar-fixed-top,\n  .navbar-fixed-bottom {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top {\n  top: 0;\n  border-width: 0 0 1px;\n}\n.navbar-fixed-bottom {\n  bottom: 0;\n  margin-bottom: 0;\n  border-width: 1px 0 0;\n}\n.navbar-brand {\n  float: left;\n  height: 50px;\n  padding: 15px 15px;\n  font-size: 18px;\n  line-height: 20px;\n}\n.navbar-brand:hover,\n.navbar-brand:focus {\n  text-decoration: none;\n}\n.navbar-brand > img {\n  display: block;\n}\n@media (min-width: 768px) {\n  .navbar > .container .navbar-brand,\n  .navbar > .container-fluid .navbar-brand {\n    margin-left: -15px;\n  }\n}\n.navbar-toggle {\n  position: relative;\n  float: right;\n  padding: 9px 10px;\n  margin-top: 8px;\n  margin-right: 15px;\n  margin-bottom: 8px;\n  background-color: transparent;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.navbar-toggle:focus {\n  outline: 0;\n}\n.navbar-toggle .icon-bar {\n  display: block;\n  width: 22px;\n  height: 2px;\n  border-radius: 1px;\n}\n.navbar-toggle .icon-bar + .icon-bar {\n  margin-top: 4px;\n}\n@media (min-width: 768px) {\n  .navbar-toggle {\n    display: none;\n  }\n}\n.navbar-nav {\n  margin: 7.5px -15px;\n}\n.navbar-nav > li > a {\n  padding-top: 10px;\n  padding-bottom: 10px;\n  line-height: 20px;\n}\n@media (max-width: 767px) {\n  .navbar-nav .open .dropdown-menu {\n    position: static;\n    float: none;\n    width: auto;\n    margin-top: 0;\n    background-color: transparent;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-nav .open .dropdown-menu > li > a,\n  .navbar-nav .open .dropdown-menu .dropdown-header {\n    padding: 5px 15px 5px 25px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a {\n    line-height: 20px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-nav .open .dropdown-menu > li > a:focus {\n    background-image: none;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-nav {\n    float: left;\n    margin: 0;\n  }\n  .navbar-nav > li {\n    float: left;\n  }\n  .navbar-nav > li > a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n  }\n}\n.navbar-form {\n  padding: 10px 15px;\n  margin-top: 8px;\n  margin-right: -15px;\n  margin-bottom: 8px;\n  margin-left: -15px;\n  border-top: 1px solid transparent;\n  border-bottom: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n}\n@media (min-width: 768px) {\n  .navbar-form .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control-static {\n    display: inline-block;\n  }\n  .navbar-form .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .navbar-form .input-group .input-group-addon,\n  .navbar-form .input-group .input-group-btn,\n  .navbar-form .input-group .form-control {\n    width: auto;\n  }\n  .navbar-form .input-group > .form-control {\n    width: 100%;\n  }\n  .navbar-form .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio,\n  .navbar-form .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio label,\n  .navbar-form .checkbox label {\n    padding-left: 0;\n  }\n  .navbar-form .radio input[type=\"radio\"],\n  .navbar-form .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .navbar-form .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n@media (max-width: 767px) {\n  .navbar-form .form-group {\n    margin-bottom: 5px;\n  }\n  .navbar-form .form-group:last-child {\n    margin-bottom: 0;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-form {\n    width: auto;\n    padding-top: 0;\n    padding-bottom: 0;\n    margin-right: 0;\n    margin-left: 0;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n}\n.navbar-nav > li > .dropdown-menu {\n  margin-top: 0;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {\n  margin-bottom: 0;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.navbar-btn {\n  margin-top: 8px;\n  margin-bottom: 8px;\n}\n.navbar-btn.btn-sm {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.navbar-btn.btn-xs {\n  margin-top: 14px;\n  margin-bottom: 14px;\n}\n.navbar-text {\n  margin-top: 15px;\n  margin-bottom: 15px;\n}\n@media (min-width: 768px) {\n  .navbar-text {\n    float: left;\n    margin-right: 15px;\n    margin-left: 15px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-left {\n    float: left !important;\n  }\n  .navbar-right {\n    float: right !important;\n    margin-right: -15px;\n  }\n  .navbar-right ~ .navbar-right {\n    margin-right: 0;\n  }\n}\n.navbar-default {\n  background-color: #f8f8f8;\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-brand {\n  color: #777;\n}\n.navbar-default .navbar-brand:hover,\n.navbar-default .navbar-brand:focus {\n  color: #5e5e5e;\n  background-color: transparent;\n}\n.navbar-default .navbar-text {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a:hover,\n.navbar-default .navbar-nav > li > a:focus {\n  color: #333;\n  background-color: transparent;\n}\n.navbar-default .navbar-nav > .active > a,\n.navbar-default .navbar-nav > .active > a:hover,\n.navbar-default .navbar-nav > .active > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .disabled > a,\n.navbar-default .navbar-nav > .disabled > a:hover,\n.navbar-default .navbar-nav > .disabled > a:focus {\n  color: #ccc;\n  background-color: transparent;\n}\n.navbar-default .navbar-toggle {\n  border-color: #ddd;\n}\n.navbar-default .navbar-toggle:hover,\n.navbar-default .navbar-toggle:focus {\n  background-color: #ddd;\n}\n.navbar-default .navbar-toggle .icon-bar {\n  background-color: #888;\n}\n.navbar-default .navbar-collapse,\n.navbar-default .navbar-form {\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .open > a,\n.navbar-default .navbar-nav > .open > a:hover,\n.navbar-default .navbar-nav > .open > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n@media (max-width: 767px) {\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a {\n    color: #777;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #333;\n    background-color: transparent;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #555;\n    background-color: #e7e7e7;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #ccc;\n    background-color: transparent;\n  }\n}\n.navbar-default .navbar-link {\n  color: #777;\n}\n.navbar-default .navbar-link:hover {\n  color: #333;\n}\n.navbar-default .btn-link {\n  color: #777;\n}\n.navbar-default .btn-link:hover,\n.navbar-default .btn-link:focus {\n  color: #333;\n}\n.navbar-default .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-default .btn-link:hover,\n.navbar-default .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-default .btn-link:focus {\n  color: #ccc;\n}\n.navbar-inverse {\n  background-color: #222;\n  border-color: #080808;\n}\n.navbar-inverse .navbar-brand {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-brand:hover,\n.navbar-inverse .navbar-brand:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-text {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a:hover,\n.navbar-inverse .navbar-nav > li > a:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-nav > .active > a,\n.navbar-inverse .navbar-nav > .active > a:hover,\n.navbar-inverse .navbar-nav > .active > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n.navbar-inverse .navbar-nav > .disabled > a,\n.navbar-inverse .navbar-nav > .disabled > a:hover,\n.navbar-inverse .navbar-nav > .disabled > a:focus {\n  color: #444;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-toggle {\n  border-color: #333;\n}\n.navbar-inverse .navbar-toggle:hover,\n.navbar-inverse .navbar-toggle:focus {\n  background-color: #333;\n}\n.navbar-inverse .navbar-toggle .icon-bar {\n  background-color: #fff;\n}\n.navbar-inverse .navbar-collapse,\n.navbar-inverse .navbar-form {\n  border-color: #101010;\n}\n.navbar-inverse .navbar-nav > .open > a,\n.navbar-inverse .navbar-nav > .open > a:hover,\n.navbar-inverse .navbar-nav > .open > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n@media (max-width: 767px) {\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .dropdown-header {\n    border-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu .divider {\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {\n    color: #9d9d9d;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #fff;\n    background-color: transparent;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #fff;\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #444;\n    background-color: transparent;\n  }\n}\n.navbar-inverse .navbar-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-link:hover {\n  color: #fff;\n}\n.navbar-inverse .btn-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link:focus {\n  color: #fff;\n}\n.navbar-inverse .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-inverse .btn-link:focus {\n  color: #444;\n}\n.breadcrumb {\n  padding: 8px 15px;\n  margin-bottom: 20px;\n  list-style: none;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n}\n.breadcrumb > li {\n  display: inline-block;\n}\n.breadcrumb > li + li:before {\n  padding: 0 5px;\n  color: #ccc;\n  content: \"/\\A0\";\n}\n.breadcrumb > .active {\n  color: #777;\n}\n.pagination {\n  display: inline-block;\n  padding-left: 0;\n  margin: 20px 0;\n  border-radius: 4px;\n}\n.pagination > li {\n  display: inline;\n}\n.pagination > li > a,\n.pagination > li > span {\n  position: relative;\n  float: left;\n  padding: 6px 12px;\n  margin-left: -1px;\n  line-height: 1.42857143;\n  color: #337ab7;\n  text-decoration: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.pagination > li:first-child > a,\n.pagination > li:first-child > span {\n  margin-left: 0;\n  border-top-left-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.pagination > li:last-child > a,\n.pagination > li:last-child > span {\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 4px;\n}\n.pagination > li > a:hover,\n.pagination > li > span:hover,\n.pagination > li > a:focus,\n.pagination > li > span:focus {\n  z-index: 3;\n  color: #23527c;\n  background-color: #eee;\n  border-color: #ddd;\n}\n.pagination > .active > a,\n.pagination > .active > span,\n.pagination > .active > a:hover,\n.pagination > .active > span:hover,\n.pagination > .active > a:focus,\n.pagination > .active > span:focus {\n  z-index: 2;\n  color: #fff;\n  cursor: default;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.pagination > .disabled > span,\n.pagination > .disabled > span:hover,\n.pagination > .disabled > span:focus,\n.pagination > .disabled > a,\n.pagination > .disabled > a:hover,\n.pagination > .disabled > a:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n.pagination-lg > li > a,\n.pagination-lg > li > span {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.pagination-lg > li:first-child > a,\n.pagination-lg > li:first-child > span {\n  border-top-left-radius: 6px;\n  border-bottom-left-radius: 6px;\n}\n.pagination-lg > li:last-child > a,\n.pagination-lg > li:last-child > span {\n  border-top-right-radius: 6px;\n  border-bottom-right-radius: 6px;\n}\n.pagination-sm > li > a,\n.pagination-sm > li > span {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.pagination-sm > li:first-child > a,\n.pagination-sm > li:first-child > span {\n  border-top-left-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.pagination-sm > li:last-child > a,\n.pagination-sm > li:last-child > span {\n  border-top-right-radius: 3px;\n  border-bottom-right-radius: 3px;\n}\n.pager {\n  padding-left: 0;\n  margin: 20px 0;\n  text-align: center;\n  list-style: none;\n}\n.pager li {\n  display: inline;\n}\n.pager li > a,\n.pager li > span {\n  display: inline-block;\n  padding: 5px 14px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 15px;\n}\n.pager li > a:hover,\n.pager li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.pager .next > a,\n.pager .next > span {\n  float: right;\n}\n.pager .previous > a,\n.pager .previous > span {\n  float: left;\n}\n.pager .disabled > a,\n.pager .disabled > a:hover,\n.pager .disabled > a:focus,\n.pager .disabled > span {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n}\n.label {\n  display: inline;\n  padding: .2em .6em .3em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: .25em;\n}\na.label:hover,\na.label:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.label:empty {\n  display: none;\n}\n.btn .label {\n  position: relative;\n  top: -1px;\n}\n.label-default {\n  background-color: #777;\n}\n.label-default[href]:hover,\n.label-default[href]:focus {\n  background-color: #5e5e5e;\n}\n.label-primary {\n  background-color: #337ab7;\n}\n.label-primary[href]:hover,\n.label-primary[href]:focus {\n  background-color: #286090;\n}\n.label-success {\n  background-color: #5cb85c;\n}\n.label-success[href]:hover,\n.label-success[href]:focus {\n  background-color: #449d44;\n}\n.label-info {\n  background-color: #5bc0de;\n}\n.label-info[href]:hover,\n.label-info[href]:focus {\n  background-color: #31b0d5;\n}\n.label-warning {\n  background-color: #f0ad4e;\n}\n.label-warning[href]:hover,\n.label-warning[href]:focus {\n  background-color: #ec971f;\n}\n.label-danger {\n  background-color: #d9534f;\n}\n.label-danger[href]:hover,\n.label-danger[href]:focus {\n  background-color: #c9302c;\n}\n.badge {\n  display: inline-block;\n  min-width: 10px;\n  padding: 3px 7px;\n  font-size: 12px;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  background-color: #777;\n  border-radius: 10px;\n}\n.badge:empty {\n  display: none;\n}\n.btn .badge {\n  position: relative;\n  top: -1px;\n}\n.btn-xs .badge,\n.btn-group-xs > .btn .badge {\n  top: 0;\n  padding: 1px 5px;\n}\na.badge:hover,\na.badge:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.list-group-item.active > .badge,\n.nav-pills > .active > a > .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.list-group-item > .badge {\n  float: right;\n}\n.list-group-item > .badge + .badge {\n  margin-right: 5px;\n}\n.nav-pills > li > a > .badge {\n  margin-left: 3px;\n}\n.jumbotron {\n  padding-top: 30px;\n  padding-bottom: 30px;\n  margin-bottom: 30px;\n  color: inherit;\n  background-color: #eee;\n}\n.jumbotron h1,\n.jumbotron .h1 {\n  color: inherit;\n}\n.jumbotron p {\n  margin-bottom: 15px;\n  font-size: 21px;\n  font-weight: 200;\n}\n.jumbotron > hr {\n  border-top-color: #d5d5d5;\n}\n.container .jumbotron,\n.container-fluid .jumbotron {\n  border-radius: 6px;\n}\n.jumbotron .container {\n  max-width: 100%;\n}\n@media screen and (min-width: 768px) {\n  .jumbotron {\n    padding-top: 48px;\n    padding-bottom: 48px;\n  }\n  .container .jumbotron,\n  .container-fluid .jumbotron {\n    padding-right: 60px;\n    padding-left: 60px;\n  }\n  .jumbotron h1,\n  .jumbotron .h1 {\n    font-size: 63px;\n  }\n}\n.thumbnail {\n  display: block;\n  padding: 4px;\n  margin-bottom: 20px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: border .2s ease-in-out;\n       -o-transition: border .2s ease-in-out;\n          transition: border .2s ease-in-out;\n}\n.thumbnail > img,\n.thumbnail a > img {\n  margin-right: auto;\n  margin-left: auto;\n}\na.thumbnail:hover,\na.thumbnail:focus,\na.thumbnail.active {\n  border-color: #337ab7;\n}\n.thumbnail .caption {\n  padding: 9px;\n  color: #333;\n}\n.alert {\n  padding: 15px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.alert h4 {\n  margin-top: 0;\n  color: inherit;\n}\n.alert .alert-link {\n  font-weight: bold;\n}\n.alert > p,\n.alert > ul {\n  margin-bottom: 0;\n}\n.alert > p + p {\n  margin-top: 5px;\n}\n.alert-dismissable,\n.alert-dismissible {\n  padding-right: 35px;\n}\n.alert-dismissable .close,\n.alert-dismissible .close {\n  position: relative;\n  top: -2px;\n  right: -21px;\n  color: inherit;\n}\n.alert-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.alert-success hr {\n  border-top-color: #c9e2b3;\n}\n.alert-success .alert-link {\n  color: #2b542c;\n}\n.alert-info {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.alert-info hr {\n  border-top-color: #a6e1ec;\n}\n.alert-info .alert-link {\n  color: #245269;\n}\n.alert-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.alert-warning hr {\n  border-top-color: #f7e1b5;\n}\n.alert-warning .alert-link {\n  color: #66512c;\n}\n.alert-danger {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.alert-danger hr {\n  border-top-color: #e4b9c0;\n}\n.alert-danger .alert-link {\n  color: #843534;\n}\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n.progress {\n  height: 20px;\n  margin-bottom: 20px;\n  overflow: hidden;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n          box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n}\n.progress-bar {\n  float: left;\n  width: 0;\n  height: 100%;\n  font-size: 12px;\n  line-height: 20px;\n  color: #fff;\n  text-align: center;\n  background-color: #337ab7;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n  -webkit-transition: width .6s ease;\n       -o-transition: width .6s ease;\n          transition: width .6s ease;\n}\n.progress-striped .progress-bar,\n.progress-bar-striped {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 40px 40px;\n          background-size: 40px 40px;\n}\n.progress.active .progress-bar,\n.progress-bar.active {\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\n       -o-animation: progress-bar-stripes 2s linear infinite;\n          animation: progress-bar-stripes 2s linear infinite;\n}\n.progress-bar-success {\n  background-color: #5cb85c;\n}\n.progress-striped .progress-bar-success {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-info {\n  background-color: #5bc0de;\n}\n.progress-striped .progress-bar-info {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-warning {\n  background-color: #f0ad4e;\n}\n.progress-striped .progress-bar-warning {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-danger {\n  background-color: #d9534f;\n}\n.progress-striped .progress-bar-danger {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.media {\n  margin-top: 15px;\n}\n.media:first-child {\n  margin-top: 0;\n}\n.media,\n.media-body {\n  overflow: hidden;\n  zoom: 1;\n}\n.media-body {\n  width: 10000px;\n}\n.media-object {\n  display: block;\n}\n.media-object.img-thumbnail {\n  max-width: none;\n}\n.media-right,\n.media > .pull-right {\n  padding-left: 10px;\n}\n.media-left,\n.media > .pull-left {\n  padding-right: 10px;\n}\n.media-left,\n.media-right,\n.media-body {\n  display: table-cell;\n  vertical-align: top;\n}\n.media-middle {\n  vertical-align: middle;\n}\n.media-bottom {\n  vertical-align: bottom;\n}\n.media-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.media-list {\n  padding-left: 0;\n  list-style: none;\n}\n.list-group {\n  padding-left: 0;\n  margin-bottom: 20px;\n}\n.list-group-item {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.list-group-item:first-child {\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n}\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\na.list-group-item,\nbutton.list-group-item {\n  color: #555;\n}\na.list-group-item .list-group-item-heading,\nbutton.list-group-item .list-group-item-heading {\n  color: #333;\n}\na.list-group-item:hover,\nbutton.list-group-item:hover,\na.list-group-item:focus,\nbutton.list-group-item:focus {\n  color: #555;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\nbutton.list-group-item {\n  width: 100%;\n  text-align: left;\n}\n.list-group-item.disabled,\n.list-group-item.disabled:hover,\n.list-group-item.disabled:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #eee;\n}\n.list-group-item.disabled .list-group-item-heading,\n.list-group-item.disabled:hover .list-group-item-heading,\n.list-group-item.disabled:focus .list-group-item-heading {\n  color: inherit;\n}\n.list-group-item.disabled .list-group-item-text,\n.list-group-item.disabled:hover .list-group-item-text,\n.list-group-item.disabled:focus .list-group-item-text {\n  color: #777;\n}\n.list-group-item.active,\n.list-group-item.active:hover,\n.list-group-item.active:focus {\n  z-index: 2;\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active:hover .list-group-item-heading,\n.list-group-item.active:focus .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active:hover .list-group-item-heading > small,\n.list-group-item.active:focus .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small,\n.list-group-item.active:hover .list-group-item-heading > .small,\n.list-group-item.active:focus .list-group-item-heading > .small {\n  color: inherit;\n}\n.list-group-item.active .list-group-item-text,\n.list-group-item.active:hover .list-group-item-text,\n.list-group-item.active:focus .list-group-item-text {\n  color: #c7ddef;\n}\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-success:hover,\nbutton.list-group-item-success:hover,\na.list-group-item-success:focus,\nbutton.list-group-item-success:focus {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\na.list-group-item-success.active,\nbutton.list-group-item-success.active,\na.list-group-item-success.active:hover,\nbutton.list-group-item-success.active:hover,\na.list-group-item-success.active:focus,\nbutton.list-group-item-success.active:focus {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-info:hover,\nbutton.list-group-item-info:hover,\na.list-group-item-info:focus,\nbutton.list-group-item-info:focus {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\na.list-group-item-info.active,\nbutton.list-group-item-info.active,\na.list-group-item-info.active:hover,\nbutton.list-group-item-info.active:hover,\na.list-group-item-info.active:focus,\nbutton.list-group-item-info.active:focus {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-warning:hover,\nbutton.list-group-item-warning:hover,\na.list-group-item-warning:focus,\nbutton.list-group-item-warning:focus {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\na.list-group-item-warning.active,\nbutton.list-group-item-warning.active,\na.list-group-item-warning.active:hover,\nbutton.list-group-item-warning.active:hover,\na.list-group-item-warning.active:focus,\nbutton.list-group-item-warning.active:focus {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-danger:hover,\nbutton.list-group-item-danger:hover,\na.list-group-item-danger:focus,\nbutton.list-group-item-danger:focus {\n  color: #a94442;\n  background-color: #ebcccc;\n}\na.list-group-item-danger.active,\nbutton.list-group-item-danger.active,\na.list-group-item-danger.active:hover,\nbutton.list-group-item-danger.active:hover,\na.list-group-item-danger.active:focus,\nbutton.list-group-item-danger.active:focus {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n.list-group-item-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.list-group-item-text {\n  margin-bottom: 0;\n  line-height: 1.3;\n}\n.panel {\n  margin-bottom: 20px;\n  background-color: #fff;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n}\n.panel-body {\n  padding: 15px;\n}\n.panel-heading {\n  padding: 10px 15px;\n  border-bottom: 1px solid transparent;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel-heading > .dropdown .dropdown-toggle {\n  color: inherit;\n}\n.panel-title {\n  margin-top: 0;\n  margin-bottom: 0;\n  font-size: 16px;\n  color: inherit;\n}\n.panel-title > a,\n.panel-title > small,\n.panel-title > .small,\n.panel-title > small > a,\n.panel-title > .small > a {\n  color: inherit;\n}\n.panel-footer {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .list-group,\n.panel > .panel-collapse > .list-group {\n  margin-bottom: 0;\n}\n.panel > .list-group .list-group-item,\n.panel > .panel-collapse > .list-group .list-group-item {\n  border-width: 1px 0;\n  border-radius: 0;\n}\n.panel > .list-group:first-child .list-group-item:first-child,\n.panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {\n  border-top: 0;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .list-group:last-child .list-group-item:last-child,\n.panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {\n  border-bottom: 0;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .panel-heading + .panel-collapse > .list-group .list-group-item:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.panel-heading + .list-group .list-group-item:first-child {\n  border-top-width: 0;\n}\n.list-group + .panel-footer {\n  border-top-width: 0;\n}\n.panel > .table,\n.panel > .table-responsive > .table,\n.panel > .panel-collapse > .table {\n  margin-bottom: 0;\n}\n.panel > .table caption,\n.panel > .table-responsive > .table caption,\n.panel > .panel-collapse > .table caption {\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.panel > .table:first-child,\n.panel > .table-responsive:first-child > .table:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {\n  border-top-left-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {\n  border-top-right-radius: 3px;\n}\n.panel > .table:last-child,\n.panel > .table-responsive:last-child > .table:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {\n  border-bottom-right-radius: 3px;\n}\n.panel > .panel-body + .table,\n.panel > .panel-body + .table-responsive,\n.panel > .table + .panel-body,\n.panel > .table-responsive + .panel-body {\n  border-top: 1px solid #ddd;\n}\n.panel > .table > tbody:first-child > tr:first-child th,\n.panel > .table > tbody:first-child > tr:first-child td {\n  border-top: 0;\n}\n.panel > .table-bordered,\n.panel > .table-responsive > .table-bordered {\n  border: 0;\n}\n.panel > .table-bordered > thead > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:first-child,\n.panel > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-bordered > thead > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:first-child,\n.panel > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-bordered > tfoot > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n  border-left: 0;\n}\n.panel > .table-bordered > thead > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:last-child,\n.panel > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-bordered > thead > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:last-child,\n.panel > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-bordered > tfoot > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n  border-right: 0;\n}\n.panel > .table-bordered > thead > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > td,\n.panel > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-bordered > thead > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > th,\n.panel > .table-bordered > tbody > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > th {\n  border-bottom: 0;\n}\n.panel > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-bordered > tfoot > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {\n  border-bottom: 0;\n}\n.panel > .table-responsive {\n  margin-bottom: 0;\n  border: 0;\n}\n.panel-group {\n  margin-bottom: 20px;\n}\n.panel-group .panel {\n  margin-bottom: 0;\n  border-radius: 4px;\n}\n.panel-group .panel + .panel {\n  margin-top: 5px;\n}\n.panel-group .panel-heading {\n  border-bottom: 0;\n}\n.panel-group .panel-heading + .panel-collapse > .panel-body,\n.panel-group .panel-heading + .panel-collapse > .list-group {\n  border-top: 1px solid #ddd;\n}\n.panel-group .panel-footer {\n  border-top: 0;\n}\n.panel-group .panel-footer + .panel-collapse .panel-body {\n  border-bottom: 1px solid #ddd;\n}\n.panel-default {\n  border-color: #ddd;\n}\n.panel-default > .panel-heading {\n  color: #333;\n  background-color: #f5f5f5;\n  border-color: #ddd;\n}\n.panel-default > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ddd;\n}\n.panel-default > .panel-heading .badge {\n  color: #f5f5f5;\n  background-color: #333;\n}\n.panel-default > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ddd;\n}\n.panel-primary {\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #337ab7;\n}\n.panel-primary > .panel-heading .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.panel-primary > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #337ab7;\n}\n.panel-success {\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #d6e9c6;\n}\n.panel-success > .panel-heading .badge {\n  color: #dff0d8;\n  background-color: #3c763d;\n}\n.panel-success > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #d6e9c6;\n}\n.panel-info {\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #bce8f1;\n}\n.panel-info > .panel-heading .badge {\n  color: #d9edf7;\n  background-color: #31708f;\n}\n.panel-info > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #bce8f1;\n}\n.panel-warning {\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #faebcc;\n}\n.panel-warning > .panel-heading .badge {\n  color: #fcf8e3;\n  background-color: #8a6d3b;\n}\n.panel-warning > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #faebcc;\n}\n.panel-danger {\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ebccd1;\n}\n.panel-danger > .panel-heading .badge {\n  color: #f2dede;\n  background-color: #a94442;\n}\n.panel-danger > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ebccd1;\n}\n.embed-responsive {\n  position: relative;\n  display: block;\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n.embed-responsive-16by9 {\n  padding-bottom: 56.25%;\n}\n.embed-responsive-4by3 {\n  padding-bottom: 75%;\n}\n.well {\n  min-height: 20px;\n  padding: 19px;\n  margin-bottom: 20px;\n  background-color: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n}\n.well blockquote {\n  border-color: #ddd;\n  border-color: rgba(0, 0, 0, .15);\n}\n.well-lg {\n  padding: 24px;\n  border-radius: 6px;\n}\n.well-sm {\n  padding: 9px;\n  border-radius: 3px;\n}\n.close {\n  float: right;\n  font-size: 21px;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  filter: alpha(opacity=20);\n  opacity: .2;\n}\n.close:hover,\n.close:focus {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\nbutton.close {\n  -webkit-appearance: none;\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n}\n.modal-open {\n  overflow: hidden;\n}\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  -webkit-overflow-scrolling: touch;\n  outline: 0;\n}\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform .3s ease-out;\n       -o-transition:      -o-transform .3s ease-out;\n          transition:         transform .3s ease-out;\n  -webkit-transform: translate(0, -25%);\n      -ms-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n.modal.in .modal-dialog {\n  -webkit-transform: translate(0, 0);\n      -ms-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n.modal-content {\n  position: relative;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #999;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  outline: 0;\n  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n          box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n}\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n.modal-backdrop.fade {\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n.modal-backdrop.in {\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.modal-header {\n  min-height: 16.42857143px;\n  padding: 15px;\n  border-bottom: 1px solid #e5e5e5;\n}\n.modal-header .close {\n  margin-top: -2px;\n}\n.modal-title {\n  margin: 0;\n  line-height: 1.42857143;\n}\n.modal-body {\n  position: relative;\n  padding: 15px;\n}\n.modal-footer {\n  padding: 15px;\n  text-align: right;\n  border-top: 1px solid #e5e5e5;\n}\n.modal-footer .btn + .btn {\n  margin-bottom: 0;\n  margin-left: 5px;\n}\n.modal-footer .btn-group .btn + .btn {\n  margin-left: -1px;\n}\n.modal-footer .btn-block + .btn-block {\n  margin-left: 0;\n}\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n@media (min-width: 768px) {\n  .modal-dialog {\n    width: 600px;\n    margin: 30px auto;\n  }\n  .modal-content {\n    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n            box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n  }\n  .modal-sm {\n    width: 300px;\n  }\n}\n@media (min-width: 992px) {\n  .modal-lg {\n    width: 900px;\n  }\n}\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 12px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  filter: alpha(opacity=0);\n  opacity: 0;\n\n  line-break: auto;\n}\n.tooltip.in {\n  filter: alpha(opacity=90);\n  opacity: .9;\n}\n.tooltip.top {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n.tooltip.right {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n.tooltip.bottom {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n.tooltip.left {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 4px;\n}\n.tooltip-arrow {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.tooltip.top .tooltip-arrow {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-left .tooltip-arrow {\n  right: 5px;\n  bottom: 0;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-right .tooltip-arrow {\n  bottom: 0;\n  left: 5px;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.right .tooltip-arrow {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n.tooltip.left .tooltip-arrow {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n.tooltip.bottom .tooltip-arrow {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-left .tooltip-arrow {\n  top: 0;\n  right: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-right .tooltip-arrow {\n  top: 0;\n  left: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: none;\n  max-width: 276px;\n  padding: 1px;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n\n  line-break: auto;\n}\n.popover.top {\n  margin-top: -10px;\n}\n.popover.right {\n  margin-left: 10px;\n}\n.popover.bottom {\n  margin-top: 10px;\n}\n.popover.left {\n  margin-left: -10px;\n}\n.popover-title {\n  padding: 8px 14px;\n  margin: 0;\n  font-size: 14px;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-radius: 5px 5px 0 0;\n}\n.popover-content {\n  padding: 9px 14px;\n}\n.popover > .arrow,\n.popover > .arrow:after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.popover > .arrow {\n  border-width: 11px;\n}\n.popover > .arrow:after {\n  content: \"\";\n  border-width: 10px;\n}\n.popover.top > .arrow {\n  bottom: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-color: #999;\n  border-top-color: rgba(0, 0, 0, .25);\n  border-bottom-width: 0;\n}\n.popover.top > .arrow:after {\n  bottom: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-color: #fff;\n  border-bottom-width: 0;\n}\n.popover.right > .arrow {\n  top: 50%;\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: #999;\n  border-right-color: rgba(0, 0, 0, .25);\n  border-left-width: 0;\n}\n.popover.right > .arrow:after {\n  bottom: -10px;\n  left: 1px;\n  content: \" \";\n  border-right-color: #fff;\n  border-left-width: 0;\n}\n.popover.bottom > .arrow {\n  top: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-width: 0;\n  border-bottom-color: #999;\n  border-bottom-color: rgba(0, 0, 0, .25);\n}\n.popover.bottom > .arrow:after {\n  top: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-width: 0;\n  border-bottom-color: #fff;\n}\n.popover.left > .arrow {\n  top: 50%;\n  right: -11px;\n  margin-top: -11px;\n  border-right-width: 0;\n  border-left-color: #999;\n  border-left-color: rgba(0, 0, 0, .25);\n}\n.popover.left > .arrow:after {\n  right: 1px;\n  bottom: -10px;\n  content: \" \";\n  border-right-width: 0;\n  border-left-color: #fff;\n}\n.carousel {\n  position: relative;\n}\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n.carousel-inner > .item {\n  position: relative;\n  display: none;\n  -webkit-transition: .6s ease-in-out left;\n       -o-transition: .6s ease-in-out left;\n          transition: .6s ease-in-out left;\n}\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  line-height: 1;\n}\n@media all and (transform-3d), (-webkit-transform-3d) {\n  .carousel-inner > .item {\n    -webkit-transition: -webkit-transform .6s ease-in-out;\n         -o-transition:      -o-transform .6s ease-in-out;\n            transition:         transform .6s ease-in-out;\n\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n  .carousel-inner > .item.next,\n  .carousel-inner > .item.active.right {\n    left: 0;\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-inner > .item.prev,\n  .carousel-inner > .item.active.left {\n    left: 0;\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n  .carousel-inner > .item.next.left,\n  .carousel-inner > .item.prev.right,\n  .carousel-inner > .item.active {\n    left: 0;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n.carousel-inner > .active,\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  display: block;\n}\n.carousel-inner > .active {\n  left: 0;\n}\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  position: absolute;\n  top: 0;\n  width: 100%;\n}\n.carousel-inner > .next {\n  left: 100%;\n}\n.carousel-inner > .prev {\n  left: -100%;\n}\n.carousel-inner > .next.left,\n.carousel-inner > .prev.right {\n  left: 0;\n}\n.carousel-inner > .active.left {\n  left: -100%;\n}\n.carousel-inner > .active.right {\n  left: 100%;\n}\n.carousel-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 15%;\n  font-size: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.carousel-control.left {\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control.right {\n  right: 0;\n  left: auto;\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .0001)), to(rgba(0, 0, 0, .5)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control:hover,\n.carousel-control:focus {\n  color: #fff;\n  text-decoration: none;\n  filter: alpha(opacity=90);\n  outline: 0;\n  opacity: .9;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-left,\n.carousel-control .glyphicon-chevron-right {\n  position: absolute;\n  top: 50%;\n  z-index: 5;\n  display: inline-block;\n  margin-top: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .glyphicon-chevron-left {\n  left: 50%;\n  margin-left: -10px;\n}\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-right {\n  right: 50%;\n  margin-right: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next {\n  width: 20px;\n  height: 20px;\n  font-family: serif;\n  line-height: 1;\n}\n.carousel-control .icon-prev:before {\n  content: '\\2039';\n}\n.carousel-control .icon-next:before {\n  content: '\\203A';\n}\n.carousel-indicators {\n  position: absolute;\n  bottom: 10px;\n  left: 50%;\n  z-index: 15;\n  width: 60%;\n  padding-left: 0;\n  margin-left: -30%;\n  text-align: center;\n  list-style: none;\n}\n.carousel-indicators li {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin: 1px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: #000 \\9;\n  background-color: rgba(0, 0, 0, 0);\n  border: 1px solid #fff;\n  border-radius: 10px;\n}\n.carousel-indicators .active {\n  width: 12px;\n  height: 12px;\n  margin: 0;\n  background-color: #fff;\n}\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n}\n.carousel-caption .btn {\n  text-shadow: none;\n}\n@media screen and (min-width: 768px) {\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-prev,\n  .carousel-control .icon-next {\n    width: 30px;\n    height: 30px;\n    margin-top: -15px;\n    font-size: 30px;\n  }\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .icon-prev {\n    margin-left: -15px;\n  }\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-next {\n    margin-right: -15px;\n  }\n  .carousel-caption {\n    right: 20%;\n    left: 20%;\n    padding-bottom: 30px;\n  }\n  .carousel-indicators {\n    bottom: 20px;\n  }\n}\n.clearfix:before,\n.clearfix:after,\n.dl-horizontal dd:before,\n.dl-horizontal dd:after,\n.container:before,\n.container:after,\n.container-fluid:before,\n.container-fluid:after,\n.row:before,\n.row:after,\n.form-horizontal .form-group:before,\n.form-horizontal .form-group:after,\n.btn-toolbar:before,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:before,\n.btn-group-vertical > .btn-group:after,\n.nav:before,\n.nav:after,\n.navbar:before,\n.navbar:after,\n.navbar-header:before,\n.navbar-header:after,\n.navbar-collapse:before,\n.navbar-collapse:after,\n.pager:before,\n.pager:after,\n.panel-body:before,\n.panel-body:after,\n.modal-footer:before,\n.modal-footer:after {\n  display: table;\n  content: \" \";\n}\n.clearfix:after,\n.dl-horizontal dd:after,\n.container:after,\n.container-fluid:after,\n.row:after,\n.form-horizontal .form-group:after,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:after,\n.nav:after,\n.navbar:after,\n.navbar-header:after,\n.navbar-collapse:after,\n.pager:after,\n.panel-body:after,\n.modal-footer:after {\n  clear: both;\n}\n.center-block {\n  display: block;\n  margin-right: auto;\n  margin-left: auto;\n}\n.pull-right {\n  float: right !important;\n}\n.pull-left {\n  float: left !important;\n}\n.hide {\n  display: none !important;\n}\n.show {\n  display: block !important;\n}\n.invisible {\n  visibility: hidden;\n}\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n.hidden {\n  display: none !important;\n}\n.affix {\n  position: fixed;\n}\n@-ms-viewport {\n  width: device-width;\n}\n.visible-xs,\n.visible-sm,\n.visible-md,\n.visible-lg {\n  display: none !important;\n}\n.visible-xs-block,\n.visible-xs-inline,\n.visible-xs-inline-block,\n.visible-sm-block,\n.visible-sm-inline,\n.visible-sm-inline-block,\n.visible-md-block,\n.visible-md-inline,\n.visible-md-inline-block,\n.visible-lg-block,\n.visible-lg-inline,\n.visible-lg-inline-block {\n  display: none !important;\n}\n@media (max-width: 767px) {\n  .visible-xs {\n    display: block !important;\n  }\n  table.visible-xs {\n    display: table !important;\n  }\n  tr.visible-xs {\n    display: table-row !important;\n  }\n  th.visible-xs,\n  td.visible-xs {\n    display: table-cell !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-block {\n    display: block !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline {\n    display: inline !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm {\n    display: block !important;\n  }\n  table.visible-sm {\n    display: table !important;\n  }\n  tr.visible-sm {\n    display: table-row !important;\n  }\n  th.visible-sm,\n  td.visible-sm {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-block {\n    display: block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md {\n    display: block !important;\n  }\n  table.visible-md {\n    display: table !important;\n  }\n  tr.visible-md {\n    display: table-row !important;\n  }\n  th.visible-md,\n  td.visible-md {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-block {\n    display: block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg {\n    display: block !important;\n  }\n  table.visible-lg {\n    display: table !important;\n  }\n  tr.visible-lg {\n    display: table-row !important;\n  }\n  th.visible-lg,\n  td.visible-lg {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-block {\n    display: block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (max-width: 767px) {\n  .hidden-xs {\n    display: none !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .hidden-sm {\n    display: none !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .hidden-md {\n    display: none !important;\n  }\n}\n@media (min-width: 1200px) {\n  .hidden-lg {\n    display: none !important;\n  }\n}\n.visible-print {\n  display: none !important;\n}\n@media print {\n  .visible-print {\n    display: block !important;\n  }\n  table.visible-print {\n    display: table !important;\n  }\n  tr.visible-print {\n    display: table-row !important;\n  }\n  th.visible-print,\n  td.visible-print {\n    display: table-cell !important;\n  }\n}\n.visible-print-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n.visible-print-inline {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n.visible-print-inline-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */\n", ""]);
+	exports.push([module.id, "/*!\n * Bootstrap v3.3.5 (http://getbootstrap.com)\n * Copyright 2011-2015 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  -webkit-text-size-adjust: 100%;\n      -ms-text-size-adjust: 100%;\n}\nbody {\n  margin: 0;\n}\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nhgroup,\nmain,\nmenu,\nnav,\nsection,\nsummary {\n  display: block;\n}\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n  vertical-align: baseline;\n}\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n[hidden],\ntemplate {\n  display: none;\n}\na {\n  background-color: transparent;\n}\na:active,\na:hover {\n  outline: 0;\n}\nabbr[title] {\n  border-bottom: 1px dotted;\n}\nb,\nstrong {\n  font-weight: bold;\n}\ndfn {\n  font-style: italic;\n}\nh1 {\n  margin: .67em 0;\n  font-size: 2em;\n}\nmark {\n  color: #000;\n  background: #ff0;\n}\nsmall {\n  font-size: 80%;\n}\nsub,\nsup {\n  position: relative;\n  font-size: 75%;\n  line-height: 0;\n  vertical-align: baseline;\n}\nsup {\n  top: -.5em;\n}\nsub {\n  bottom: -.25em;\n}\nimg {\n  border: 0;\n}\nsvg:not(:root) {\n  overflow: hidden;\n}\nfigure {\n  margin: 1em 40px;\n}\nhr {\n  height: 0;\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n}\npre {\n  overflow: auto;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  margin: 0;\n  font: inherit;\n  color: inherit;\n}\nbutton {\n  overflow: visible;\n}\nbutton,\nselect {\n  text-transform: none;\n}\nbutton,\nhtml input[type=\"button\"],\ninput[type=\"reset\"],\ninput[type=\"submit\"] {\n  -webkit-appearance: button;\n  cursor: pointer;\n}\nbutton[disabled],\nhtml input[disabled] {\n  cursor: default;\n}\nbutton::-moz-focus-inner,\ninput::-moz-focus-inner {\n  padding: 0;\n  border: 0;\n}\ninput {\n  line-height: normal;\n}\ninput[type=\"checkbox\"],\ninput[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\ninput[type=\"number\"]::-webkit-inner-spin-button,\ninput[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n  -webkit-appearance: textfield;\n}\ninput[type=\"search\"]::-webkit-search-cancel-button,\ninput[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\nfieldset {\n  padding: .35em .625em .75em;\n  margin: 0 2px;\n  border: 1px solid #c0c0c0;\n}\nlegend {\n  padding: 0;\n  border: 0;\n}\ntextarea {\n  overflow: auto;\n}\noptgroup {\n  font-weight: bold;\n}\ntable {\n  border-spacing: 0;\n  border-collapse: collapse;\n}\ntd,\nth {\n  padding: 0;\n}\n/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */\n@media print {\n  *,\n  *:before,\n  *:after {\n    color: #000 !important;\n    text-shadow: none !important;\n    background: transparent !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  a[href]:after {\n    content: \" (\" attr(href) \")\";\n  }\n  abbr[title]:after {\n    content: \" (\" attr(title) \")\";\n  }\n  a[href^=\"#\"]:after,\n  a[href^=\"javascript:\"]:after {\n    content: \"\";\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  img {\n    max-width: 100% !important;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .btn > .caret,\n  .dropup > .btn > .caret {\n    border-top-color: #000 !important;\n  }\n  .label {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n@font-face {\n  font-family: 'Glyphicons Halflings';\n\n  src: url(" + __webpack_require__(85) + ");\n  src: url(" + __webpack_require__(85) + "?#iefix) format('embedded-opentype'), url(" + __webpack_require__(86) + ") format('woff2'), url(" + __webpack_require__(87) + ") format('woff'), url(" + __webpack_require__(88) + ") format('truetype'), url(" + __webpack_require__(89) + "#glyphicons_halflingsregular) format('svg');\n}\n.glyphicon {\n  position: relative;\n  top: 1px;\n  display: inline-block;\n  font-family: 'Glyphicons Halflings';\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1;\n\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n.glyphicon-asterisk:before {\n  content: \"*\";\n}\n.glyphicon-plus:before {\n  content: \"+\";\n}\n.glyphicon-euro:before,\n.glyphicon-eur:before {\n  content: \"\\20AC\";\n}\n.glyphicon-minus:before {\n  content: \"\\2212\";\n}\n.glyphicon-cloud:before {\n  content: \"\\2601\";\n}\n.glyphicon-envelope:before {\n  content: \"\\2709\";\n}\n.glyphicon-pencil:before {\n  content: \"\\270F\";\n}\n.glyphicon-glass:before {\n  content: \"\\E001\";\n}\n.glyphicon-music:before {\n  content: \"\\E002\";\n}\n.glyphicon-search:before {\n  content: \"\\E003\";\n}\n.glyphicon-heart:before {\n  content: \"\\E005\";\n}\n.glyphicon-star:before {\n  content: \"\\E006\";\n}\n.glyphicon-star-empty:before {\n  content: \"\\E007\";\n}\n.glyphicon-user:before {\n  content: \"\\E008\";\n}\n.glyphicon-film:before {\n  content: \"\\E009\";\n}\n.glyphicon-th-large:before {\n  content: \"\\E010\";\n}\n.glyphicon-th:before {\n  content: \"\\E011\";\n}\n.glyphicon-th-list:before {\n  content: \"\\E012\";\n}\n.glyphicon-ok:before {\n  content: \"\\E013\";\n}\n.glyphicon-remove:before {\n  content: \"\\E014\";\n}\n.glyphicon-zoom-in:before {\n  content: \"\\E015\";\n}\n.glyphicon-zoom-out:before {\n  content: \"\\E016\";\n}\n.glyphicon-off:before {\n  content: \"\\E017\";\n}\n.glyphicon-signal:before {\n  content: \"\\E018\";\n}\n.glyphicon-cog:before {\n  content: \"\\E019\";\n}\n.glyphicon-trash:before {\n  content: \"\\E020\";\n}\n.glyphicon-home:before {\n  content: \"\\E021\";\n}\n.glyphicon-file:before {\n  content: \"\\E022\";\n}\n.glyphicon-time:before {\n  content: \"\\E023\";\n}\n.glyphicon-road:before {\n  content: \"\\E024\";\n}\n.glyphicon-download-alt:before {\n  content: \"\\E025\";\n}\n.glyphicon-download:before {\n  content: \"\\E026\";\n}\n.glyphicon-upload:before {\n  content: \"\\E027\";\n}\n.glyphicon-inbox:before {\n  content: \"\\E028\";\n}\n.glyphicon-play-circle:before {\n  content: \"\\E029\";\n}\n.glyphicon-repeat:before {\n  content: \"\\E030\";\n}\n.glyphicon-refresh:before {\n  content: \"\\E031\";\n}\n.glyphicon-list-alt:before {\n  content: \"\\E032\";\n}\n.glyphicon-lock:before {\n  content: \"\\E033\";\n}\n.glyphicon-flag:before {\n  content: \"\\E034\";\n}\n.glyphicon-headphones:before {\n  content: \"\\E035\";\n}\n.glyphicon-volume-off:before {\n  content: \"\\E036\";\n}\n.glyphicon-volume-down:before {\n  content: \"\\E037\";\n}\n.glyphicon-volume-up:before {\n  content: \"\\E038\";\n}\n.glyphicon-qrcode:before {\n  content: \"\\E039\";\n}\n.glyphicon-barcode:before {\n  content: \"\\E040\";\n}\n.glyphicon-tag:before {\n  content: \"\\E041\";\n}\n.glyphicon-tags:before {\n  content: \"\\E042\";\n}\n.glyphicon-book:before {\n  content: \"\\E043\";\n}\n.glyphicon-bookmark:before {\n  content: \"\\E044\";\n}\n.glyphicon-print:before {\n  content: \"\\E045\";\n}\n.glyphicon-camera:before {\n  content: \"\\E046\";\n}\n.glyphicon-font:before {\n  content: \"\\E047\";\n}\n.glyphicon-bold:before {\n  content: \"\\E048\";\n}\n.glyphicon-italic:before {\n  content: \"\\E049\";\n}\n.glyphicon-text-height:before {\n  content: \"\\E050\";\n}\n.glyphicon-text-width:before {\n  content: \"\\E051\";\n}\n.glyphicon-align-left:before {\n  content: \"\\E052\";\n}\n.glyphicon-align-center:before {\n  content: \"\\E053\";\n}\n.glyphicon-align-right:before {\n  content: \"\\E054\";\n}\n.glyphicon-align-justify:before {\n  content: \"\\E055\";\n}\n.glyphicon-list:before {\n  content: \"\\E056\";\n}\n.glyphicon-indent-left:before {\n  content: \"\\E057\";\n}\n.glyphicon-indent-right:before {\n  content: \"\\E058\";\n}\n.glyphicon-facetime-video:before {\n  content: \"\\E059\";\n}\n.glyphicon-picture:before {\n  content: \"\\E060\";\n}\n.glyphicon-map-marker:before {\n  content: \"\\E062\";\n}\n.glyphicon-adjust:before {\n  content: \"\\E063\";\n}\n.glyphicon-tint:before {\n  content: \"\\E064\";\n}\n.glyphicon-edit:before {\n  content: \"\\E065\";\n}\n.glyphicon-share:before {\n  content: \"\\E066\";\n}\n.glyphicon-check:before {\n  content: \"\\E067\";\n}\n.glyphicon-move:before {\n  content: \"\\E068\";\n}\n.glyphicon-step-backward:before {\n  content: \"\\E069\";\n}\n.glyphicon-fast-backward:before {\n  content: \"\\E070\";\n}\n.glyphicon-backward:before {\n  content: \"\\E071\";\n}\n.glyphicon-play:before {\n  content: \"\\E072\";\n}\n.glyphicon-pause:before {\n  content: \"\\E073\";\n}\n.glyphicon-stop:before {\n  content: \"\\E074\";\n}\n.glyphicon-forward:before {\n  content: \"\\E075\";\n}\n.glyphicon-fast-forward:before {\n  content: \"\\E076\";\n}\n.glyphicon-step-forward:before {\n  content: \"\\E077\";\n}\n.glyphicon-eject:before {\n  content: \"\\E078\";\n}\n.glyphicon-chevron-left:before {\n  content: \"\\E079\";\n}\n.glyphicon-chevron-right:before {\n  content: \"\\E080\";\n}\n.glyphicon-plus-sign:before {\n  content: \"\\E081\";\n}\n.glyphicon-minus-sign:before {\n  content: \"\\E082\";\n}\n.glyphicon-remove-sign:before {\n  content: \"\\E083\";\n}\n.glyphicon-ok-sign:before {\n  content: \"\\E084\";\n}\n.glyphicon-question-sign:before {\n  content: \"\\E085\";\n}\n.glyphicon-info-sign:before {\n  content: \"\\E086\";\n}\n.glyphicon-screenshot:before {\n  content: \"\\E087\";\n}\n.glyphicon-remove-circle:before {\n  content: \"\\E088\";\n}\n.glyphicon-ok-circle:before {\n  content: \"\\E089\";\n}\n.glyphicon-ban-circle:before {\n  content: \"\\E090\";\n}\n.glyphicon-arrow-left:before {\n  content: \"\\E091\";\n}\n.glyphicon-arrow-right:before {\n  content: \"\\E092\";\n}\n.glyphicon-arrow-up:before {\n  content: \"\\E093\";\n}\n.glyphicon-arrow-down:before {\n  content: \"\\E094\";\n}\n.glyphicon-share-alt:before {\n  content: \"\\E095\";\n}\n.glyphicon-resize-full:before {\n  content: \"\\E096\";\n}\n.glyphicon-resize-small:before {\n  content: \"\\E097\";\n}\n.glyphicon-exclamation-sign:before {\n  content: \"\\E101\";\n}\n.glyphicon-gift:before {\n  content: \"\\E102\";\n}\n.glyphicon-leaf:before {\n  content: \"\\E103\";\n}\n.glyphicon-fire:before {\n  content: \"\\E104\";\n}\n.glyphicon-eye-open:before {\n  content: \"\\E105\";\n}\n.glyphicon-eye-close:before {\n  content: \"\\E106\";\n}\n.glyphicon-warning-sign:before {\n  content: \"\\E107\";\n}\n.glyphicon-plane:before {\n  content: \"\\E108\";\n}\n.glyphicon-calendar:before {\n  content: \"\\E109\";\n}\n.glyphicon-random:before {\n  content: \"\\E110\";\n}\n.glyphicon-comment:before {\n  content: \"\\E111\";\n}\n.glyphicon-magnet:before {\n  content: \"\\E112\";\n}\n.glyphicon-chevron-up:before {\n  content: \"\\E113\";\n}\n.glyphicon-chevron-down:before {\n  content: \"\\E114\";\n}\n.glyphicon-retweet:before {\n  content: \"\\E115\";\n}\n.glyphicon-shopping-cart:before {\n  content: \"\\E116\";\n}\n.glyphicon-folder-close:before {\n  content: \"\\E117\";\n}\n.glyphicon-folder-open:before {\n  content: \"\\E118\";\n}\n.glyphicon-resize-vertical:before {\n  content: \"\\E119\";\n}\n.glyphicon-resize-horizontal:before {\n  content: \"\\E120\";\n}\n.glyphicon-hdd:before {\n  content: \"\\E121\";\n}\n.glyphicon-bullhorn:before {\n  content: \"\\E122\";\n}\n.glyphicon-bell:before {\n  content: \"\\E123\";\n}\n.glyphicon-certificate:before {\n  content: \"\\E124\";\n}\n.glyphicon-thumbs-up:before {\n  content: \"\\E125\";\n}\n.glyphicon-thumbs-down:before {\n  content: \"\\E126\";\n}\n.glyphicon-hand-right:before {\n  content: \"\\E127\";\n}\n.glyphicon-hand-left:before {\n  content: \"\\E128\";\n}\n.glyphicon-hand-up:before {\n  content: \"\\E129\";\n}\n.glyphicon-hand-down:before {\n  content: \"\\E130\";\n}\n.glyphicon-circle-arrow-right:before {\n  content: \"\\E131\";\n}\n.glyphicon-circle-arrow-left:before {\n  content: \"\\E132\";\n}\n.glyphicon-circle-arrow-up:before {\n  content: \"\\E133\";\n}\n.glyphicon-circle-arrow-down:before {\n  content: \"\\E134\";\n}\n.glyphicon-globe:before {\n  content: \"\\E135\";\n}\n.glyphicon-wrench:before {\n  content: \"\\E136\";\n}\n.glyphicon-tasks:before {\n  content: \"\\E137\";\n}\n.glyphicon-filter:before {\n  content: \"\\E138\";\n}\n.glyphicon-briefcase:before {\n  content: \"\\E139\";\n}\n.glyphicon-fullscreen:before {\n  content: \"\\E140\";\n}\n.glyphicon-dashboard:before {\n  content: \"\\E141\";\n}\n.glyphicon-paperclip:before {\n  content: \"\\E142\";\n}\n.glyphicon-heart-empty:before {\n  content: \"\\E143\";\n}\n.glyphicon-link:before {\n  content: \"\\E144\";\n}\n.glyphicon-phone:before {\n  content: \"\\E145\";\n}\n.glyphicon-pushpin:before {\n  content: \"\\E146\";\n}\n.glyphicon-usd:before {\n  content: \"\\E148\";\n}\n.glyphicon-gbp:before {\n  content: \"\\E149\";\n}\n.glyphicon-sort:before {\n  content: \"\\E150\";\n}\n.glyphicon-sort-by-alphabet:before {\n  content: \"\\E151\";\n}\n.glyphicon-sort-by-alphabet-alt:before {\n  content: \"\\E152\";\n}\n.glyphicon-sort-by-order:before {\n  content: \"\\E153\";\n}\n.glyphicon-sort-by-order-alt:before {\n  content: \"\\E154\";\n}\n.glyphicon-sort-by-attributes:before {\n  content: \"\\E155\";\n}\n.glyphicon-sort-by-attributes-alt:before {\n  content: \"\\E156\";\n}\n.glyphicon-unchecked:before {\n  content: \"\\E157\";\n}\n.glyphicon-expand:before {\n  content: \"\\E158\";\n}\n.glyphicon-collapse-down:before {\n  content: \"\\E159\";\n}\n.glyphicon-collapse-up:before {\n  content: \"\\E160\";\n}\n.glyphicon-log-in:before {\n  content: \"\\E161\";\n}\n.glyphicon-flash:before {\n  content: \"\\E162\";\n}\n.glyphicon-log-out:before {\n  content: \"\\E163\";\n}\n.glyphicon-new-window:before {\n  content: \"\\E164\";\n}\n.glyphicon-record:before {\n  content: \"\\E165\";\n}\n.glyphicon-save:before {\n  content: \"\\E166\";\n}\n.glyphicon-open:before {\n  content: \"\\E167\";\n}\n.glyphicon-saved:before {\n  content: \"\\E168\";\n}\n.glyphicon-import:before {\n  content: \"\\E169\";\n}\n.glyphicon-export:before {\n  content: \"\\E170\";\n}\n.glyphicon-send:before {\n  content: \"\\E171\";\n}\n.glyphicon-floppy-disk:before {\n  content: \"\\E172\";\n}\n.glyphicon-floppy-saved:before {\n  content: \"\\E173\";\n}\n.glyphicon-floppy-remove:before {\n  content: \"\\E174\";\n}\n.glyphicon-floppy-save:before {\n  content: \"\\E175\";\n}\n.glyphicon-floppy-open:before {\n  content: \"\\E176\";\n}\n.glyphicon-credit-card:before {\n  content: \"\\E177\";\n}\n.glyphicon-transfer:before {\n  content: \"\\E178\";\n}\n.glyphicon-cutlery:before {\n  content: \"\\E179\";\n}\n.glyphicon-header:before {\n  content: \"\\E180\";\n}\n.glyphicon-compressed:before {\n  content: \"\\E181\";\n}\n.glyphicon-earphone:before {\n  content: \"\\E182\";\n}\n.glyphicon-phone-alt:before {\n  content: \"\\E183\";\n}\n.glyphicon-tower:before {\n  content: \"\\E184\";\n}\n.glyphicon-stats:before {\n  content: \"\\E185\";\n}\n.glyphicon-sd-video:before {\n  content: \"\\E186\";\n}\n.glyphicon-hd-video:before {\n  content: \"\\E187\";\n}\n.glyphicon-subtitles:before {\n  content: \"\\E188\";\n}\n.glyphicon-sound-stereo:before {\n  content: \"\\E189\";\n}\n.glyphicon-sound-dolby:before {\n  content: \"\\E190\";\n}\n.glyphicon-sound-5-1:before {\n  content: \"\\E191\";\n}\n.glyphicon-sound-6-1:before {\n  content: \"\\E192\";\n}\n.glyphicon-sound-7-1:before {\n  content: \"\\E193\";\n}\n.glyphicon-copyright-mark:before {\n  content: \"\\E194\";\n}\n.glyphicon-registration-mark:before {\n  content: \"\\E195\";\n}\n.glyphicon-cloud-download:before {\n  content: \"\\E197\";\n}\n.glyphicon-cloud-upload:before {\n  content: \"\\E198\";\n}\n.glyphicon-tree-conifer:before {\n  content: \"\\E199\";\n}\n.glyphicon-tree-deciduous:before {\n  content: \"\\E200\";\n}\n.glyphicon-cd:before {\n  content: \"\\E201\";\n}\n.glyphicon-save-file:before {\n  content: \"\\E202\";\n}\n.glyphicon-open-file:before {\n  content: \"\\E203\";\n}\n.glyphicon-level-up:before {\n  content: \"\\E204\";\n}\n.glyphicon-copy:before {\n  content: \"\\E205\";\n}\n.glyphicon-paste:before {\n  content: \"\\E206\";\n}\n.glyphicon-alert:before {\n  content: \"\\E209\";\n}\n.glyphicon-equalizer:before {\n  content: \"\\E210\";\n}\n.glyphicon-king:before {\n  content: \"\\E211\";\n}\n.glyphicon-queen:before {\n  content: \"\\E212\";\n}\n.glyphicon-pawn:before {\n  content: \"\\E213\";\n}\n.glyphicon-bishop:before {\n  content: \"\\E214\";\n}\n.glyphicon-knight:before {\n  content: \"\\E215\";\n}\n.glyphicon-baby-formula:before {\n  content: \"\\E216\";\n}\n.glyphicon-tent:before {\n  content: \"\\26FA\";\n}\n.glyphicon-blackboard:before {\n  content: \"\\E218\";\n}\n.glyphicon-bed:before {\n  content: \"\\E219\";\n}\n.glyphicon-apple:before {\n  content: \"\\F8FF\";\n}\n.glyphicon-erase:before {\n  content: \"\\E221\";\n}\n.glyphicon-hourglass:before {\n  content: \"\\231B\";\n}\n.glyphicon-lamp:before {\n  content: \"\\E223\";\n}\n.glyphicon-duplicate:before {\n  content: \"\\E224\";\n}\n.glyphicon-piggy-bank:before {\n  content: \"\\E225\";\n}\n.glyphicon-scissors:before {\n  content: \"\\E226\";\n}\n.glyphicon-bitcoin:before {\n  content: \"\\E227\";\n}\n.glyphicon-btc:before {\n  content: \"\\E227\";\n}\n.glyphicon-xbt:before {\n  content: \"\\E227\";\n}\n.glyphicon-yen:before {\n  content: \"\\A5\";\n}\n.glyphicon-jpy:before {\n  content: \"\\A5\";\n}\n.glyphicon-ruble:before {\n  content: \"\\20BD\";\n}\n.glyphicon-rub:before {\n  content: \"\\20BD\";\n}\n.glyphicon-scale:before {\n  content: \"\\E230\";\n}\n.glyphicon-ice-lolly:before {\n  content: \"\\E231\";\n}\n.glyphicon-ice-lolly-tasted:before {\n  content: \"\\E232\";\n}\n.glyphicon-education:before {\n  content: \"\\E233\";\n}\n.glyphicon-option-horizontal:before {\n  content: \"\\E234\";\n}\n.glyphicon-option-vertical:before {\n  content: \"\\E235\";\n}\n.glyphicon-menu-hamburger:before {\n  content: \"\\E236\";\n}\n.glyphicon-modal-window:before {\n  content: \"\\E237\";\n}\n.glyphicon-oil:before {\n  content: \"\\E238\";\n}\n.glyphicon-grain:before {\n  content: \"\\E239\";\n}\n.glyphicon-sunglasses:before {\n  content: \"\\E240\";\n}\n.glyphicon-text-size:before {\n  content: \"\\E241\";\n}\n.glyphicon-text-color:before {\n  content: \"\\E242\";\n}\n.glyphicon-text-background:before {\n  content: \"\\E243\";\n}\n.glyphicon-object-align-top:before {\n  content: \"\\E244\";\n}\n.glyphicon-object-align-bottom:before {\n  content: \"\\E245\";\n}\n.glyphicon-object-align-horizontal:before {\n  content: \"\\E246\";\n}\n.glyphicon-object-align-left:before {\n  content: \"\\E247\";\n}\n.glyphicon-object-align-vertical:before {\n  content: \"\\E248\";\n}\n.glyphicon-object-align-right:before {\n  content: \"\\E249\";\n}\n.glyphicon-triangle-right:before {\n  content: \"\\E250\";\n}\n.glyphicon-triangle-left:before {\n  content: \"\\E251\";\n}\n.glyphicon-triangle-bottom:before {\n  content: \"\\E252\";\n}\n.glyphicon-triangle-top:before {\n  content: \"\\E253\";\n}\n.glyphicon-console:before {\n  content: \"\\E254\";\n}\n.glyphicon-superscript:before {\n  content: \"\\E255\";\n}\n.glyphicon-subscript:before {\n  content: \"\\E256\";\n}\n.glyphicon-menu-left:before {\n  content: \"\\E257\";\n}\n.glyphicon-menu-right:before {\n  content: \"\\E258\";\n}\n.glyphicon-menu-down:before {\n  content: \"\\E259\";\n}\n.glyphicon-menu-up:before {\n  content: \"\\E260\";\n}\n* {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n*:before,\n*:after {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\nhtml {\n  font-size: 10px;\n\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n}\nbody {\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #333;\n  background-color: #fff;\n}\ninput,\nbutton,\nselect,\ntextarea {\n  font-family: inherit;\n  font-size: inherit;\n  line-height: inherit;\n}\na {\n  color: #337ab7;\n  text-decoration: none;\n}\na:hover,\na:focus {\n  color: #23527c;\n  text-decoration: underline;\n}\na:focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\nfigure {\n  margin: 0;\n}\nimg {\n  vertical-align: middle;\n}\n.img-responsive,\n.thumbnail > img,\n.thumbnail a > img,\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  display: block;\n  max-width: 100%;\n  height: auto;\n}\n.img-rounded {\n  border-radius: 6px;\n}\n.img-thumbnail {\n  display: inline-block;\n  max-width: 100%;\n  height: auto;\n  padding: 4px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: all .2s ease-in-out;\n       -o-transition: all .2s ease-in-out;\n          transition: all .2s ease-in-out;\n}\n.img-circle {\n  border-radius: 50%;\n}\nhr {\n  margin-top: 20px;\n  margin-bottom: 20px;\n  border: 0;\n  border-top: 1px solid #eee;\n}\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n.sr-only-focusable:active,\n.sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n[role=\"button\"] {\n  cursor: pointer;\n}\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\n.h1,\n.h2,\n.h3,\n.h4,\n.h5,\n.h6 {\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\nh1 small,\nh2 small,\nh3 small,\nh4 small,\nh5 small,\nh6 small,\n.h1 small,\n.h2 small,\n.h3 small,\n.h4 small,\n.h5 small,\n.h6 small,\nh1 .small,\nh2 .small,\nh3 .small,\nh4 .small,\nh5 .small,\nh6 .small,\n.h1 .small,\n.h2 .small,\n.h3 .small,\n.h4 .small,\n.h5 .small,\n.h6 .small {\n  font-weight: normal;\n  line-height: 1;\n  color: #777;\n}\nh1,\n.h1,\nh2,\n.h2,\nh3,\n.h3 {\n  margin-top: 20px;\n  margin-bottom: 10px;\n}\nh1 small,\n.h1 small,\nh2 small,\n.h2 small,\nh3 small,\n.h3 small,\nh1 .small,\n.h1 .small,\nh2 .small,\n.h2 .small,\nh3 .small,\n.h3 .small {\n  font-size: 65%;\n}\nh4,\n.h4,\nh5,\n.h5,\nh6,\n.h6 {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\nh4 small,\n.h4 small,\nh5 small,\n.h5 small,\nh6 small,\n.h6 small,\nh4 .small,\n.h4 .small,\nh5 .small,\n.h5 .small,\nh6 .small,\n.h6 .small {\n  font-size: 75%;\n}\nh1,\n.h1 {\n  font-size: 36px;\n}\nh2,\n.h2 {\n  font-size: 30px;\n}\nh3,\n.h3 {\n  font-size: 24px;\n}\nh4,\n.h4 {\n  font-size: 18px;\n}\nh5,\n.h5 {\n  font-size: 14px;\n}\nh6,\n.h6 {\n  font-size: 12px;\n}\np {\n  margin: 0 0 10px;\n}\n.lead {\n  margin-bottom: 20px;\n  font-size: 16px;\n  font-weight: 300;\n  line-height: 1.4;\n}\n@media (min-width: 768px) {\n  .lead {\n    font-size: 21px;\n  }\n}\nsmall,\n.small {\n  font-size: 85%;\n}\nmark,\n.mark {\n  padding: .2em;\n  background-color: #fcf8e3;\n}\n.text-left {\n  text-align: left;\n}\n.text-right {\n  text-align: right;\n}\n.text-center {\n  text-align: center;\n}\n.text-justify {\n  text-align: justify;\n}\n.text-nowrap {\n  white-space: nowrap;\n}\n.text-lowercase {\n  text-transform: lowercase;\n}\n.text-uppercase {\n  text-transform: uppercase;\n}\n.text-capitalize {\n  text-transform: capitalize;\n}\n.text-muted {\n  color: #777;\n}\n.text-primary {\n  color: #337ab7;\n}\na.text-primary:hover,\na.text-primary:focus {\n  color: #286090;\n}\n.text-success {\n  color: #3c763d;\n}\na.text-success:hover,\na.text-success:focus {\n  color: #2b542c;\n}\n.text-info {\n  color: #31708f;\n}\na.text-info:hover,\na.text-info:focus {\n  color: #245269;\n}\n.text-warning {\n  color: #8a6d3b;\n}\na.text-warning:hover,\na.text-warning:focus {\n  color: #66512c;\n}\n.text-danger {\n  color: #a94442;\n}\na.text-danger:hover,\na.text-danger:focus {\n  color: #843534;\n}\n.bg-primary {\n  color: #fff;\n  background-color: #337ab7;\n}\na.bg-primary:hover,\na.bg-primary:focus {\n  background-color: #286090;\n}\n.bg-success {\n  background-color: #dff0d8;\n}\na.bg-success:hover,\na.bg-success:focus {\n  background-color: #c1e2b3;\n}\n.bg-info {\n  background-color: #d9edf7;\n}\na.bg-info:hover,\na.bg-info:focus {\n  background-color: #afd9ee;\n}\n.bg-warning {\n  background-color: #fcf8e3;\n}\na.bg-warning:hover,\na.bg-warning:focus {\n  background-color: #f7ecb5;\n}\n.bg-danger {\n  background-color: #f2dede;\n}\na.bg-danger:hover,\na.bg-danger:focus {\n  background-color: #e4b9b9;\n}\n.page-header {\n  padding-bottom: 9px;\n  margin: 40px 0 20px;\n  border-bottom: 1px solid #eee;\n}\nul,\nol {\n  margin-top: 0;\n  margin-bottom: 10px;\n}\nul ul,\nol ul,\nul ol,\nol ol {\n  margin-bottom: 0;\n}\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n.list-inline {\n  padding-left: 0;\n  margin-left: -5px;\n  list-style: none;\n}\n.list-inline > li {\n  display: inline-block;\n  padding-right: 5px;\n  padding-left: 5px;\n}\ndl {\n  margin-top: 0;\n  margin-bottom: 20px;\n}\ndt,\ndd {\n  line-height: 1.42857143;\n}\ndt {\n  font-weight: bold;\n}\ndd {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .dl-horizontal dt {\n    float: left;\n    width: 160px;\n    overflow: hidden;\n    clear: left;\n    text-align: right;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n  .dl-horizontal dd {\n    margin-left: 180px;\n  }\n}\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n  border-bottom: 1px dotted #777;\n}\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\nblockquote {\n  padding: 10px 20px;\n  margin: 0 0 20px;\n  font-size: 17.5px;\n  border-left: 5px solid #eee;\n}\nblockquote p:last-child,\nblockquote ul:last-child,\nblockquote ol:last-child {\n  margin-bottom: 0;\n}\nblockquote footer,\nblockquote small,\nblockquote .small {\n  display: block;\n  font-size: 80%;\n  line-height: 1.42857143;\n  color: #777;\n}\nblockquote footer:before,\nblockquote small:before,\nblockquote .small:before {\n  content: '\\2014   \\A0';\n}\n.blockquote-reverse,\nblockquote.pull-right {\n  padding-right: 15px;\n  padding-left: 0;\n  text-align: right;\n  border-right: 5px solid #eee;\n  border-left: 0;\n}\n.blockquote-reverse footer:before,\nblockquote.pull-right footer:before,\n.blockquote-reverse small:before,\nblockquote.pull-right small:before,\n.blockquote-reverse .small:before,\nblockquote.pull-right .small:before {\n  content: '';\n}\n.blockquote-reverse footer:after,\nblockquote.pull-right footer:after,\n.blockquote-reverse small:after,\nblockquote.pull-right small:after,\n.blockquote-reverse .small:after,\nblockquote.pull-right .small:after {\n  content: '\\A0   \\2014';\n}\naddress {\n  margin-bottom: 20px;\n  font-style: normal;\n  line-height: 1.42857143;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n}\ncode {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #c7254e;\n  background-color: #f9f2f4;\n  border-radius: 4px;\n}\nkbd {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #fff;\n  background-color: #333;\n  border-radius: 3px;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n}\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\npre {\n  display: block;\n  padding: 9.5px;\n  margin: 0 0 10px;\n  font-size: 13px;\n  line-height: 1.42857143;\n  color: #333;\n  word-break: break-all;\n  word-wrap: break-word;\n  background-color: #f5f5f5;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  white-space: pre-wrap;\n  background-color: transparent;\n  border-radius: 0;\n}\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n.container {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n@media (min-width: 768px) {\n  .container {\n    width: 750px;\n  }\n}\n@media (min-width: 992px) {\n  .container {\n    width: 970px;\n  }\n}\n@media (min-width: 1200px) {\n  .container {\n    width: 1170px;\n  }\n}\n.container-fluid {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n.row {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left;\n}\n.col-xs-12 {\n  width: 100%;\n}\n.col-xs-11 {\n  width: 91.66666667%;\n}\n.col-xs-10 {\n  width: 83.33333333%;\n}\n.col-xs-9 {\n  width: 75%;\n}\n.col-xs-8 {\n  width: 66.66666667%;\n}\n.col-xs-7 {\n  width: 58.33333333%;\n}\n.col-xs-6 {\n  width: 50%;\n}\n.col-xs-5 {\n  width: 41.66666667%;\n}\n.col-xs-4 {\n  width: 33.33333333%;\n}\n.col-xs-3 {\n  width: 25%;\n}\n.col-xs-2 {\n  width: 16.66666667%;\n}\n.col-xs-1 {\n  width: 8.33333333%;\n}\n.col-xs-pull-12 {\n  right: 100%;\n}\n.col-xs-pull-11 {\n  right: 91.66666667%;\n}\n.col-xs-pull-10 {\n  right: 83.33333333%;\n}\n.col-xs-pull-9 {\n  right: 75%;\n}\n.col-xs-pull-8 {\n  right: 66.66666667%;\n}\n.col-xs-pull-7 {\n  right: 58.33333333%;\n}\n.col-xs-pull-6 {\n  right: 50%;\n}\n.col-xs-pull-5 {\n  right: 41.66666667%;\n}\n.col-xs-pull-4 {\n  right: 33.33333333%;\n}\n.col-xs-pull-3 {\n  right: 25%;\n}\n.col-xs-pull-2 {\n  right: 16.66666667%;\n}\n.col-xs-pull-1 {\n  right: 8.33333333%;\n}\n.col-xs-pull-0 {\n  right: auto;\n}\n.col-xs-push-12 {\n  left: 100%;\n}\n.col-xs-push-11 {\n  left: 91.66666667%;\n}\n.col-xs-push-10 {\n  left: 83.33333333%;\n}\n.col-xs-push-9 {\n  left: 75%;\n}\n.col-xs-push-8 {\n  left: 66.66666667%;\n}\n.col-xs-push-7 {\n  left: 58.33333333%;\n}\n.col-xs-push-6 {\n  left: 50%;\n}\n.col-xs-push-5 {\n  left: 41.66666667%;\n}\n.col-xs-push-4 {\n  left: 33.33333333%;\n}\n.col-xs-push-3 {\n  left: 25%;\n}\n.col-xs-push-2 {\n  left: 16.66666667%;\n}\n.col-xs-push-1 {\n  left: 8.33333333%;\n}\n.col-xs-push-0 {\n  left: auto;\n}\n.col-xs-offset-12 {\n  margin-left: 100%;\n}\n.col-xs-offset-11 {\n  margin-left: 91.66666667%;\n}\n.col-xs-offset-10 {\n  margin-left: 83.33333333%;\n}\n.col-xs-offset-9 {\n  margin-left: 75%;\n}\n.col-xs-offset-8 {\n  margin-left: 66.66666667%;\n}\n.col-xs-offset-7 {\n  margin-left: 58.33333333%;\n}\n.col-xs-offset-6 {\n  margin-left: 50%;\n}\n.col-xs-offset-5 {\n  margin-left: 41.66666667%;\n}\n.col-xs-offset-4 {\n  margin-left: 33.33333333%;\n}\n.col-xs-offset-3 {\n  margin-left: 25%;\n}\n.col-xs-offset-2 {\n  margin-left: 16.66666667%;\n}\n.col-xs-offset-1 {\n  margin-left: 8.33333333%;\n}\n.col-xs-offset-0 {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left;\n  }\n  .col-sm-12 {\n    width: 100%;\n  }\n  .col-sm-11 {\n    width: 91.66666667%;\n  }\n  .col-sm-10 {\n    width: 83.33333333%;\n  }\n  .col-sm-9 {\n    width: 75%;\n  }\n  .col-sm-8 {\n    width: 66.66666667%;\n  }\n  .col-sm-7 {\n    width: 58.33333333%;\n  }\n  .col-sm-6 {\n    width: 50%;\n  }\n  .col-sm-5 {\n    width: 41.66666667%;\n  }\n  .col-sm-4 {\n    width: 33.33333333%;\n  }\n  .col-sm-3 {\n    width: 25%;\n  }\n  .col-sm-2 {\n    width: 16.66666667%;\n  }\n  .col-sm-1 {\n    width: 8.33333333%;\n  }\n  .col-sm-pull-12 {\n    right: 100%;\n  }\n  .col-sm-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-sm-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-sm-pull-9 {\n    right: 75%;\n  }\n  .col-sm-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-sm-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-sm-pull-6 {\n    right: 50%;\n  }\n  .col-sm-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-sm-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-sm-pull-3 {\n    right: 25%;\n  }\n  .col-sm-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-sm-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-sm-pull-0 {\n    right: auto;\n  }\n  .col-sm-push-12 {\n    left: 100%;\n  }\n  .col-sm-push-11 {\n    left: 91.66666667%;\n  }\n  .col-sm-push-10 {\n    left: 83.33333333%;\n  }\n  .col-sm-push-9 {\n    left: 75%;\n  }\n  .col-sm-push-8 {\n    left: 66.66666667%;\n  }\n  .col-sm-push-7 {\n    left: 58.33333333%;\n  }\n  .col-sm-push-6 {\n    left: 50%;\n  }\n  .col-sm-push-5 {\n    left: 41.66666667%;\n  }\n  .col-sm-push-4 {\n    left: 33.33333333%;\n  }\n  .col-sm-push-3 {\n    left: 25%;\n  }\n  .col-sm-push-2 {\n    left: 16.66666667%;\n  }\n  .col-sm-push-1 {\n    left: 8.33333333%;\n  }\n  .col-sm-push-0 {\n    left: auto;\n  }\n  .col-sm-offset-12 {\n    margin-left: 100%;\n  }\n  .col-sm-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-sm-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-sm-offset-9 {\n    margin-left: 75%;\n  }\n  .col-sm-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-sm-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-sm-offset-6 {\n    margin-left: 50%;\n  }\n  .col-sm-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-sm-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-sm-offset-3 {\n    margin-left: 25%;\n  }\n  .col-sm-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-sm-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-sm-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left;\n  }\n  .col-md-12 {\n    width: 100%;\n  }\n  .col-md-11 {\n    width: 91.66666667%;\n  }\n  .col-md-10 {\n    width: 83.33333333%;\n  }\n  .col-md-9 {\n    width: 75%;\n  }\n  .col-md-8 {\n    width: 66.66666667%;\n  }\n  .col-md-7 {\n    width: 58.33333333%;\n  }\n  .col-md-6 {\n    width: 50%;\n  }\n  .col-md-5 {\n    width: 41.66666667%;\n  }\n  .col-md-4 {\n    width: 33.33333333%;\n  }\n  .col-md-3 {\n    width: 25%;\n  }\n  .col-md-2 {\n    width: 16.66666667%;\n  }\n  .col-md-1 {\n    width: 8.33333333%;\n  }\n  .col-md-pull-12 {\n    right: 100%;\n  }\n  .col-md-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-md-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-md-pull-9 {\n    right: 75%;\n  }\n  .col-md-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-md-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-md-pull-6 {\n    right: 50%;\n  }\n  .col-md-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-md-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-md-pull-3 {\n    right: 25%;\n  }\n  .col-md-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-md-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-md-pull-0 {\n    right: auto;\n  }\n  .col-md-push-12 {\n    left: 100%;\n  }\n  .col-md-push-11 {\n    left: 91.66666667%;\n  }\n  .col-md-push-10 {\n    left: 83.33333333%;\n  }\n  .col-md-push-9 {\n    left: 75%;\n  }\n  .col-md-push-8 {\n    left: 66.66666667%;\n  }\n  .col-md-push-7 {\n    left: 58.33333333%;\n  }\n  .col-md-push-6 {\n    left: 50%;\n  }\n  .col-md-push-5 {\n    left: 41.66666667%;\n  }\n  .col-md-push-4 {\n    left: 33.33333333%;\n  }\n  .col-md-push-3 {\n    left: 25%;\n  }\n  .col-md-push-2 {\n    left: 16.66666667%;\n  }\n  .col-md-push-1 {\n    left: 8.33333333%;\n  }\n  .col-md-push-0 {\n    left: auto;\n  }\n  .col-md-offset-12 {\n    margin-left: 100%;\n  }\n  .col-md-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-md-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-md-offset-9 {\n    margin-left: 75%;\n  }\n  .col-md-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-md-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-md-offset-6 {\n    margin-left: 50%;\n  }\n  .col-md-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-md-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-md-offset-3 {\n    margin-left: 25%;\n  }\n  .col-md-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-md-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-md-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left;\n  }\n  .col-lg-12 {\n    width: 100%;\n  }\n  .col-lg-11 {\n    width: 91.66666667%;\n  }\n  .col-lg-10 {\n    width: 83.33333333%;\n  }\n  .col-lg-9 {\n    width: 75%;\n  }\n  .col-lg-8 {\n    width: 66.66666667%;\n  }\n  .col-lg-7 {\n    width: 58.33333333%;\n  }\n  .col-lg-6 {\n    width: 50%;\n  }\n  .col-lg-5 {\n    width: 41.66666667%;\n  }\n  .col-lg-4 {\n    width: 33.33333333%;\n  }\n  .col-lg-3 {\n    width: 25%;\n  }\n  .col-lg-2 {\n    width: 16.66666667%;\n  }\n  .col-lg-1 {\n    width: 8.33333333%;\n  }\n  .col-lg-pull-12 {\n    right: 100%;\n  }\n  .col-lg-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-lg-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-lg-pull-9 {\n    right: 75%;\n  }\n  .col-lg-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-lg-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-lg-pull-6 {\n    right: 50%;\n  }\n  .col-lg-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-lg-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-lg-pull-3 {\n    right: 25%;\n  }\n  .col-lg-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-lg-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-lg-pull-0 {\n    right: auto;\n  }\n  .col-lg-push-12 {\n    left: 100%;\n  }\n  .col-lg-push-11 {\n    left: 91.66666667%;\n  }\n  .col-lg-push-10 {\n    left: 83.33333333%;\n  }\n  .col-lg-push-9 {\n    left: 75%;\n  }\n  .col-lg-push-8 {\n    left: 66.66666667%;\n  }\n  .col-lg-push-7 {\n    left: 58.33333333%;\n  }\n  .col-lg-push-6 {\n    left: 50%;\n  }\n  .col-lg-push-5 {\n    left: 41.66666667%;\n  }\n  .col-lg-push-4 {\n    left: 33.33333333%;\n  }\n  .col-lg-push-3 {\n    left: 25%;\n  }\n  .col-lg-push-2 {\n    left: 16.66666667%;\n  }\n  .col-lg-push-1 {\n    left: 8.33333333%;\n  }\n  .col-lg-push-0 {\n    left: auto;\n  }\n  .col-lg-offset-12 {\n    margin-left: 100%;\n  }\n  .col-lg-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-lg-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-lg-offset-9 {\n    margin-left: 75%;\n  }\n  .col-lg-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-lg-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-lg-offset-6 {\n    margin-left: 50%;\n  }\n  .col-lg-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-lg-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-lg-offset-3 {\n    margin-left: 25%;\n  }\n  .col-lg-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-lg-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-lg-offset-0 {\n    margin-left: 0;\n  }\n}\ntable {\n  background-color: transparent;\n}\ncaption {\n  padding-top: 8px;\n  padding-bottom: 8px;\n  color: #777;\n  text-align: left;\n}\nth {\n  text-align: left;\n}\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 20px;\n}\n.table > thead > tr > th,\n.table > tbody > tr > th,\n.table > tfoot > tr > th,\n.table > thead > tr > td,\n.table > tbody > tr > td,\n.table > tfoot > tr > td {\n  padding: 8px;\n  line-height: 1.42857143;\n  vertical-align: top;\n  border-top: 1px solid #ddd;\n}\n.table > thead > tr > th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #ddd;\n}\n.table > caption + thead > tr:first-child > th,\n.table > colgroup + thead > tr:first-child > th,\n.table > thead:first-child > tr:first-child > th,\n.table > caption + thead > tr:first-child > td,\n.table > colgroup + thead > tr:first-child > td,\n.table > thead:first-child > tr:first-child > td {\n  border-top: 0;\n}\n.table > tbody + tbody {\n  border-top: 2px solid #ddd;\n}\n.table .table {\n  background-color: #fff;\n}\n.table-condensed > thead > tr > th,\n.table-condensed > tbody > tr > th,\n.table-condensed > tfoot > tr > th,\n.table-condensed > thead > tr > td,\n.table-condensed > tbody > tr > td,\n.table-condensed > tfoot > tr > td {\n  padding: 5px;\n}\n.table-bordered {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > tbody > tr > th,\n.table-bordered > tfoot > tr > th,\n.table-bordered > thead > tr > td,\n.table-bordered > tbody > tr > td,\n.table-bordered > tfoot > tr > td {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > thead > tr > td {\n  border-bottom-width: 2px;\n}\n.table-striped > tbody > tr:nth-of-type(odd) {\n  background-color: #f9f9f9;\n}\n.table-hover > tbody > tr:hover {\n  background-color: #f5f5f5;\n}\ntable col[class*=\"col-\"] {\n  position: static;\n  display: table-column;\n  float: none;\n}\ntable td[class*=\"col-\"],\ntable th[class*=\"col-\"] {\n  position: static;\n  display: table-cell;\n  float: none;\n}\n.table > thead > tr > td.active,\n.table > tbody > tr > td.active,\n.table > tfoot > tr > td.active,\n.table > thead > tr > th.active,\n.table > tbody > tr > th.active,\n.table > tfoot > tr > th.active,\n.table > thead > tr.active > td,\n.table > tbody > tr.active > td,\n.table > tfoot > tr.active > td,\n.table > thead > tr.active > th,\n.table > tbody > tr.active > th,\n.table > tfoot > tr.active > th {\n  background-color: #f5f5f5;\n}\n.table-hover > tbody > tr > td.active:hover,\n.table-hover > tbody > tr > th.active:hover,\n.table-hover > tbody > tr.active:hover > td,\n.table-hover > tbody > tr:hover > .active,\n.table-hover > tbody > tr.active:hover > th {\n  background-color: #e8e8e8;\n}\n.table > thead > tr > td.success,\n.table > tbody > tr > td.success,\n.table > tfoot > tr > td.success,\n.table > thead > tr > th.success,\n.table > tbody > tr > th.success,\n.table > tfoot > tr > th.success,\n.table > thead > tr.success > td,\n.table > tbody > tr.success > td,\n.table > tfoot > tr.success > td,\n.table > thead > tr.success > th,\n.table > tbody > tr.success > th,\n.table > tfoot > tr.success > th {\n  background-color: #dff0d8;\n}\n.table-hover > tbody > tr > td.success:hover,\n.table-hover > tbody > tr > th.success:hover,\n.table-hover > tbody > tr.success:hover > td,\n.table-hover > tbody > tr:hover > .success,\n.table-hover > tbody > tr.success:hover > th {\n  background-color: #d0e9c6;\n}\n.table > thead > tr > td.info,\n.table > tbody > tr > td.info,\n.table > tfoot > tr > td.info,\n.table > thead > tr > th.info,\n.table > tbody > tr > th.info,\n.table > tfoot > tr > th.info,\n.table > thead > tr.info > td,\n.table > tbody > tr.info > td,\n.table > tfoot > tr.info > td,\n.table > thead > tr.info > th,\n.table > tbody > tr.info > th,\n.table > tfoot > tr.info > th {\n  background-color: #d9edf7;\n}\n.table-hover > tbody > tr > td.info:hover,\n.table-hover > tbody > tr > th.info:hover,\n.table-hover > tbody > tr.info:hover > td,\n.table-hover > tbody > tr:hover > .info,\n.table-hover > tbody > tr.info:hover > th {\n  background-color: #c4e3f3;\n}\n.table > thead > tr > td.warning,\n.table > tbody > tr > td.warning,\n.table > tfoot > tr > td.warning,\n.table > thead > tr > th.warning,\n.table > tbody > tr > th.warning,\n.table > tfoot > tr > th.warning,\n.table > thead > tr.warning > td,\n.table > tbody > tr.warning > td,\n.table > tfoot > tr.warning > td,\n.table > thead > tr.warning > th,\n.table > tbody > tr.warning > th,\n.table > tfoot > tr.warning > th {\n  background-color: #fcf8e3;\n}\n.table-hover > tbody > tr > td.warning:hover,\n.table-hover > tbody > tr > th.warning:hover,\n.table-hover > tbody > tr.warning:hover > td,\n.table-hover > tbody > tr:hover > .warning,\n.table-hover > tbody > tr.warning:hover > th {\n  background-color: #faf2cc;\n}\n.table > thead > tr > td.danger,\n.table > tbody > tr > td.danger,\n.table > tfoot > tr > td.danger,\n.table > thead > tr > th.danger,\n.table > tbody > tr > th.danger,\n.table > tfoot > tr > th.danger,\n.table > thead > tr.danger > td,\n.table > tbody > tr.danger > td,\n.table > tfoot > tr.danger > td,\n.table > thead > tr.danger > th,\n.table > tbody > tr.danger > th,\n.table > tfoot > tr.danger > th {\n  background-color: #f2dede;\n}\n.table-hover > tbody > tr > td.danger:hover,\n.table-hover > tbody > tr > th.danger:hover,\n.table-hover > tbody > tr.danger:hover > td,\n.table-hover > tbody > tr:hover > .danger,\n.table-hover > tbody > tr.danger:hover > th {\n  background-color: #ebcccc;\n}\n.table-responsive {\n  min-height: .01%;\n  overflow-x: auto;\n}\n@media screen and (max-width: 767px) {\n  .table-responsive {\n    width: 100%;\n    margin-bottom: 15px;\n    overflow-y: hidden;\n    -ms-overflow-style: -ms-autohiding-scrollbar;\n    border: 1px solid #ddd;\n  }\n  .table-responsive > .table {\n    margin-bottom: 0;\n  }\n  .table-responsive > .table > thead > tr > th,\n  .table-responsive > .table > tbody > tr > th,\n  .table-responsive > .table > tfoot > tr > th,\n  .table-responsive > .table > thead > tr > td,\n  .table-responsive > .table > tbody > tr > td,\n  .table-responsive > .table > tfoot > tr > td {\n    white-space: nowrap;\n  }\n  .table-responsive > .table-bordered {\n    border: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:first-child,\n  .table-responsive > .table-bordered > tbody > tr > th:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n  .table-responsive > .table-bordered > thead > tr > td:first-child,\n  .table-responsive > .table-bordered > tbody > tr > td:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n    border-left: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:last-child,\n  .table-responsive > .table-bordered > tbody > tr > th:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n  .table-responsive > .table-bordered > thead > tr > td:last-child,\n  .table-responsive > .table-bordered > tbody > tr > td:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n    border-right: 0;\n  }\n  .table-responsive > .table-bordered > tbody > tr:last-child > th,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > th,\n  .table-responsive > .table-bordered > tbody > tr:last-child > td,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > td {\n    border-bottom: 0;\n  }\n}\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: 20px;\n  font-size: 21px;\n  line-height: inherit;\n  color: #333;\n  border: 0;\n  border-bottom: 1px solid #e5e5e5;\n}\nlabel {\n  display: inline-block;\n  max-width: 100%;\n  margin-bottom: 5px;\n  font-weight: bold;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\ninput[type=\"radio\"],\ninput[type=\"checkbox\"] {\n  margin: 4px 0 0;\n  margin-top: 1px \\9;\n  line-height: normal;\n}\ninput[type=\"file\"] {\n  display: block;\n}\ninput[type=\"range\"] {\n  display: block;\n  width: 100%;\n}\nselect[multiple],\nselect[size] {\n  height: auto;\n}\ninput[type=\"file\"]:focus,\ninput[type=\"radio\"]:focus,\ninput[type=\"checkbox\"]:focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\noutput {\n  display: block;\n  padding-top: 7px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n}\n.form-control {\n  display: block;\n  width: 100%;\n  height: 34px;\n  padding: 6px 12px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n  background-color: #fff;\n  background-image: none;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.form-control:focus {\n  border-color: #66afe9;\n  outline: 0;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n}\n.form-control::-moz-placeholder {\n  color: #999;\n  opacity: 1;\n}\n.form-control:-ms-input-placeholder {\n  color: #999;\n}\n.form-control::-webkit-input-placeholder {\n  color: #999;\n}\n.form-control[disabled],\n.form-control[readonly],\nfieldset[disabled] .form-control {\n  background-color: #eee;\n  opacity: 1;\n}\n.form-control[disabled],\nfieldset[disabled] .form-control {\n  cursor: not-allowed;\n}\ntextarea.form-control {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n@media screen and (-webkit-min-device-pixel-ratio: 0) {\n  input[type=\"date\"].form-control,\n  input[type=\"time\"].form-control,\n  input[type=\"datetime-local\"].form-control,\n  input[type=\"month\"].form-control {\n    line-height: 34px;\n  }\n  input[type=\"date\"].input-sm,\n  input[type=\"time\"].input-sm,\n  input[type=\"datetime-local\"].input-sm,\n  input[type=\"month\"].input-sm,\n  .input-group-sm input[type=\"date\"],\n  .input-group-sm input[type=\"time\"],\n  .input-group-sm input[type=\"datetime-local\"],\n  .input-group-sm input[type=\"month\"] {\n    line-height: 30px;\n  }\n  input[type=\"date\"].input-lg,\n  input[type=\"time\"].input-lg,\n  input[type=\"datetime-local\"].input-lg,\n  input[type=\"month\"].input-lg,\n  .input-group-lg input[type=\"date\"],\n  .input-group-lg input[type=\"time\"],\n  .input-group-lg input[type=\"datetime-local\"],\n  .input-group-lg input[type=\"month\"] {\n    line-height: 46px;\n  }\n}\n.form-group {\n  margin-bottom: 15px;\n}\n.radio,\n.checkbox {\n  position: relative;\n  display: block;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.radio label,\n.checkbox label {\n  min-height: 20px;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  cursor: pointer;\n}\n.radio input[type=\"radio\"],\n.radio-inline input[type=\"radio\"],\n.checkbox input[type=\"checkbox\"],\n.checkbox-inline input[type=\"checkbox\"] {\n  position: absolute;\n  margin-top: 4px \\9;\n  margin-left: -20px;\n}\n.radio + .radio,\n.checkbox + .checkbox {\n  margin-top: -5px;\n}\n.radio-inline,\n.checkbox-inline {\n  position: relative;\n  display: inline-block;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  vertical-align: middle;\n  cursor: pointer;\n}\n.radio-inline + .radio-inline,\n.checkbox-inline + .checkbox-inline {\n  margin-top: 0;\n  margin-left: 10px;\n}\ninput[type=\"radio\"][disabled],\ninput[type=\"checkbox\"][disabled],\ninput[type=\"radio\"].disabled,\ninput[type=\"checkbox\"].disabled,\nfieldset[disabled] input[type=\"radio\"],\nfieldset[disabled] input[type=\"checkbox\"] {\n  cursor: not-allowed;\n}\n.radio-inline.disabled,\n.checkbox-inline.disabled,\nfieldset[disabled] .radio-inline,\nfieldset[disabled] .checkbox-inline {\n  cursor: not-allowed;\n}\n.radio.disabled label,\n.checkbox.disabled label,\nfieldset[disabled] .radio label,\nfieldset[disabled] .checkbox label {\n  cursor: not-allowed;\n}\n.form-control-static {\n  min-height: 34px;\n  padding-top: 7px;\n  padding-bottom: 7px;\n  margin-bottom: 0;\n}\n.form-control-static.input-lg,\n.form-control-static.input-sm {\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-sm {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-sm {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-sm,\nselect[multiple].input-sm {\n  height: auto;\n}\n.form-group-sm .form-control {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.form-group-sm select.form-control {\n  height: 30px;\n  line-height: 30px;\n}\n.form-group-sm textarea.form-control,\n.form-group-sm select[multiple].form-control {\n  height: auto;\n}\n.form-group-sm .form-control-static {\n  height: 30px;\n  min-height: 32px;\n  padding: 6px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.input-lg {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-lg {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-lg,\nselect[multiple].input-lg {\n  height: auto;\n}\n.form-group-lg .form-control {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.form-group-lg select.form-control {\n  height: 46px;\n  line-height: 46px;\n}\n.form-group-lg textarea.form-control,\n.form-group-lg select[multiple].form-control {\n  height: auto;\n}\n.form-group-lg .form-control-static {\n  height: 46px;\n  min-height: 38px;\n  padding: 11px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.has-feedback {\n  position: relative;\n}\n.has-feedback .form-control {\n  padding-right: 42.5px;\n}\n.form-control-feedback {\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: 2;\n  display: block;\n  width: 34px;\n  height: 34px;\n  line-height: 34px;\n  text-align: center;\n  pointer-events: none;\n}\n.input-lg + .form-control-feedback,\n.input-group-lg + .form-control-feedback,\n.form-group-lg .form-control + .form-control-feedback {\n  width: 46px;\n  height: 46px;\n  line-height: 46px;\n}\n.input-sm + .form-control-feedback,\n.input-group-sm + .form-control-feedback,\n.form-group-sm .form-control + .form-control-feedback {\n  width: 30px;\n  height: 30px;\n  line-height: 30px;\n}\n.has-success .help-block,\n.has-success .control-label,\n.has-success .radio,\n.has-success .checkbox,\n.has-success .radio-inline,\n.has-success .checkbox-inline,\n.has-success.radio label,\n.has-success.checkbox label,\n.has-success.radio-inline label,\n.has-success.checkbox-inline label {\n  color: #3c763d;\n}\n.has-success .form-control {\n  border-color: #3c763d;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-success .form-control:focus {\n  border-color: #2b542c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n}\n.has-success .input-group-addon {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #3c763d;\n}\n.has-success .form-control-feedback {\n  color: #3c763d;\n}\n.has-warning .help-block,\n.has-warning .control-label,\n.has-warning .radio,\n.has-warning .checkbox,\n.has-warning .radio-inline,\n.has-warning .checkbox-inline,\n.has-warning.radio label,\n.has-warning.checkbox label,\n.has-warning.radio-inline label,\n.has-warning.checkbox-inline label {\n  color: #8a6d3b;\n}\n.has-warning .form-control {\n  border-color: #8a6d3b;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-warning .form-control:focus {\n  border-color: #66512c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n}\n.has-warning .input-group-addon {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #8a6d3b;\n}\n.has-warning .form-control-feedback {\n  color: #8a6d3b;\n}\n.has-error .help-block,\n.has-error .control-label,\n.has-error .radio,\n.has-error .checkbox,\n.has-error .radio-inline,\n.has-error .checkbox-inline,\n.has-error.radio label,\n.has-error.checkbox label,\n.has-error.radio-inline label,\n.has-error.checkbox-inline label {\n  color: #a94442;\n}\n.has-error .form-control {\n  border-color: #a94442;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-error .form-control:focus {\n  border-color: #843534;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n}\n.has-error .input-group-addon {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #a94442;\n}\n.has-error .form-control-feedback {\n  color: #a94442;\n}\n.has-feedback label ~ .form-control-feedback {\n  top: 25px;\n}\n.has-feedback label.sr-only ~ .form-control-feedback {\n  top: 0;\n}\n.help-block {\n  display: block;\n  margin-top: 5px;\n  margin-bottom: 10px;\n  color: #737373;\n}\n@media (min-width: 768px) {\n  .form-inline .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .form-inline .input-group .input-group-addon,\n  .form-inline .input-group .input-group-btn,\n  .form-inline .input-group .form-control {\n    width: auto;\n  }\n  .form-inline .input-group > .form-control {\n    width: 100%;\n  }\n  .form-inline .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio,\n  .form-inline .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio label,\n  .form-inline .checkbox label {\n    padding-left: 0;\n  }\n  .form-inline .radio input[type=\"radio\"],\n  .form-inline .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox,\n.form-horizontal .radio-inline,\n.form-horizontal .checkbox-inline {\n  padding-top: 7px;\n  margin-top: 0;\n  margin-bottom: 0;\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox {\n  min-height: 27px;\n}\n.form-horizontal .form-group {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .control-label {\n    padding-top: 7px;\n    margin-bottom: 0;\n    text-align: right;\n  }\n}\n.form-horizontal .has-feedback .form-control-feedback {\n  right: 15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-lg .control-label {\n    padding-top: 14.333333px;\n    font-size: 18px;\n  }\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-sm .control-label {\n    padding-top: 6px;\n    font-size: 12px;\n  }\n}\n.btn {\n  display: inline-block;\n  padding: 6px 12px;\n  margin-bottom: 0;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.btn:focus,\n.btn:active:focus,\n.btn.active:focus,\n.btn.focus,\n.btn:active.focus,\n.btn.active.focus {\n  outline: thin dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n.btn:hover,\n.btn:focus,\n.btn.focus {\n  color: #333;\n  text-decoration: none;\n}\n.btn:active,\n.btn.active {\n  background-image: none;\n  outline: 0;\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn.disabled,\n.btn[disabled],\nfieldset[disabled] .btn {\n  cursor: not-allowed;\n  filter: alpha(opacity=65);\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  opacity: .65;\n}\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n.btn-default {\n  color: #333;\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default:focus,\n.btn-default.focus {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #8c8c8c;\n}\n.btn-default:hover {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active:hover,\n.btn-default.active:hover,\n.open > .dropdown-toggle.btn-default:hover,\n.btn-default:active:focus,\n.btn-default.active:focus,\n.open > .dropdown-toggle.btn-default:focus,\n.btn-default:active.focus,\n.btn-default.active.focus,\n.open > .dropdown-toggle.btn-default.focus {\n  color: #333;\n  background-color: #d4d4d4;\n  border-color: #8c8c8c;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  background-image: none;\n}\n.btn-default.disabled,\n.btn-default[disabled],\nfieldset[disabled] .btn-default,\n.btn-default.disabled:hover,\n.btn-default[disabled]:hover,\nfieldset[disabled] .btn-default:hover,\n.btn-default.disabled:focus,\n.btn-default[disabled]:focus,\nfieldset[disabled] .btn-default:focus,\n.btn-default.disabled.focus,\n.btn-default[disabled].focus,\nfieldset[disabled] .btn-default.focus,\n.btn-default.disabled:active,\n.btn-default[disabled]:active,\nfieldset[disabled] .btn-default:active,\n.btn-default.disabled.active,\n.btn-default[disabled].active,\nfieldset[disabled] .btn-default.active {\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default .badge {\n  color: #fff;\n  background-color: #333;\n}\n.btn-primary {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary:focus,\n.btn-primary.focus {\n  color: #fff;\n  background-color: #286090;\n  border-color: #122b40;\n}\n.btn-primary:hover {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active:hover,\n.btn-primary.active:hover,\n.open > .dropdown-toggle.btn-primary:hover,\n.btn-primary:active:focus,\n.btn-primary.active:focus,\n.open > .dropdown-toggle.btn-primary:focus,\n.btn-primary:active.focus,\n.btn-primary.active.focus,\n.open > .dropdown-toggle.btn-primary.focus {\n  color: #fff;\n  background-color: #204d74;\n  border-color: #122b40;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  background-image: none;\n}\n.btn-primary.disabled,\n.btn-primary[disabled],\nfieldset[disabled] .btn-primary,\n.btn-primary.disabled:hover,\n.btn-primary[disabled]:hover,\nfieldset[disabled] .btn-primary:hover,\n.btn-primary.disabled:focus,\n.btn-primary[disabled]:focus,\nfieldset[disabled] .btn-primary:focus,\n.btn-primary.disabled.focus,\n.btn-primary[disabled].focus,\nfieldset[disabled] .btn-primary.focus,\n.btn-primary.disabled:active,\n.btn-primary[disabled]:active,\nfieldset[disabled] .btn-primary:active,\n.btn-primary.disabled.active,\n.btn-primary[disabled].active,\nfieldset[disabled] .btn-primary.active {\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success:focus,\n.btn-success.focus {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #255625;\n}\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active:hover,\n.btn-success.active:hover,\n.open > .dropdown-toggle.btn-success:hover,\n.btn-success:active:focus,\n.btn-success.active:focus,\n.open > .dropdown-toggle.btn-success:focus,\n.btn-success:active.focus,\n.btn-success.active.focus,\n.open > .dropdown-toggle.btn-success.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #255625;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  background-image: none;\n}\n.btn-success.disabled,\n.btn-success[disabled],\nfieldset[disabled] .btn-success,\n.btn-success.disabled:hover,\n.btn-success[disabled]:hover,\nfieldset[disabled] .btn-success:hover,\n.btn-success.disabled:focus,\n.btn-success[disabled]:focus,\nfieldset[disabled] .btn-success:focus,\n.btn-success.disabled.focus,\n.btn-success[disabled].focus,\nfieldset[disabled] .btn-success.focus,\n.btn-success.disabled:active,\n.btn-success[disabled]:active,\nfieldset[disabled] .btn-success:active,\n.btn-success.disabled.active,\n.btn-success[disabled].active,\nfieldset[disabled] .btn-success.active {\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success .badge {\n  color: #5cb85c;\n  background-color: #fff;\n}\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info:focus,\n.btn-info.focus {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #1b6d85;\n}\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active:hover,\n.btn-info.active:hover,\n.open > .dropdown-toggle.btn-info:hover,\n.btn-info:active:focus,\n.btn-info.active:focus,\n.open > .dropdown-toggle.btn-info:focus,\n.btn-info:active.focus,\n.btn-info.active.focus,\n.open > .dropdown-toggle.btn-info.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1b6d85;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  background-image: none;\n}\n.btn-info.disabled,\n.btn-info[disabled],\nfieldset[disabled] .btn-info,\n.btn-info.disabled:hover,\n.btn-info[disabled]:hover,\nfieldset[disabled] .btn-info:hover,\n.btn-info.disabled:focus,\n.btn-info[disabled]:focus,\nfieldset[disabled] .btn-info:focus,\n.btn-info.disabled.focus,\n.btn-info[disabled].focus,\nfieldset[disabled] .btn-info.focus,\n.btn-info.disabled:active,\n.btn-info[disabled]:active,\nfieldset[disabled] .btn-info:active,\n.btn-info.disabled.active,\n.btn-info[disabled].active,\nfieldset[disabled] .btn-info.active {\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info .badge {\n  color: #5bc0de;\n  background-color: #fff;\n}\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning:focus,\n.btn-warning.focus {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #985f0d;\n}\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active:hover,\n.btn-warning.active:hover,\n.open > .dropdown-toggle.btn-warning:hover,\n.btn-warning:active:focus,\n.btn-warning.active:focus,\n.open > .dropdown-toggle.btn-warning:focus,\n.btn-warning:active.focus,\n.btn-warning.active.focus,\n.open > .dropdown-toggle.btn-warning.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #985f0d;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  background-image: none;\n}\n.btn-warning.disabled,\n.btn-warning[disabled],\nfieldset[disabled] .btn-warning,\n.btn-warning.disabled:hover,\n.btn-warning[disabled]:hover,\nfieldset[disabled] .btn-warning:hover,\n.btn-warning.disabled:focus,\n.btn-warning[disabled]:focus,\nfieldset[disabled] .btn-warning:focus,\n.btn-warning.disabled.focus,\n.btn-warning[disabled].focus,\nfieldset[disabled] .btn-warning.focus,\n.btn-warning.disabled:active,\n.btn-warning[disabled]:active,\nfieldset[disabled] .btn-warning:active,\n.btn-warning.disabled.active,\n.btn-warning[disabled].active,\nfieldset[disabled] .btn-warning.active {\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning .badge {\n  color: #f0ad4e;\n  background-color: #fff;\n}\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger:focus,\n.btn-danger.focus {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #761c19;\n}\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active:hover,\n.btn-danger.active:hover,\n.open > .dropdown-toggle.btn-danger:hover,\n.btn-danger:active:focus,\n.btn-danger.active:focus,\n.open > .dropdown-toggle.btn-danger:focus,\n.btn-danger:active.focus,\n.btn-danger.active.focus,\n.open > .dropdown-toggle.btn-danger.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #761c19;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  background-image: none;\n}\n.btn-danger.disabled,\n.btn-danger[disabled],\nfieldset[disabled] .btn-danger,\n.btn-danger.disabled:hover,\n.btn-danger[disabled]:hover,\nfieldset[disabled] .btn-danger:hover,\n.btn-danger.disabled:focus,\n.btn-danger[disabled]:focus,\nfieldset[disabled] .btn-danger:focus,\n.btn-danger.disabled.focus,\n.btn-danger[disabled].focus,\nfieldset[disabled] .btn-danger.focus,\n.btn-danger.disabled:active,\n.btn-danger[disabled]:active,\nfieldset[disabled] .btn-danger:active,\n.btn-danger.disabled.active,\n.btn-danger[disabled].active,\nfieldset[disabled] .btn-danger.active {\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger .badge {\n  color: #d9534f;\n  background-color: #fff;\n}\n.btn-link {\n  font-weight: normal;\n  color: #337ab7;\n  border-radius: 0;\n}\n.btn-link,\n.btn-link:active,\n.btn-link.active,\n.btn-link[disabled],\nfieldset[disabled] .btn-link {\n  background-color: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn-link,\n.btn-link:hover,\n.btn-link:focus,\n.btn-link:active {\n  border-color: transparent;\n}\n.btn-link:hover,\n.btn-link:focus {\n  color: #23527c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n.btn-link[disabled]:hover,\nfieldset[disabled] .btn-link:hover,\n.btn-link[disabled]:focus,\nfieldset[disabled] .btn-link:focus {\n  color: #777;\n  text-decoration: none;\n}\n.btn-lg,\n.btn-group-lg > .btn {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.btn-sm,\n.btn-group-sm > .btn {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-xs,\n.btn-group-xs > .btn {\n  padding: 1px 5px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-block + .btn-block {\n  margin-top: 5px;\n}\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity .15s linear;\n       -o-transition: opacity .15s linear;\n          transition: opacity .15s linear;\n}\n.fade.in {\n  opacity: 1;\n}\n.collapse {\n  display: none;\n}\n.collapse.in {\n  display: block;\n}\ntr.collapse.in {\n  display: table-row;\n}\ntbody.collapse.in {\n  display: table-row-group;\n}\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition-timing-function: ease;\n       -o-transition-timing-function: ease;\n          transition-timing-function: ease;\n  -webkit-transition-duration: .35s;\n       -o-transition-duration: .35s;\n          transition-duration: .35s;\n  -webkit-transition-property: height, visibility;\n       -o-transition-property: height, visibility;\n          transition-property: height, visibility;\n}\n.caret {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 2px;\n  vertical-align: middle;\n  border-top: 4px dashed;\n  border-top: 4px solid \\9;\n  border-right: 4px solid transparent;\n  border-left: 4px solid transparent;\n}\n.dropup,\n.dropdown {\n  position: relative;\n}\n.dropdown-toggle:focus {\n  outline: 0;\n}\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 160px;\n  padding: 5px 0;\n  margin: 2px 0 0;\n  font-size: 14px;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .15);\n  border-radius: 4px;\n  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n}\n.dropdown-menu.pull-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu .divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.dropdown-menu > li > a {\n  display: block;\n  padding: 3px 20px;\n  clear: both;\n  font-weight: normal;\n  line-height: 1.42857143;\n  color: #333;\n  white-space: nowrap;\n}\n.dropdown-menu > li > a:hover,\n.dropdown-menu > li > a:focus {\n  color: #262626;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n.dropdown-menu > .active > a,\n.dropdown-menu > .active > a:hover,\n.dropdown-menu > .active > a:focus {\n  color: #fff;\n  text-decoration: none;\n  background-color: #337ab7;\n  outline: 0;\n}\n.dropdown-menu > .disabled > a,\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  color: #777;\n}\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n  background-image: none;\n  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);\n}\n.open > .dropdown-menu {\n  display: block;\n}\n.open > a {\n  outline: 0;\n}\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n.dropdown-header {\n  display: block;\n  padding: 3px 20px;\n  font-size: 12px;\n  line-height: 1.42857143;\n  color: #777;\n  white-space: nowrap;\n}\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n.pull-right > .dropdown-menu {\n  right: 0;\n  left: auto;\n}\n.dropup .caret,\n.navbar-fixed-bottom .dropdown .caret {\n  content: \"\";\n  border-top: 0;\n  border-bottom: 4px dashed;\n  border-bottom: 4px solid \\9;\n}\n.dropup .dropdown-menu,\n.navbar-fixed-bottom .dropdown .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 2px;\n}\n@media (min-width: 768px) {\n  .navbar-right .dropdown-menu {\n    right: 0;\n    left: auto;\n  }\n  .navbar-right .dropdown-menu-left {\n    right: auto;\n    left: 0;\n  }\n}\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: inline-block;\n  vertical-align: middle;\n}\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  float: left;\n}\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover,\n.btn-group > .btn:focus,\n.btn-group-vertical > .btn:focus,\n.btn-group > .btn:active,\n.btn-group-vertical > .btn:active,\n.btn-group > .btn.active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group {\n  margin-left: -1px;\n}\n.btn-toolbar {\n  margin-left: -5px;\n}\n.btn-toolbar .btn,\n.btn-toolbar .btn-group,\n.btn-toolbar .input-group {\n  float: left;\n}\n.btn-toolbar > .btn,\n.btn-toolbar > .btn-group,\n.btn-toolbar > .input-group {\n  margin-left: 5px;\n}\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group > .btn-group {\n  float: left;\n}\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n.btn-group > .btn + .dropdown-toggle {\n  padding-right: 8px;\n  padding-left: 8px;\n}\n.btn-group > .btn-lg + .dropdown-toggle {\n  padding-right: 12px;\n  padding-left: 12px;\n}\n.btn-group.open .dropdown-toggle {\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn-group.open .dropdown-toggle.btn-link {\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn .caret {\n  margin-left: 0;\n}\n.btn-lg .caret {\n  border-width: 5px 5px 0;\n  border-bottom-width: 0;\n}\n.dropup .btn-lg .caret {\n  border-width: 0 5px 5px;\n}\n.btn-group-vertical > .btn,\n.btn-group-vertical > .btn-group,\n.btn-group-vertical > .btn-group > .btn {\n  display: block;\n  float: none;\n  width: 100%;\n  max-width: 100%;\n}\n.btn-group-vertical > .btn-group > .btn {\n  float: none;\n}\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-left-radius: 4px;\n}\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.btn-group-justified {\n  display: table;\n  width: 100%;\n  table-layout: fixed;\n  border-collapse: separate;\n}\n.btn-group-justified > .btn,\n.btn-group-justified > .btn-group {\n  display: table-cell;\n  float: none;\n  width: 1%;\n}\n.btn-group-justified > .btn-group .btn {\n  width: 100%;\n}\n.btn-group-justified > .btn-group .dropdown-menu {\n  left: auto;\n}\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n.input-group {\n  position: relative;\n  display: table;\n  border-collapse: separate;\n}\n.input-group[class*=\"col-\"] {\n  float: none;\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  float: left;\n  width: 100%;\n  margin-bottom: 0;\n}\n.input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-group-lg > .form-control,\nselect.input-group-lg > .input-group-addon,\nselect.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-group-lg > .form-control,\ntextarea.input-group-lg > .input-group-addon,\ntextarea.input-group-lg > .input-group-btn > .btn,\nselect[multiple].input-group-lg > .form-control,\nselect[multiple].input-group-lg > .input-group-addon,\nselect[multiple].input-group-lg > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-group-sm > .form-control,\nselect.input-group-sm > .input-group-addon,\nselect.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-group-sm > .form-control,\ntextarea.input-group-sm > .input-group-addon,\ntextarea.input-group-sm > .input-group-btn > .btn,\nselect[multiple].input-group-sm > .form-control,\nselect[multiple].input-group-sm > .input-group-addon,\nselect[multiple].input-group-sm > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: table-cell;\n}\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.input-group-addon,\n.input-group-btn {\n  width: 1%;\n  white-space: nowrap;\n  vertical-align: middle;\n}\n.input-group-addon {\n  padding: 6px 12px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1;\n  color: #555;\n  text-align: center;\n  background-color: #eee;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\n.input-group-addon.input-sm {\n  padding: 5px 10px;\n  font-size: 12px;\n  border-radius: 3px;\n}\n.input-group-addon.input-lg {\n  padding: 10px 16px;\n  font-size: 18px;\n  border-radius: 6px;\n}\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n.input-group .form-control:first-child,\n.input-group-addon:first-child,\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group > .btn,\n.input-group-btn:first-child > .dropdown-toggle,\n.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:last-child > .btn-group:not(:last-child) > .btn {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.input-group-addon:first-child {\n  border-right: 0;\n}\n.input-group .form-control:last-child,\n.input-group-addon:last-child,\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group > .btn,\n.input-group-btn:last-child > .dropdown-toggle,\n.input-group-btn:first-child > .btn:not(:first-child),\n.input-group-btn:first-child > .btn-group:not(:first-child) > .btn {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.input-group-addon:last-child {\n  border-left: 0;\n}\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n.input-group-btn > .btn {\n  position: relative;\n}\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n.input-group-btn > .btn:hover,\n.input-group-btn > .btn:focus,\n.input-group-btn > .btn:active {\n  z-index: 2;\n}\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group {\n  margin-right: -1px;\n}\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n.nav {\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n.nav > li {\n  position: relative;\n  display: block;\n}\n.nav > li > a {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n}\n.nav > li > a:hover,\n.nav > li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.nav > li.disabled > a {\n  color: #777;\n}\n.nav > li.disabled > a:hover,\n.nav > li.disabled > a:focus {\n  color: #777;\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n.nav .open > a,\n.nav .open > a:hover,\n.nav .open > a:focus {\n  background-color: #eee;\n  border-color: #337ab7;\n}\n.nav .nav-divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.nav > li > a > img {\n  max-width: none;\n}\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n.nav-tabs > li {\n  float: left;\n  margin-bottom: -1px;\n}\n.nav-tabs > li > a {\n  margin-right: 2px;\n  line-height: 1.42857143;\n  border: 1px solid transparent;\n  border-radius: 4px 4px 0 0;\n}\n.nav-tabs > li > a:hover {\n  border-color: #eee #eee #ddd;\n}\n.nav-tabs > li.active > a,\n.nav-tabs > li.active > a:hover,\n.nav-tabs > li.active > a:focus {\n  color: #555;\n  cursor: default;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-bottom-color: transparent;\n}\n.nav-tabs.nav-justified {\n  width: 100%;\n  border-bottom: 0;\n}\n.nav-tabs.nav-justified > li {\n  float: none;\n}\n.nav-tabs.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-tabs.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-tabs.nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs.nav-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs.nav-justified > .active > a,\n.nav-tabs.nav-justified > .active > a:hover,\n.nav-tabs.nav-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs.nav-justified > .active > a,\n  .nav-tabs.nav-justified > .active > a:hover,\n  .nav-tabs.nav-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.nav-pills > li {\n  float: left;\n}\n.nav-pills > li > a {\n  border-radius: 4px;\n}\n.nav-pills > li + li {\n  margin-left: 2px;\n}\n.nav-pills > li.active > a,\n.nav-pills > li.active > a:hover,\n.nav-pills > li.active > a:focus {\n  color: #fff;\n  background-color: #337ab7;\n}\n.nav-stacked > li {\n  float: none;\n}\n.nav-stacked > li + li {\n  margin-top: 2px;\n  margin-left: 0;\n}\n.nav-justified {\n  width: 100%;\n}\n.nav-justified > li {\n  float: none;\n}\n.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs-justified {\n  border-bottom: 0;\n}\n.nav-tabs-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs-justified > .active > a,\n.nav-tabs-justified > .active > a:hover,\n.nav-tabs-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs-justified > .active > a,\n  .nav-tabs-justified > .active > a:hover,\n  .nav-tabs-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.tab-content > .tab-pane {\n  display: none;\n}\n.tab-content > .active {\n  display: block;\n}\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar {\n  position: relative;\n  min-height: 50px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n}\n@media (min-width: 768px) {\n  .navbar {\n    border-radius: 4px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-header {\n    float: left;\n  }\n}\n.navbar-collapse {\n  padding-right: 15px;\n  padding-left: 15px;\n  overflow-x: visible;\n  -webkit-overflow-scrolling: touch;\n  border-top: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n}\n.navbar-collapse.in {\n  overflow-y: auto;\n}\n@media (min-width: 768px) {\n  .navbar-collapse {\n    width: auto;\n    border-top: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-collapse.collapse {\n    display: block !important;\n    height: auto !important;\n    padding-bottom: 0;\n    overflow: visible !important;\n  }\n  .navbar-collapse.in {\n    overflow-y: visible;\n  }\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-static-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n.navbar-fixed-top .navbar-collapse,\n.navbar-fixed-bottom .navbar-collapse {\n  max-height: 340px;\n}\n@media (max-device-width: 480px) and (orientation: landscape) {\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    max-height: 200px;\n  }\n}\n.container > .navbar-header,\n.container-fluid > .navbar-header,\n.container > .navbar-collapse,\n.container-fluid > .navbar-collapse {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .container > .navbar-header,\n  .container-fluid > .navbar-header,\n  .container > .navbar-collapse,\n  .container-fluid > .navbar-collapse {\n    margin-right: 0;\n    margin-left: 0;\n  }\n}\n.navbar-static-top {\n  z-index: 1000;\n  border-width: 0 0 1px;\n}\n@media (min-width: 768px) {\n  .navbar-static-top {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top,\n.navbar-fixed-bottom {\n  position: fixed;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n@media (min-width: 768px) {\n  .navbar-fixed-top,\n  .navbar-fixed-bottom {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top {\n  top: 0;\n  border-width: 0 0 1px;\n}\n.navbar-fixed-bottom {\n  bottom: 0;\n  margin-bottom: 0;\n  border-width: 1px 0 0;\n}\n.navbar-brand {\n  float: left;\n  height: 50px;\n  padding: 15px 15px;\n  font-size: 18px;\n  line-height: 20px;\n}\n.navbar-brand:hover,\n.navbar-brand:focus {\n  text-decoration: none;\n}\n.navbar-brand > img {\n  display: block;\n}\n@media (min-width: 768px) {\n  .navbar > .container .navbar-brand,\n  .navbar > .container-fluid .navbar-brand {\n    margin-left: -15px;\n  }\n}\n.navbar-toggle {\n  position: relative;\n  float: right;\n  padding: 9px 10px;\n  margin-top: 8px;\n  margin-right: 15px;\n  margin-bottom: 8px;\n  background-color: transparent;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.navbar-toggle:focus {\n  outline: 0;\n}\n.navbar-toggle .icon-bar {\n  display: block;\n  width: 22px;\n  height: 2px;\n  border-radius: 1px;\n}\n.navbar-toggle .icon-bar + .icon-bar {\n  margin-top: 4px;\n}\n@media (min-width: 768px) {\n  .navbar-toggle {\n    display: none;\n  }\n}\n.navbar-nav {\n  margin: 7.5px -15px;\n}\n.navbar-nav > li > a {\n  padding-top: 10px;\n  padding-bottom: 10px;\n  line-height: 20px;\n}\n@media (max-width: 767px) {\n  .navbar-nav .open .dropdown-menu {\n    position: static;\n    float: none;\n    width: auto;\n    margin-top: 0;\n    background-color: transparent;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-nav .open .dropdown-menu > li > a,\n  .navbar-nav .open .dropdown-menu .dropdown-header {\n    padding: 5px 15px 5px 25px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a {\n    line-height: 20px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-nav .open .dropdown-menu > li > a:focus {\n    background-image: none;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-nav {\n    float: left;\n    margin: 0;\n  }\n  .navbar-nav > li {\n    float: left;\n  }\n  .navbar-nav > li > a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n  }\n}\n.navbar-form {\n  padding: 10px 15px;\n  margin-top: 8px;\n  margin-right: -15px;\n  margin-bottom: 8px;\n  margin-left: -15px;\n  border-top: 1px solid transparent;\n  border-bottom: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n}\n@media (min-width: 768px) {\n  .navbar-form .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control-static {\n    display: inline-block;\n  }\n  .navbar-form .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .navbar-form .input-group .input-group-addon,\n  .navbar-form .input-group .input-group-btn,\n  .navbar-form .input-group .form-control {\n    width: auto;\n  }\n  .navbar-form .input-group > .form-control {\n    width: 100%;\n  }\n  .navbar-form .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio,\n  .navbar-form .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio label,\n  .navbar-form .checkbox label {\n    padding-left: 0;\n  }\n  .navbar-form .radio input[type=\"radio\"],\n  .navbar-form .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .navbar-form .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n@media (max-width: 767px) {\n  .navbar-form .form-group {\n    margin-bottom: 5px;\n  }\n  .navbar-form .form-group:last-child {\n    margin-bottom: 0;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-form {\n    width: auto;\n    padding-top: 0;\n    padding-bottom: 0;\n    margin-right: 0;\n    margin-left: 0;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n}\n.navbar-nav > li > .dropdown-menu {\n  margin-top: 0;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {\n  margin-bottom: 0;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.navbar-btn {\n  margin-top: 8px;\n  margin-bottom: 8px;\n}\n.navbar-btn.btn-sm {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.navbar-btn.btn-xs {\n  margin-top: 14px;\n  margin-bottom: 14px;\n}\n.navbar-text {\n  margin-top: 15px;\n  margin-bottom: 15px;\n}\n@media (min-width: 768px) {\n  .navbar-text {\n    float: left;\n    margin-right: 15px;\n    margin-left: 15px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-left {\n    float: left !important;\n  }\n  .navbar-right {\n    float: right !important;\n    margin-right: -15px;\n  }\n  .navbar-right ~ .navbar-right {\n    margin-right: 0;\n  }\n}\n.navbar-default {\n  background-color: #f8f8f8;\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-brand {\n  color: #777;\n}\n.navbar-default .navbar-brand:hover,\n.navbar-default .navbar-brand:focus {\n  color: #5e5e5e;\n  background-color: transparent;\n}\n.navbar-default .navbar-text {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a:hover,\n.navbar-default .navbar-nav > li > a:focus {\n  color: #333;\n  background-color: transparent;\n}\n.navbar-default .navbar-nav > .active > a,\n.navbar-default .navbar-nav > .active > a:hover,\n.navbar-default .navbar-nav > .active > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .disabled > a,\n.navbar-default .navbar-nav > .disabled > a:hover,\n.navbar-default .navbar-nav > .disabled > a:focus {\n  color: #ccc;\n  background-color: transparent;\n}\n.navbar-default .navbar-toggle {\n  border-color: #ddd;\n}\n.navbar-default .navbar-toggle:hover,\n.navbar-default .navbar-toggle:focus {\n  background-color: #ddd;\n}\n.navbar-default .navbar-toggle .icon-bar {\n  background-color: #888;\n}\n.navbar-default .navbar-collapse,\n.navbar-default .navbar-form {\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .open > a,\n.navbar-default .navbar-nav > .open > a:hover,\n.navbar-default .navbar-nav > .open > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n@media (max-width: 767px) {\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a {\n    color: #777;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #333;\n    background-color: transparent;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #555;\n    background-color: #e7e7e7;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #ccc;\n    background-color: transparent;\n  }\n}\n.navbar-default .navbar-link {\n  color: #777;\n}\n.navbar-default .navbar-link:hover {\n  color: #333;\n}\n.navbar-default .btn-link {\n  color: #777;\n}\n.navbar-default .btn-link:hover,\n.navbar-default .btn-link:focus {\n  color: #333;\n}\n.navbar-default .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-default .btn-link:hover,\n.navbar-default .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-default .btn-link:focus {\n  color: #ccc;\n}\n.navbar-inverse {\n  background-color: #222;\n  border-color: #080808;\n}\n.navbar-inverse .navbar-brand {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-brand:hover,\n.navbar-inverse .navbar-brand:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-text {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a:hover,\n.navbar-inverse .navbar-nav > li > a:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-nav > .active > a,\n.navbar-inverse .navbar-nav > .active > a:hover,\n.navbar-inverse .navbar-nav > .active > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n.navbar-inverse .navbar-nav > .disabled > a,\n.navbar-inverse .navbar-nav > .disabled > a:hover,\n.navbar-inverse .navbar-nav > .disabled > a:focus {\n  color: #444;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-toggle {\n  border-color: #333;\n}\n.navbar-inverse .navbar-toggle:hover,\n.navbar-inverse .navbar-toggle:focus {\n  background-color: #333;\n}\n.navbar-inverse .navbar-toggle .icon-bar {\n  background-color: #fff;\n}\n.navbar-inverse .navbar-collapse,\n.navbar-inverse .navbar-form {\n  border-color: #101010;\n}\n.navbar-inverse .navbar-nav > .open > a,\n.navbar-inverse .navbar-nav > .open > a:hover,\n.navbar-inverse .navbar-nav > .open > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n@media (max-width: 767px) {\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .dropdown-header {\n    border-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu .divider {\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {\n    color: #9d9d9d;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #fff;\n    background-color: transparent;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #fff;\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #444;\n    background-color: transparent;\n  }\n}\n.navbar-inverse .navbar-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-link:hover {\n  color: #fff;\n}\n.navbar-inverse .btn-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link:focus {\n  color: #fff;\n}\n.navbar-inverse .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-inverse .btn-link:focus {\n  color: #444;\n}\n.breadcrumb {\n  padding: 8px 15px;\n  margin-bottom: 20px;\n  list-style: none;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n}\n.breadcrumb > li {\n  display: inline-block;\n}\n.breadcrumb > li + li:before {\n  padding: 0 5px;\n  color: #ccc;\n  content: \"/\\A0\";\n}\n.breadcrumb > .active {\n  color: #777;\n}\n.pagination {\n  display: inline-block;\n  padding-left: 0;\n  margin: 20px 0;\n  border-radius: 4px;\n}\n.pagination > li {\n  display: inline;\n}\n.pagination > li > a,\n.pagination > li > span {\n  position: relative;\n  float: left;\n  padding: 6px 12px;\n  margin-left: -1px;\n  line-height: 1.42857143;\n  color: #337ab7;\n  text-decoration: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.pagination > li:first-child > a,\n.pagination > li:first-child > span {\n  margin-left: 0;\n  border-top-left-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.pagination > li:last-child > a,\n.pagination > li:last-child > span {\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 4px;\n}\n.pagination > li > a:hover,\n.pagination > li > span:hover,\n.pagination > li > a:focus,\n.pagination > li > span:focus {\n  z-index: 3;\n  color: #23527c;\n  background-color: #eee;\n  border-color: #ddd;\n}\n.pagination > .active > a,\n.pagination > .active > span,\n.pagination > .active > a:hover,\n.pagination > .active > span:hover,\n.pagination > .active > a:focus,\n.pagination > .active > span:focus {\n  z-index: 2;\n  color: #fff;\n  cursor: default;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.pagination > .disabled > span,\n.pagination > .disabled > span:hover,\n.pagination > .disabled > span:focus,\n.pagination > .disabled > a,\n.pagination > .disabled > a:hover,\n.pagination > .disabled > a:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n.pagination-lg > li > a,\n.pagination-lg > li > span {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.pagination-lg > li:first-child > a,\n.pagination-lg > li:first-child > span {\n  border-top-left-radius: 6px;\n  border-bottom-left-radius: 6px;\n}\n.pagination-lg > li:last-child > a,\n.pagination-lg > li:last-child > span {\n  border-top-right-radius: 6px;\n  border-bottom-right-radius: 6px;\n}\n.pagination-sm > li > a,\n.pagination-sm > li > span {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.pagination-sm > li:first-child > a,\n.pagination-sm > li:first-child > span {\n  border-top-left-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.pagination-sm > li:last-child > a,\n.pagination-sm > li:last-child > span {\n  border-top-right-radius: 3px;\n  border-bottom-right-radius: 3px;\n}\n.pager {\n  padding-left: 0;\n  margin: 20px 0;\n  text-align: center;\n  list-style: none;\n}\n.pager li {\n  display: inline;\n}\n.pager li > a,\n.pager li > span {\n  display: inline-block;\n  padding: 5px 14px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 15px;\n}\n.pager li > a:hover,\n.pager li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.pager .next > a,\n.pager .next > span {\n  float: right;\n}\n.pager .previous > a,\n.pager .previous > span {\n  float: left;\n}\n.pager .disabled > a,\n.pager .disabled > a:hover,\n.pager .disabled > a:focus,\n.pager .disabled > span {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n}\n.label {\n  display: inline;\n  padding: .2em .6em .3em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: .25em;\n}\na.label:hover,\na.label:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.label:empty {\n  display: none;\n}\n.btn .label {\n  position: relative;\n  top: -1px;\n}\n.label-default {\n  background-color: #777;\n}\n.label-default[href]:hover,\n.label-default[href]:focus {\n  background-color: #5e5e5e;\n}\n.label-primary {\n  background-color: #337ab7;\n}\n.label-primary[href]:hover,\n.label-primary[href]:focus {\n  background-color: #286090;\n}\n.label-success {\n  background-color: #5cb85c;\n}\n.label-success[href]:hover,\n.label-success[href]:focus {\n  background-color: #449d44;\n}\n.label-info {\n  background-color: #5bc0de;\n}\n.label-info[href]:hover,\n.label-info[href]:focus {\n  background-color: #31b0d5;\n}\n.label-warning {\n  background-color: #f0ad4e;\n}\n.label-warning[href]:hover,\n.label-warning[href]:focus {\n  background-color: #ec971f;\n}\n.label-danger {\n  background-color: #d9534f;\n}\n.label-danger[href]:hover,\n.label-danger[href]:focus {\n  background-color: #c9302c;\n}\n.badge {\n  display: inline-block;\n  min-width: 10px;\n  padding: 3px 7px;\n  font-size: 12px;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  background-color: #777;\n  border-radius: 10px;\n}\n.badge:empty {\n  display: none;\n}\n.btn .badge {\n  position: relative;\n  top: -1px;\n}\n.btn-xs .badge,\n.btn-group-xs > .btn .badge {\n  top: 0;\n  padding: 1px 5px;\n}\na.badge:hover,\na.badge:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.list-group-item.active > .badge,\n.nav-pills > .active > a > .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.list-group-item > .badge {\n  float: right;\n}\n.list-group-item > .badge + .badge {\n  margin-right: 5px;\n}\n.nav-pills > li > a > .badge {\n  margin-left: 3px;\n}\n.jumbotron {\n  padding-top: 30px;\n  padding-bottom: 30px;\n  margin-bottom: 30px;\n  color: inherit;\n  background-color: #eee;\n}\n.jumbotron h1,\n.jumbotron .h1 {\n  color: inherit;\n}\n.jumbotron p {\n  margin-bottom: 15px;\n  font-size: 21px;\n  font-weight: 200;\n}\n.jumbotron > hr {\n  border-top-color: #d5d5d5;\n}\n.container .jumbotron,\n.container-fluid .jumbotron {\n  border-radius: 6px;\n}\n.jumbotron .container {\n  max-width: 100%;\n}\n@media screen and (min-width: 768px) {\n  .jumbotron {\n    padding-top: 48px;\n    padding-bottom: 48px;\n  }\n  .container .jumbotron,\n  .container-fluid .jumbotron {\n    padding-right: 60px;\n    padding-left: 60px;\n  }\n  .jumbotron h1,\n  .jumbotron .h1 {\n    font-size: 63px;\n  }\n}\n.thumbnail {\n  display: block;\n  padding: 4px;\n  margin-bottom: 20px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: border .2s ease-in-out;\n       -o-transition: border .2s ease-in-out;\n          transition: border .2s ease-in-out;\n}\n.thumbnail > img,\n.thumbnail a > img {\n  margin-right: auto;\n  margin-left: auto;\n}\na.thumbnail:hover,\na.thumbnail:focus,\na.thumbnail.active {\n  border-color: #337ab7;\n}\n.thumbnail .caption {\n  padding: 9px;\n  color: #333;\n}\n.alert {\n  padding: 15px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.alert h4 {\n  margin-top: 0;\n  color: inherit;\n}\n.alert .alert-link {\n  font-weight: bold;\n}\n.alert > p,\n.alert > ul {\n  margin-bottom: 0;\n}\n.alert > p + p {\n  margin-top: 5px;\n}\n.alert-dismissable,\n.alert-dismissible {\n  padding-right: 35px;\n}\n.alert-dismissable .close,\n.alert-dismissible .close {\n  position: relative;\n  top: -2px;\n  right: -21px;\n  color: inherit;\n}\n.alert-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.alert-success hr {\n  border-top-color: #c9e2b3;\n}\n.alert-success .alert-link {\n  color: #2b542c;\n}\n.alert-info {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.alert-info hr {\n  border-top-color: #a6e1ec;\n}\n.alert-info .alert-link {\n  color: #245269;\n}\n.alert-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.alert-warning hr {\n  border-top-color: #f7e1b5;\n}\n.alert-warning .alert-link {\n  color: #66512c;\n}\n.alert-danger {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.alert-danger hr {\n  border-top-color: #e4b9c0;\n}\n.alert-danger .alert-link {\n  color: #843534;\n}\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n.progress {\n  height: 20px;\n  margin-bottom: 20px;\n  overflow: hidden;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n          box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n}\n.progress-bar {\n  float: left;\n  width: 0;\n  height: 100%;\n  font-size: 12px;\n  line-height: 20px;\n  color: #fff;\n  text-align: center;\n  background-color: #337ab7;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n  -webkit-transition: width .6s ease;\n       -o-transition: width .6s ease;\n          transition: width .6s ease;\n}\n.progress-striped .progress-bar,\n.progress-bar-striped {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 40px 40px;\n          background-size: 40px 40px;\n}\n.progress.active .progress-bar,\n.progress-bar.active {\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\n       -o-animation: progress-bar-stripes 2s linear infinite;\n          animation: progress-bar-stripes 2s linear infinite;\n}\n.progress-bar-success {\n  background-color: #5cb85c;\n}\n.progress-striped .progress-bar-success {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-info {\n  background-color: #5bc0de;\n}\n.progress-striped .progress-bar-info {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-warning {\n  background-color: #f0ad4e;\n}\n.progress-striped .progress-bar-warning {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-danger {\n  background-color: #d9534f;\n}\n.progress-striped .progress-bar-danger {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.media {\n  margin-top: 15px;\n}\n.media:first-child {\n  margin-top: 0;\n}\n.media,\n.media-body {\n  overflow: hidden;\n  zoom: 1;\n}\n.media-body {\n  width: 10000px;\n}\n.media-object {\n  display: block;\n}\n.media-object.img-thumbnail {\n  max-width: none;\n}\n.media-right,\n.media > .pull-right {\n  padding-left: 10px;\n}\n.media-left,\n.media > .pull-left {\n  padding-right: 10px;\n}\n.media-left,\n.media-right,\n.media-body {\n  display: table-cell;\n  vertical-align: top;\n}\n.media-middle {\n  vertical-align: middle;\n}\n.media-bottom {\n  vertical-align: bottom;\n}\n.media-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.media-list {\n  padding-left: 0;\n  list-style: none;\n}\n.list-group {\n  padding-left: 0;\n  margin-bottom: 20px;\n}\n.list-group-item {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.list-group-item:first-child {\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n}\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\na.list-group-item,\nbutton.list-group-item {\n  color: #555;\n}\na.list-group-item .list-group-item-heading,\nbutton.list-group-item .list-group-item-heading {\n  color: #333;\n}\na.list-group-item:hover,\nbutton.list-group-item:hover,\na.list-group-item:focus,\nbutton.list-group-item:focus {\n  color: #555;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\nbutton.list-group-item {\n  width: 100%;\n  text-align: left;\n}\n.list-group-item.disabled,\n.list-group-item.disabled:hover,\n.list-group-item.disabled:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #eee;\n}\n.list-group-item.disabled .list-group-item-heading,\n.list-group-item.disabled:hover .list-group-item-heading,\n.list-group-item.disabled:focus .list-group-item-heading {\n  color: inherit;\n}\n.list-group-item.disabled .list-group-item-text,\n.list-group-item.disabled:hover .list-group-item-text,\n.list-group-item.disabled:focus .list-group-item-text {\n  color: #777;\n}\n.list-group-item.active,\n.list-group-item.active:hover,\n.list-group-item.active:focus {\n  z-index: 2;\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active:hover .list-group-item-heading,\n.list-group-item.active:focus .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active:hover .list-group-item-heading > small,\n.list-group-item.active:focus .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small,\n.list-group-item.active:hover .list-group-item-heading > .small,\n.list-group-item.active:focus .list-group-item-heading > .small {\n  color: inherit;\n}\n.list-group-item.active .list-group-item-text,\n.list-group-item.active:hover .list-group-item-text,\n.list-group-item.active:focus .list-group-item-text {\n  color: #c7ddef;\n}\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-success:hover,\nbutton.list-group-item-success:hover,\na.list-group-item-success:focus,\nbutton.list-group-item-success:focus {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\na.list-group-item-success.active,\nbutton.list-group-item-success.active,\na.list-group-item-success.active:hover,\nbutton.list-group-item-success.active:hover,\na.list-group-item-success.active:focus,\nbutton.list-group-item-success.active:focus {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-info:hover,\nbutton.list-group-item-info:hover,\na.list-group-item-info:focus,\nbutton.list-group-item-info:focus {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\na.list-group-item-info.active,\nbutton.list-group-item-info.active,\na.list-group-item-info.active:hover,\nbutton.list-group-item-info.active:hover,\na.list-group-item-info.active:focus,\nbutton.list-group-item-info.active:focus {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-warning:hover,\nbutton.list-group-item-warning:hover,\na.list-group-item-warning:focus,\nbutton.list-group-item-warning:focus {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\na.list-group-item-warning.active,\nbutton.list-group-item-warning.active,\na.list-group-item-warning.active:hover,\nbutton.list-group-item-warning.active:hover,\na.list-group-item-warning.active:focus,\nbutton.list-group-item-warning.active:focus {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-danger:hover,\nbutton.list-group-item-danger:hover,\na.list-group-item-danger:focus,\nbutton.list-group-item-danger:focus {\n  color: #a94442;\n  background-color: #ebcccc;\n}\na.list-group-item-danger.active,\nbutton.list-group-item-danger.active,\na.list-group-item-danger.active:hover,\nbutton.list-group-item-danger.active:hover,\na.list-group-item-danger.active:focus,\nbutton.list-group-item-danger.active:focus {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n.list-group-item-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.list-group-item-text {\n  margin-bottom: 0;\n  line-height: 1.3;\n}\n.panel {\n  margin-bottom: 20px;\n  background-color: #fff;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n}\n.panel-body {\n  padding: 15px;\n}\n.panel-heading {\n  padding: 10px 15px;\n  border-bottom: 1px solid transparent;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel-heading > .dropdown .dropdown-toggle {\n  color: inherit;\n}\n.panel-title {\n  margin-top: 0;\n  margin-bottom: 0;\n  font-size: 16px;\n  color: inherit;\n}\n.panel-title > a,\n.panel-title > small,\n.panel-title > .small,\n.panel-title > small > a,\n.panel-title > .small > a {\n  color: inherit;\n}\n.panel-footer {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .list-group,\n.panel > .panel-collapse > .list-group {\n  margin-bottom: 0;\n}\n.panel > .list-group .list-group-item,\n.panel > .panel-collapse > .list-group .list-group-item {\n  border-width: 1px 0;\n  border-radius: 0;\n}\n.panel > .list-group:first-child .list-group-item:first-child,\n.panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {\n  border-top: 0;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .list-group:last-child .list-group-item:last-child,\n.panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {\n  border-bottom: 0;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .panel-heading + .panel-collapse > .list-group .list-group-item:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.panel-heading + .list-group .list-group-item:first-child {\n  border-top-width: 0;\n}\n.list-group + .panel-footer {\n  border-top-width: 0;\n}\n.panel > .table,\n.panel > .table-responsive > .table,\n.panel > .panel-collapse > .table {\n  margin-bottom: 0;\n}\n.panel > .table caption,\n.panel > .table-responsive > .table caption,\n.panel > .panel-collapse > .table caption {\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.panel > .table:first-child,\n.panel > .table-responsive:first-child > .table:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {\n  border-top-left-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {\n  border-top-right-radius: 3px;\n}\n.panel > .table:last-child,\n.panel > .table-responsive:last-child > .table:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {\n  border-bottom-right-radius: 3px;\n}\n.panel > .panel-body + .table,\n.panel > .panel-body + .table-responsive,\n.panel > .table + .panel-body,\n.panel > .table-responsive + .panel-body {\n  border-top: 1px solid #ddd;\n}\n.panel > .table > tbody:first-child > tr:first-child th,\n.panel > .table > tbody:first-child > tr:first-child td {\n  border-top: 0;\n}\n.panel > .table-bordered,\n.panel > .table-responsive > .table-bordered {\n  border: 0;\n}\n.panel > .table-bordered > thead > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:first-child,\n.panel > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-bordered > thead > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:first-child,\n.panel > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-bordered > tfoot > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n  border-left: 0;\n}\n.panel > .table-bordered > thead > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:last-child,\n.panel > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-bordered > thead > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:last-child,\n.panel > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-bordered > tfoot > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n  border-right: 0;\n}\n.panel > .table-bordered > thead > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > td,\n.panel > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-bordered > thead > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > th,\n.panel > .table-bordered > tbody > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > th {\n  border-bottom: 0;\n}\n.panel > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-bordered > tfoot > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {\n  border-bottom: 0;\n}\n.panel > .table-responsive {\n  margin-bottom: 0;\n  border: 0;\n}\n.panel-group {\n  margin-bottom: 20px;\n}\n.panel-group .panel {\n  margin-bottom: 0;\n  border-radius: 4px;\n}\n.panel-group .panel + .panel {\n  margin-top: 5px;\n}\n.panel-group .panel-heading {\n  border-bottom: 0;\n}\n.panel-group .panel-heading + .panel-collapse > .panel-body,\n.panel-group .panel-heading + .panel-collapse > .list-group {\n  border-top: 1px solid #ddd;\n}\n.panel-group .panel-footer {\n  border-top: 0;\n}\n.panel-group .panel-footer + .panel-collapse .panel-body {\n  border-bottom: 1px solid #ddd;\n}\n.panel-default {\n  border-color: #ddd;\n}\n.panel-default > .panel-heading {\n  color: #333;\n  background-color: #f5f5f5;\n  border-color: #ddd;\n}\n.panel-default > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ddd;\n}\n.panel-default > .panel-heading .badge {\n  color: #f5f5f5;\n  background-color: #333;\n}\n.panel-default > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ddd;\n}\n.panel-primary {\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #337ab7;\n}\n.panel-primary > .panel-heading .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.panel-primary > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #337ab7;\n}\n.panel-success {\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #d6e9c6;\n}\n.panel-success > .panel-heading .badge {\n  color: #dff0d8;\n  background-color: #3c763d;\n}\n.panel-success > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #d6e9c6;\n}\n.panel-info {\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #bce8f1;\n}\n.panel-info > .panel-heading .badge {\n  color: #d9edf7;\n  background-color: #31708f;\n}\n.panel-info > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #bce8f1;\n}\n.panel-warning {\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #faebcc;\n}\n.panel-warning > .panel-heading .badge {\n  color: #fcf8e3;\n  background-color: #8a6d3b;\n}\n.panel-warning > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #faebcc;\n}\n.panel-danger {\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ebccd1;\n}\n.panel-danger > .panel-heading .badge {\n  color: #f2dede;\n  background-color: #a94442;\n}\n.panel-danger > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ebccd1;\n}\n.embed-responsive {\n  position: relative;\n  display: block;\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n.embed-responsive-16by9 {\n  padding-bottom: 56.25%;\n}\n.embed-responsive-4by3 {\n  padding-bottom: 75%;\n}\n.well {\n  min-height: 20px;\n  padding: 19px;\n  margin-bottom: 20px;\n  background-color: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n}\n.well blockquote {\n  border-color: #ddd;\n  border-color: rgba(0, 0, 0, .15);\n}\n.well-lg {\n  padding: 24px;\n  border-radius: 6px;\n}\n.well-sm {\n  padding: 9px;\n  border-radius: 3px;\n}\n.close {\n  float: right;\n  font-size: 21px;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  filter: alpha(opacity=20);\n  opacity: .2;\n}\n.close:hover,\n.close:focus {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\nbutton.close {\n  -webkit-appearance: none;\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n}\n.modal-open {\n  overflow: hidden;\n}\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  -webkit-overflow-scrolling: touch;\n  outline: 0;\n}\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform .3s ease-out;\n       -o-transition:      -o-transform .3s ease-out;\n          transition:         transform .3s ease-out;\n  -webkit-transform: translate(0, -25%);\n      -ms-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n.modal.in .modal-dialog {\n  -webkit-transform: translate(0, 0);\n      -ms-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n.modal-content {\n  position: relative;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #999;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  outline: 0;\n  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n          box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n}\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n.modal-backdrop.fade {\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n.modal-backdrop.in {\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.modal-header {\n  min-height: 16.42857143px;\n  padding: 15px;\n  border-bottom: 1px solid #e5e5e5;\n}\n.modal-header .close {\n  margin-top: -2px;\n}\n.modal-title {\n  margin: 0;\n  line-height: 1.42857143;\n}\n.modal-body {\n  position: relative;\n  padding: 15px;\n}\n.modal-footer {\n  padding: 15px;\n  text-align: right;\n  border-top: 1px solid #e5e5e5;\n}\n.modal-footer .btn + .btn {\n  margin-bottom: 0;\n  margin-left: 5px;\n}\n.modal-footer .btn-group .btn + .btn {\n  margin-left: -1px;\n}\n.modal-footer .btn-block + .btn-block {\n  margin-left: 0;\n}\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n@media (min-width: 768px) {\n  .modal-dialog {\n    width: 600px;\n    margin: 30px auto;\n  }\n  .modal-content {\n    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n            box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n  }\n  .modal-sm {\n    width: 300px;\n  }\n}\n@media (min-width: 992px) {\n  .modal-lg {\n    width: 900px;\n  }\n}\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 12px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  filter: alpha(opacity=0);\n  opacity: 0;\n\n  line-break: auto;\n}\n.tooltip.in {\n  filter: alpha(opacity=90);\n  opacity: .9;\n}\n.tooltip.top {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n.tooltip.right {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n.tooltip.bottom {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n.tooltip.left {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 4px;\n}\n.tooltip-arrow {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.tooltip.top .tooltip-arrow {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-left .tooltip-arrow {\n  right: 5px;\n  bottom: 0;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-right .tooltip-arrow {\n  bottom: 0;\n  left: 5px;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.right .tooltip-arrow {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n.tooltip.left .tooltip-arrow {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n.tooltip.bottom .tooltip-arrow {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-left .tooltip-arrow {\n  top: 0;\n  right: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-right .tooltip-arrow {\n  top: 0;\n  left: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: none;\n  max-width: 276px;\n  padding: 1px;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n\n  line-break: auto;\n}\n.popover.top {\n  margin-top: -10px;\n}\n.popover.right {\n  margin-left: 10px;\n}\n.popover.bottom {\n  margin-top: 10px;\n}\n.popover.left {\n  margin-left: -10px;\n}\n.popover-title {\n  padding: 8px 14px;\n  margin: 0;\n  font-size: 14px;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-radius: 5px 5px 0 0;\n}\n.popover-content {\n  padding: 9px 14px;\n}\n.popover > .arrow,\n.popover > .arrow:after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.popover > .arrow {\n  border-width: 11px;\n}\n.popover > .arrow:after {\n  content: \"\";\n  border-width: 10px;\n}\n.popover.top > .arrow {\n  bottom: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-color: #999;\n  border-top-color: rgba(0, 0, 0, .25);\n  border-bottom-width: 0;\n}\n.popover.top > .arrow:after {\n  bottom: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-color: #fff;\n  border-bottom-width: 0;\n}\n.popover.right > .arrow {\n  top: 50%;\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: #999;\n  border-right-color: rgba(0, 0, 0, .25);\n  border-left-width: 0;\n}\n.popover.right > .arrow:after {\n  bottom: -10px;\n  left: 1px;\n  content: \" \";\n  border-right-color: #fff;\n  border-left-width: 0;\n}\n.popover.bottom > .arrow {\n  top: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-width: 0;\n  border-bottom-color: #999;\n  border-bottom-color: rgba(0, 0, 0, .25);\n}\n.popover.bottom > .arrow:after {\n  top: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-width: 0;\n  border-bottom-color: #fff;\n}\n.popover.left > .arrow {\n  top: 50%;\n  right: -11px;\n  margin-top: -11px;\n  border-right-width: 0;\n  border-left-color: #999;\n  border-left-color: rgba(0, 0, 0, .25);\n}\n.popover.left > .arrow:after {\n  right: 1px;\n  bottom: -10px;\n  content: \" \";\n  border-right-width: 0;\n  border-left-color: #fff;\n}\n.carousel {\n  position: relative;\n}\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n.carousel-inner > .item {\n  position: relative;\n  display: none;\n  -webkit-transition: .6s ease-in-out left;\n       -o-transition: .6s ease-in-out left;\n          transition: .6s ease-in-out left;\n}\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  line-height: 1;\n}\n@media all and (transform-3d), (-webkit-transform-3d) {\n  .carousel-inner > .item {\n    -webkit-transition: -webkit-transform .6s ease-in-out;\n         -o-transition:      -o-transform .6s ease-in-out;\n            transition:         transform .6s ease-in-out;\n\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n  .carousel-inner > .item.next,\n  .carousel-inner > .item.active.right {\n    left: 0;\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-inner > .item.prev,\n  .carousel-inner > .item.active.left {\n    left: 0;\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n  .carousel-inner > .item.next.left,\n  .carousel-inner > .item.prev.right,\n  .carousel-inner > .item.active {\n    left: 0;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n.carousel-inner > .active,\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  display: block;\n}\n.carousel-inner > .active {\n  left: 0;\n}\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  position: absolute;\n  top: 0;\n  width: 100%;\n}\n.carousel-inner > .next {\n  left: 100%;\n}\n.carousel-inner > .prev {\n  left: -100%;\n}\n.carousel-inner > .next.left,\n.carousel-inner > .prev.right {\n  left: 0;\n}\n.carousel-inner > .active.left {\n  left: -100%;\n}\n.carousel-inner > .active.right {\n  left: 100%;\n}\n.carousel-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 15%;\n  font-size: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.carousel-control.left {\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control.right {\n  right: 0;\n  left: auto;\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .0001)), to(rgba(0, 0, 0, .5)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control:hover,\n.carousel-control:focus {\n  color: #fff;\n  text-decoration: none;\n  filter: alpha(opacity=90);\n  outline: 0;\n  opacity: .9;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-left,\n.carousel-control .glyphicon-chevron-right {\n  position: absolute;\n  top: 50%;\n  z-index: 5;\n  display: inline-block;\n  margin-top: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .glyphicon-chevron-left {\n  left: 50%;\n  margin-left: -10px;\n}\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-right {\n  right: 50%;\n  margin-right: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next {\n  width: 20px;\n  height: 20px;\n  font-family: serif;\n  line-height: 1;\n}\n.carousel-control .icon-prev:before {\n  content: '\\2039';\n}\n.carousel-control .icon-next:before {\n  content: '\\203A';\n}\n.carousel-indicators {\n  position: absolute;\n  bottom: 10px;\n  left: 50%;\n  z-index: 15;\n  width: 60%;\n  padding-left: 0;\n  margin-left: -30%;\n  text-align: center;\n  list-style: none;\n}\n.carousel-indicators li {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin: 1px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: #000 \\9;\n  background-color: rgba(0, 0, 0, 0);\n  border: 1px solid #fff;\n  border-radius: 10px;\n}\n.carousel-indicators .active {\n  width: 12px;\n  height: 12px;\n  margin: 0;\n  background-color: #fff;\n}\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n}\n.carousel-caption .btn {\n  text-shadow: none;\n}\n@media screen and (min-width: 768px) {\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-prev,\n  .carousel-control .icon-next {\n    width: 30px;\n    height: 30px;\n    margin-top: -15px;\n    font-size: 30px;\n  }\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .icon-prev {\n    margin-left: -15px;\n  }\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-next {\n    margin-right: -15px;\n  }\n  .carousel-caption {\n    right: 20%;\n    left: 20%;\n    padding-bottom: 30px;\n  }\n  .carousel-indicators {\n    bottom: 20px;\n  }\n}\n.clearfix:before,\n.clearfix:after,\n.dl-horizontal dd:before,\n.dl-horizontal dd:after,\n.container:before,\n.container:after,\n.container-fluid:before,\n.container-fluid:after,\n.row:before,\n.row:after,\n.form-horizontal .form-group:before,\n.form-horizontal .form-group:after,\n.btn-toolbar:before,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:before,\n.btn-group-vertical > .btn-group:after,\n.nav:before,\n.nav:after,\n.navbar:before,\n.navbar:after,\n.navbar-header:before,\n.navbar-header:after,\n.navbar-collapse:before,\n.navbar-collapse:after,\n.pager:before,\n.pager:after,\n.panel-body:before,\n.panel-body:after,\n.modal-footer:before,\n.modal-footer:after {\n  display: table;\n  content: \" \";\n}\n.clearfix:after,\n.dl-horizontal dd:after,\n.container:after,\n.container-fluid:after,\n.row:after,\n.form-horizontal .form-group:after,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:after,\n.nav:after,\n.navbar:after,\n.navbar-header:after,\n.navbar-collapse:after,\n.pager:after,\n.panel-body:after,\n.modal-footer:after {\n  clear: both;\n}\n.center-block {\n  display: block;\n  margin-right: auto;\n  margin-left: auto;\n}\n.pull-right {\n  float: right !important;\n}\n.pull-left {\n  float: left !important;\n}\n.hide {\n  display: none !important;\n}\n.show {\n  display: block !important;\n}\n.invisible {\n  visibility: hidden;\n}\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n.hidden {\n  display: none !important;\n}\n.affix {\n  position: fixed;\n}\n@-ms-viewport {\n  width: device-width;\n}\n.visible-xs,\n.visible-sm,\n.visible-md,\n.visible-lg {\n  display: none !important;\n}\n.visible-xs-block,\n.visible-xs-inline,\n.visible-xs-inline-block,\n.visible-sm-block,\n.visible-sm-inline,\n.visible-sm-inline-block,\n.visible-md-block,\n.visible-md-inline,\n.visible-md-inline-block,\n.visible-lg-block,\n.visible-lg-inline,\n.visible-lg-inline-block {\n  display: none !important;\n}\n@media (max-width: 767px) {\n  .visible-xs {\n    display: block !important;\n  }\n  table.visible-xs {\n    display: table !important;\n  }\n  tr.visible-xs {\n    display: table-row !important;\n  }\n  th.visible-xs,\n  td.visible-xs {\n    display: table-cell !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-block {\n    display: block !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline {\n    display: inline !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm {\n    display: block !important;\n  }\n  table.visible-sm {\n    display: table !important;\n  }\n  tr.visible-sm {\n    display: table-row !important;\n  }\n  th.visible-sm,\n  td.visible-sm {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-block {\n    display: block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md {\n    display: block !important;\n  }\n  table.visible-md {\n    display: table !important;\n  }\n  tr.visible-md {\n    display: table-row !important;\n  }\n  th.visible-md,\n  td.visible-md {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-block {\n    display: block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg {\n    display: block !important;\n  }\n  table.visible-lg {\n    display: table !important;\n  }\n  tr.visible-lg {\n    display: table-row !important;\n  }\n  th.visible-lg,\n  td.visible-lg {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-block {\n    display: block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (max-width: 767px) {\n  .hidden-xs {\n    display: none !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .hidden-sm {\n    display: none !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .hidden-md {\n    display: none !important;\n  }\n}\n@media (min-width: 1200px) {\n  .hidden-lg {\n    display: none !important;\n  }\n}\n.visible-print {\n  display: none !important;\n}\n@media print {\n  .visible-print {\n    display: block !important;\n  }\n  table.visible-print {\n    display: table !important;\n  }\n  tr.visible-print {\n    display: table-row !important;\n  }\n  th.visible-print,\n  td.visible-print {\n    display: table-cell !important;\n  }\n}\n.visible-print-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n.visible-print-inline {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n.visible-print-inline-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 8 */
+/* 84 */
 /***/ function(module, exports) {
 
 	/*
@@ -12860,37 +23079,37 @@
 
 
 /***/ },
-/* 9 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "f4769f9bdb7466be65088239c12046d1.eot"
 
 /***/ },
-/* 10 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "448c34a56d699c29117adc64c43affeb.woff2"
 
 /***/ },
-/* 11 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "fa2772327f55d8198301fdb8bcfc8158.woff"
 
 /***/ },
-/* 12 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "e18bbf611f2a2e43afc071aa2f4e1512.ttf"
 
 /***/ },
-/* 13 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "89889688147bd7575d6327160d64e760.svg"
 
 /***/ },
-/* 14 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -13115,21 +23334,50 @@
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	module.exports = {
-		parse: {
-			appKey: '',
-			jsKey: ''
-		}
-	};
-
-/***/ },
-/* 16 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var HomeView = __webpack_require__(17);
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(92);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(90)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./style.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./style.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(84)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var HomeView = __webpack_require__(94);
 
 	module.exports = Backbone.Router.extend({
 		routes: {
@@ -13146,10 +23394,10 @@
 	}
 
 /***/ },
-/* 17 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(18);
+	var tpl = __webpack_require__(95);
 
 	module.exports = Backbone.View.extend({
 		render: function (state) {
@@ -13168,10 +23416,10 @@
 	});
 
 /***/ },
-/* 18 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Handlebars = __webpack_require__(19);
+	var Handlebars = __webpack_require__(96);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
 	    return "	Loading...\n";
 	},"3":function(container,depth0,helpers,partials,data) {
@@ -13189,16 +23437,16 @@
 	},"useData":true});
 
 /***/ },
-/* 19 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Create a simple path alias to allow browserify to resolve
 	// the runtime on a supported path.
-	module.exports = __webpack_require__(20)['default'];
+	module.exports = __webpack_require__(97)['default'];
 
 
 /***/ },
-/* 20 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13212,30 +23460,30 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-	var _handlebarsBase = __webpack_require__(21);
+	var _handlebarsBase = __webpack_require__(98);
 
 	// Each of these augment the Handlebars object. No need to setup here.
 	// (This is done to easily share code between commonjs and browse envs)
 
 	var base = _interopRequireWildcard(_handlebarsBase);
 
-	var _handlebarsSafeString = __webpack_require__(35);
+	var _handlebarsSafeString = __webpack_require__(112);
 
 	var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-	var _handlebarsException = __webpack_require__(23);
+	var _handlebarsException = __webpack_require__(100);
 
 	var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
-	var _handlebarsUtils = __webpack_require__(22);
+	var _handlebarsUtils = __webpack_require__(99);
 
 	var Utils = _interopRequireWildcard(_handlebarsUtils);
 
-	var _handlebarsRuntime = __webpack_require__(36);
+	var _handlebarsRuntime = __webpack_require__(113);
 
 	var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-	var _handlebarsNoConflict = __webpack_require__(37);
+	var _handlebarsNoConflict = __webpack_require__(114);
 
 	// For compatibility and usage outside of module systems, make the Handlebars object a namespace
 
@@ -13271,7 +23519,7 @@
 
 
 /***/ },
-/* 21 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13282,17 +23530,17 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
-	var _exception = __webpack_require__(23);
+	var _exception = __webpack_require__(100);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
-	var _helpers = __webpack_require__(24);
+	var _helpers = __webpack_require__(101);
 
-	var _decorators = __webpack_require__(32);
+	var _decorators = __webpack_require__(109);
 
-	var _logger = __webpack_require__(34);
+	var _logger = __webpack_require__(111);
 
 	var _logger2 = _interopRequireDefault(_logger);
 
@@ -13381,7 +23629,7 @@
 
 
 /***/ },
-/* 22 */
+/* 99 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13511,7 +23759,7 @@
 
 
 /***/ },
-/* 23 */
+/* 100 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13557,7 +23805,7 @@
 
 
 /***/ },
-/* 24 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13568,31 +23816,31 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _helpersBlockHelperMissing = __webpack_require__(25);
+	var _helpersBlockHelperMissing = __webpack_require__(102);
 
 	var _helpersBlockHelperMissing2 = _interopRequireDefault(_helpersBlockHelperMissing);
 
-	var _helpersEach = __webpack_require__(26);
+	var _helpersEach = __webpack_require__(103);
 
 	var _helpersEach2 = _interopRequireDefault(_helpersEach);
 
-	var _helpersHelperMissing = __webpack_require__(27);
+	var _helpersHelperMissing = __webpack_require__(104);
 
 	var _helpersHelperMissing2 = _interopRequireDefault(_helpersHelperMissing);
 
-	var _helpersIf = __webpack_require__(28);
+	var _helpersIf = __webpack_require__(105);
 
 	var _helpersIf2 = _interopRequireDefault(_helpersIf);
 
-	var _helpersLog = __webpack_require__(29);
+	var _helpersLog = __webpack_require__(106);
 
 	var _helpersLog2 = _interopRequireDefault(_helpersLog);
 
-	var _helpersLookup = __webpack_require__(30);
+	var _helpersLookup = __webpack_require__(107);
 
 	var _helpersLookup2 = _interopRequireDefault(_helpersLookup);
 
-	var _helpersWith = __webpack_require__(31);
+	var _helpersWith = __webpack_require__(108);
 
 	var _helpersWith2 = _interopRequireDefault(_helpersWith);
 
@@ -13609,14 +23857,14 @@
 
 
 /***/ },
-/* 25 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('blockHelperMissing', function (context, options) {
@@ -13654,7 +23902,7 @@
 
 
 /***/ },
-/* 26 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13664,9 +23912,9 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
-	var _exception = __webpack_require__(23);
+	var _exception = __webpack_require__(100);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
@@ -13754,7 +24002,7 @@
 
 
 /***/ },
-/* 27 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13764,7 +24012,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _exception = __webpack_require__(23);
+	var _exception = __webpack_require__(100);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
@@ -13785,14 +24033,14 @@
 
 
 /***/ },
-/* 28 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('if', function (conditional, options) {
@@ -13820,7 +24068,7 @@
 
 
 /***/ },
-/* 29 */
+/* 106 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13852,7 +24100,7 @@
 
 
 /***/ },
-/* 30 */
+/* 107 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13870,14 +24118,14 @@
 
 
 /***/ },
-/* 31 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('with', function (context, options) {
@@ -13909,7 +24157,7 @@
 
 
 /***/ },
-/* 32 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13920,7 +24168,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _decoratorsInline = __webpack_require__(33);
+	var _decoratorsInline = __webpack_require__(110);
 
 	var _decoratorsInline2 = _interopRequireDefault(_decoratorsInline);
 
@@ -13931,14 +24179,14 @@
 
 
 /***/ },
-/* 33 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	exports['default'] = function (instance) {
 	  instance.registerDecorator('inline', function (fn, props, container, options) {
@@ -13966,14 +24214,14 @@
 
 
 /***/ },
-/* 34 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	var logger = {
 	  methodMap: ['debug', 'info', 'warn', 'error'],
@@ -14019,7 +24267,7 @@
 
 
 /***/ },
-/* 35 */
+/* 112 */
 /***/ function(module, exports) {
 
 	// Build out our basic SafeString type
@@ -14040,7 +24288,7 @@
 
 
 /***/ },
-/* 36 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14060,15 +24308,15 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(99);
 
 	var Utils = _interopRequireWildcard(_utils);
 
-	var _exception = __webpack_require__(23);
+	var _exception = __webpack_require__(100);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
-	var _base = __webpack_require__(21);
+	var _base = __webpack_require__(98);
 
 	function checkRevision(compilerInfo) {
 	  var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -14338,7 +24586,7 @@
 
 
 /***/ },
-/* 37 */
+/* 114 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/* global window */
@@ -14364,10 +24612,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 38 */
+/* 115 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Handlebars = __webpack_require__(19);
+	var Handlebars = __webpack_require__(96);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
 	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
