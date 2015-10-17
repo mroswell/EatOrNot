@@ -62,7 +62,7 @@
 	__webpack_require__(82);
 	__webpack_require__(91);
 
-	//var config = require('./config');
+	var config = __webpack_require__(116);
 	var Router = __webpack_require__(93);
 
 	var containerTpl = __webpack_require__(115);
@@ -23398,13 +23398,14 @@
 	          .then(function(data){
 	            self.food = _.invoke(data, 'toJSON');
 	            console.log(self.food);
+	            console.log(self.food[0].url);
 	            self.render();
 	          });
 	        return this;
 	      }
 
 	      var data = {
-	        food: self.food
+	        foods: self.food
 	      };
 
 	      this.$el.html(
@@ -23426,6 +23427,12 @@
 	    return "	Home Page\n";
 	},"5":function(container,depth0,helpers,partials,data) {
 	    return "	Error\n";
+	},"7":function(container,depth0,helpers,partials,data) {
+	    var helper;
+
+	  return "    <li><img src=\""
+	    + container.escapeExpression(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"url","hash":{},"data":data}) : helper)))
+	    + "\"></li>\n";
 	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
 	    var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -23433,7 +23440,10 @@
 	    + "\n"
 	    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_loaded : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
 	    + "\n"
-	    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_error : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+	    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_error : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "\n<ul>\n"
+	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.foods : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "</ul>";
 	},"useData":true});
 
 /***/ },
@@ -24635,6 +24645,19 @@
 	    + alias4(((helper = (helper = helpers.footer || (depth0 != null ? depth0.footer : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"footer","hash":{},"data":data}) : helper)))
 	    + "\n	</div>\n</div>";
 	},"useData":true});
+
+/***/ },
+/* 116 */
+/***/ function(module, exports) {
+
+	var defaults;
+
+	defaults = {
+	  assetPath: "assets",
+	};
+
+	module.exports = defaults;
+	console.log(defaults.assetPath);
 
 /***/ }
 /******/ ]);

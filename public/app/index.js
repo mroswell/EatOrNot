@@ -16,7 +16,7 @@ require('backbone');
 require('bootstrap/dist/css/bootstrap.css');
 require('./style.css');
 
-//var config = require('./config');
+var config = require('./config');
 var Router = require('./router');
 
 var containerTpl = require('./templates/container.hbs');

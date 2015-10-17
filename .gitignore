@@ -1,8 +1,11 @@
 node_modules
 log.json
+attic
 
 # For Macs:
 .DS_Store
 
 # For WebStorm Users
 .idea
+
+
