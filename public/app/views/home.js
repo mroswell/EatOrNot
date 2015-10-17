@@ -23,13 +23,14 @@ module.exports = Backbone.View.extend({
           .then(function(data){
             self.food = _.invoke(data, 'toJSON');
             console.log(self.food);
+            console.log(self.food[0].url);
             self.render();
           });
         return this;
       }
 
       var data = {
-        food: self.food
+        foods: self.food
       };
 
       this.$el.html(
