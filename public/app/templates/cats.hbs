@@ -2,10 +2,10 @@
   Loading Cats
 {{/if}}
 
-{{#if is_loaded}}
+<ul>
+  {{#each food}}
+    <li style="z-index: {{zIndex}}; position: absolute; top: {{top}}; left: {{left}}" data-id={{objectId}}>{{name}}</li>
+  {{/each}}
+</ul>
 
-  <ul>
-    {{#each foods }}
-      <li></li>
-    {{/each}}
-  </ul><button class="add-cat">Add a Cat</button>
+<button class="add-cat">Add A Cat</button>

@@ -10,8 +10,15 @@
 	Error
 {{/if}}
 
+<!--<ul>-->
+  <!--{{#each foods}}-->
+    <!--<li><img src="{{url}}"></li>-->
+  <!--{{/each}}-->
+<!--</ul>-->
 <ul>
   {{#each foods}}
-    <li><img src="{{url}}"></li>
+    <li style="z-index: {{zIndex}}; position: absolute; top: {{top}}; left: {{left}}" data-id={{objectId}}>{{name}}</li>
   {{/each}}
 </ul>
+
+<button class="add-cat">Add A Cat</button>
