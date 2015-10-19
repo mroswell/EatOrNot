@@ -38,7 +38,7 @@ var Parse = require('parse').Parse;
 
 module.exports = Backbone.View.extend({
   events: {
-    'click .add-cat': 'onClickAddCat',
+    'click .add-food': 'onClickAddCat',
     'click li': 'onClickCat'
 
   },

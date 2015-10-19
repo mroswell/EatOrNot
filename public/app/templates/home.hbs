@@ -1,24 +1,6 @@
-{{#if is_loading}}
-	Loading...
-{{/if}}
-
-{{#if is_loaded}}
-	Home Page
-{{/if}}
-
-{{#if is_error}}
-	Error
-{{/if}}
-
-<!--<ul>-->
-  <!--{{#each foods}}-->
-    <!--<li><img src="{{url}}"></li>-->
-  <!--{{/each}}-->
-<!--</ul>-->
 <ul>
-  {{#each foods}}
+  {{#each food}}
     <li style="z-index: {{zIndex}}; position: absolute; top: {{top}}; left: {{left}}" data-id={{objectId}}>{{name}}</li>
   {{/each}}
 </ul>
-
-<button class="add-cat">Add A Cat</button>
+<button class="add-food">Add A Food</button>

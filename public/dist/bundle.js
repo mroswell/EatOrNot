@@ -38390,47 +38390,70 @@
 /* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
+	
+
 	var tpl = __webpack_require__(97);
-	var Parse = __webpack_require__(5).Parse;
 	var _ = __webpack_require__(4);
 
+	var CatsProfileView = __webpack_require__(120);
+
+	var Parse = __webpack_require__(5).Parse;
+
 	module.exports = Backbone.View.extend({
-	//	render: function (state) {
-	//		if (!state) state = 'loaded';
-	//
-	//		//put other possible states here
-	//
-	//		this.$el.html(tpl({
-	//			is_loaded: state === 'loaded'
-	//		}));
+	  events: {
+	    'click .add-food': 'onClickAddFood',
+	    'click li': 'onClickCat'
 
-			//jQuery stuff goes here
-	    render: function () {
-	      var self = this;
+	  },
+	  className: 'food',
 
-	      if (!this.food) {
-	        var food = Parse.Object.extend('food');
-	        (new Parse.Query(food))
-	          .find()
-	          .then(function(data){
-	            self.food = _.invoke(data, 'toJSON');
-	            console.log(self.food);
-	            console.log(self.food[0].url);
-	            self.render();
-	          });
-	        return this;
-	      }
+	  render: function () {
+	    var self = this;
 
-	      var data = {
-	        foods: self.food
-	      };
+	    if (!this.food) {
+	      var food = Parse.Object.extend('food');
 
-	      this.$el.html(
-	        tpl(data)
-	      );
-
+	      (new Parse.Query(food))
+	        .find()
+	        .then(function(data){
+	          self.food = _.invoke(data, 'toJSON');
+	          console.log(self.food);
+	          self.render();
+	        });
 	      return this;
-		}
+	    }
+
+	    var data = {
+	      food: _.map(self.food, function (food, index) {
+	        food.zIndex = index;
+	        food.left = index * 5 + 'px';
+	        food.top = index * 5 + 'px';
+	        return food;
+	      })
+	    };
+
+	    this.catsProfile = new CatsProfileView({
+
+	    }).render();
+
+	    this.$el.html(
+	      tpl(data)
+	    );
+
+	    //jQuery stuff goes here
+
+	    return this;
+	  },
+
+	  onClickAddFood: function () {
+	    console.log('a food is added');
+	  },
+	  onClickCat: function (e) {
+
+	    console.log($(e.target).data('id'));
+	    $(e.target).remove();
+	  }
+
 	});
 
 /***/ },
@@ -38439,18 +38462,6 @@
 
 	var Handlebars = __webpack_require__(98);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-	    return "	Loading...\n";
-	},"3":function(container,depth0,helpers,partials,data) {
-	    return "	Home Page\n";
-	},"5":function(container,depth0,helpers,partials,data) {
-	    return "	Error\n";
-	},"7":function(container,depth0,helpers,partials,data) {
-	    var helper;
-
-	  return "-->\n    <!--<li><img src=\""
-	    + container.escapeExpression(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"url","hash":{},"data":data}) : helper)))
-	    + "\"></li>-->\n  <!--";
-	},"9":function(container,depth0,helpers,partials,data) {
 	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
 	  return "    <li style=\"z-index: "
@@ -38465,18 +38476,11 @@
 	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
 	    + "</li>\n";
 	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    var stack1, alias1=depth0 != null ? depth0 : {};
+	    var stack1;
 
-	  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_loading : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "\n"
-	    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_loaded : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "\n"
-	    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_error : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "\n<!--<ul>-->\n  <!--"
-	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.foods : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "-->\n<!--</ul>-->\n<ul>\n"
-	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.foods : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "</ul>\n\n<button class=\"add-cat\">Add A Cat</button>";
+	  return "<ul>\n"
+	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "</ul>\n<button class=\"add-food\">Add A Food</button>\n";
 	},"useData":true});
 
 /***/ },
@@ -39723,7 +39727,7 @@
 
 	module.exports = Backbone.View.extend({
 	  events: {
-	    'click .add-cat': 'onClickAddCat',
+	    'click .add-food': 'onClickAddCat',
 	    'click li': 'onClickCat'
 
 	  },
