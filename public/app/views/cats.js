@@ -32,7 +32,7 @@
 var tpl = require('../templates/cats.hbs');
 var _ = require('underscore');
 
-var CatsProfileView = require('./cats-profile');
+var CatsProfileView = require('./food-profile');
 
 var Parse = require('parse').Parse;
 

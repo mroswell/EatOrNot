@@ -3,14 +3,14 @@
 var tpl = require('../templates/home.hbs');
 var _ = require('underscore');
 
-var CatsProfileView = require('./cats-profile');
+var FoodProfileView = require('./food-profile');
 
 var Parse = require('parse').Parse;
 
 module.exports = Backbone.View.extend({
   events: {
     'click .add-food': 'onClickAddFood',
-    'click li': 'onClickCat'
+    'click li': 'onClickFood'
 
   },
   className: 'food',
@@ -40,7 +40,7 @@ module.exports = Backbone.View.extend({
       })
     };
 
-    this.catsProfile = new CatsProfileView({
+    this.foodProfile = new FoodProfileView({
 
     }).render();
 
@@ -56,7 +56,7 @@ module.exports = Backbone.View.extend({
   onClickAddFood: function () {
     console.log('a food is added');
   },
-  onClickCat: function (e) {
+  onClickFood: function (e) {
 
     console.log($(e.target).data('id'));
     $(e.target).remove();

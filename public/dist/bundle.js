@@ -38395,14 +38395,14 @@
 	var tpl = __webpack_require__(97);
 	var _ = __webpack_require__(4);
 
-	var CatsProfileView = __webpack_require__(120);
+	var FoodProfileView = __webpack_require__(121);
 
 	var Parse = __webpack_require__(5).Parse;
 
 	module.exports = Backbone.View.extend({
 	  events: {
 	    'click .add-food': 'onClickAddFood',
-	    'click li': 'onClickCat'
+	    'click li': 'onClickFood'
 
 	  },
 	  className: 'food',
@@ -38432,7 +38432,7 @@
 	      })
 	    };
 
-	    this.catsProfile = new CatsProfileView({
+	    this.foodProfile = new FoodProfileView({
 
 	    }).render();
 
@@ -38448,7 +38448,7 @@
 	  onClickAddFood: function () {
 	    console.log('a food is added');
 	  },
-	  onClickCat: function (e) {
+	  onClickFood: function (e) {
 
 	    console.log($(e.target).data('id'));
 	    $(e.target).remove();
@@ -39721,7 +39721,7 @@
 	var tpl = __webpack_require__(119);
 	var _ = __webpack_require__(4);
 
-	var CatsProfileView = __webpack_require__(120);
+	var CatsProfileView = __webpack_require__(121);
 
 	var Parse = __webpack_require__(5).Parse;
 
@@ -39813,7 +39813,8 @@
 	},"useData":true});
 
 /***/ },
-/* 120 */
+/* 120 */,
+/* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var tpl = __webpack_require__(119);
