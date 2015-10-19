@@ -38356,7 +38356,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n    background-color: white;\n}\n\n.food {\n    position: relative;\n}\n\n.food li {\n    background-color: white;\n    width: 100px;\n    height: 200px;\n    border: 1px solid black;\n    list-style: none;\n    text-align: center;\n}", ""]);
+	exports.push([module.id, "body {\n    background-color: white;\n}\n\n.food {\n    position: relative;\n    height: 280px;\n    margin: auto;\n    display: table;\n}\n\n.food ul {\n    height: 220px;\n}\n.food li {\n    background-color: white;\n    width: 100px;\n    height: 200px;\n    border: 1px solid black;\n    list-style: none;\n    text-align: center;\n}", ""]);
 
 	// exports
 
@@ -38480,7 +38480,7 @@
 
 	  return "<ul>\n"
 	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "</ul>\n<button class=\"add-food\">Add A Food</button>\n";
+	    + "</ul>\n<div>\n<button class=\"btn btn-success\">Healthy</button>\n<button class=\"btn btn-danger\">Not</button>\n</div>";
 	},"useData":true});
 
 /***/ },
