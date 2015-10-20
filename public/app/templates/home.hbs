@@ -1,9 +1,9 @@
 <ul>
   {{#each food}}
-    <li style="z-index: {{zIndex}}; position: absolute; top: {{top}}; left: {{left}}" data-id={{objectId}}>{{name}}</li>
+    <li class='food-item' style="z-index: {{zIndex}}; position: absolute; top: {{top}}; left: {{left}}" data-id={{objectId}}>{{name}}</li>
   {{/each}}
 </ul>
 <div>
-<button class="btn btn-success">Healthy</button>
-<button class="btn btn-danger">Not</button>
+<button class="btn btn-success" id="btn-healthy">Healthy</button>
+<button class="btn btn-danger" id="btn-not-healthy">Not</button>
 </div>
