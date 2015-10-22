@@ -1,114 +1,120 @@
 var _ = require('underscore');
 
 module.exports = {
-	config: function () {
-		var fs =require('fs');
+  config: function () {
+    var fs =require('fs');
 
-		var CONFIG_FILE = process.env.CONFIG_FILE || './config';
+    var CONFIG_FILE = process.env.CONFIG_FILE || './config';
 
-		try {
-			this.config = require(CONFIG_FILE);
-		} catch (e) {
-			function camelToCaps (str) {
-				return str.replace(/([A-Z])/g, function($1) {
-					return "_" + $1;
-				}).toUpperCase();
-			}
+    try {
+      this.config = require(CONFIG_FILE);
+    } catch (e) {
+      function camelToCaps (str) {
+        return str.replace(/([A-Z])/g, function($1) {
+          return "_" + $1;
+        }).toUpperCase();
+      }
 
-			var sampleConfig = require('./config.sample.js');
-			
-			this.config = {};
+      var sampleConfig = require('./config.sample.js');
 
-			_.each(sampleConfig, function (val, moduleKey) {
-				if (!_.isObject(val)) {
-					this.config[moduleKey] = process.env[camelToCaps(moduleKey)] || val;
-					return;
-				}
+      this.config = {};
 
-				this.config[moduleKey] = {};
+      _.each(sampleConfig, function (val, moduleKey) {
+        if (!_.isObject(val)) {
+          this.config[moduleKey] = process.env[camelToCaps(moduleKey)] || val;
+          return;
+        }
 
-				_.each(val, function (defaultVal, optionKey) {
-					this.config[moduleKey][optionKey] = 
-						process.env[camelToCaps(moduleKey) + '_' + camelToCaps(optionKey)] || val;
-				}, this);
-			}, this);
-		}
-	},
+        this.config[moduleKey] = {};
 
-	logging: function () {
-		var winston = require('winston');
+        _.each(val, function (defaultVal, optionKey) {
+          this.config[moduleKey][optionKey] =
+            process.env[camelToCaps(moduleKey) + '_' + camelToCaps(optionKey)] || val;
+        }, this);
+      }, this);
+    }
+  },
 
-		this.logger = new (winston.Logger)({
-			transports: [
-			  new (winston.transports.Console)(),
-			  new (winston.transports.File)({
-			  	filename: this.config.logFile
-			  })
-			]
-		});
-	},
+  logging: function () {
+    var winston = require('winston');
 
-	server: function () {
-		var express = require('express');
-		var http = require('http');
-		var bodyParser = require('body-parser');
+    this.logger = new (winston.Logger)({
+      transports: [
+        new (winston.transports.Console)(),
+        new (winston.transports.File)({
+          filename: this.config.logFile
+        })
+      ]
+    });
+  },
 
-		this.app = express()
-			.use(express.static(__dirname + '/public'))
-			.use(bodyParser.json({
+  server: function () {
+    var express = require('express');
+    var http = require('http');
+    var bodyParser = require('body-parser');
 
-			}));
+    this.app = express()
+      .use(express.static(__dirname + '/public'))
+      .use(bodyParser.json({
 
-       	http
-       		.Server(this.app)
-       		.listen(this.config.port);
-	},
+      }));
 
-	pushState: function () {
-		this.app.get('*', function(req, res){
-			res.sendFile(__dirname + '/public/index.html');
-		});
-	},
+    this.server = http
+      .Server(this.app)
+      .listen(this.config.port);
+  },
 
-	twilio: function () {
-		var twilio = require('twilio');
-		this.twilioClient = twilio(
-			this.config.twilio.accountSid, 
-			this.config.twilio.authToken
-		);
-	},
+  pushState: function () {
+    this.app.get('*', function(req, res){
+      res.sendFile(__dirname + '/public/index.html');
+    });
+  },
 
-	socket: function () {
-		var socket = require('socket.io');
-		var io = socket(this.server);
-		io.on('connection', _.bind(function(socket){
-		  this.socket = socket;
-		}, this));
-	},
+  twilio: function () {
+    var twilio = require('twilio');
+    this.twilioClient = twilio(
+      this.config.twilio.accountSid,
+      this.config.twilio.authToken
+    );
+  },
 
-	mailgun: function () {
-		var Mailgun = require('mailgun').Mailgun;
-		this.mailgun = new Mailgun(config.mailgunKey);
-	},
+  socket: function () {
+    var socket = require('socket.io');
+    var io = socket(this.server);
 
-	localTunnel: function () {
-		var localtunnel = require('localtunnel');
+    this.socket = {};
 
-		if (!this.config.rootUrl) {
-			localtunnel(this.config.port, _.bind(function (err, tunnel) {
-				this.config.rootUrl = tunnel.url;
-				this.logger.info('LocalTunnel URL: ' + this.config.rootUrl);
-			}, this));
-		}
-	},
+    io.on('connection', _.bind(function (socket) {
+      var uniqueId = _.random(0, 100000000);
+      this.socket[uniqueId] = socket;
+      socket.emit('id', uniqueId);
+    }, this));
+  },
 
-	parse: function () {
-		Parse.initialize(
-			this.config.parse.appKey,
-			this.config.parse.jsKey,
-			this.config.parse.masterKey
-		);
+  mailgun: function () {
+    var Mailgun = require('mailgun').Mailgun;
+    this.mailgun = new Mailgun(this.config.mailgun.key);
+  },
 
-		Parse.Cloud.useMasterKey();
-	}
+  localTunnel: function () {
+    var localtunnel = require('localtunnel');
+
+    if (!this.config.rootUrl) {
+      localtunnel(this.config.port, _.bind(function (err, tunnel) {
+        this.config.rootUrl = tunnel.url;
+        this.logger.info('LocalTunnel URL: ' + this.config.rootUrl);
+      }, this));
+    }
+  },
+
+  parse: function () {
+    var Parse = require('parse/node');
+    Parse.initialize(
+      this.config.parse.appKey,
+      this.config.parse.jsKey,
+      this.config.parse.masterKey
+    );
+
+    Parse.Cloud.useMasterKey();
+  }
 };
