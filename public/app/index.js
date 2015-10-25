@@ -31,7 +31,6 @@ var app = {
       'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
     );
 
-
 //    var Cats = Parse.Object.extend('Cats');
 //    (new Parse.Query(Cats))
 //      .get('ZCXIAG78d4')

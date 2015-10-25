@@ -77,7 +77,6 @@
 	      'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
 	    );
 
-
 	//    var Cats = Parse.Object.extend('Cats');
 	//    (new Parse.Query(Cats))
 	//      .get('ZCXIAG78d4')
@@ -38366,15 +38365,15 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var HomeView = __webpack_require__(95);
-	var CatsView = __webpack_require__(96);
+	var FoodsView = __webpack_require__(121);
 
 	module.exports = Backbone.Router.extend({
 		routes: {
 			'': function () {
 				appendView(new HomeView().render());
 			},
-	    'cats': function () {
-	      appendView(new CatsView().render());
+	    'foods': function () {
+	      appendView(new FoodsView().render());
 	    }
 		}
 	});
@@ -38392,51 +38391,22 @@
 	var tpl = __webpack_require__(119);
 	var _ = __webpack_require__(4);
 
-	var FoodProfileView = __webpack_require__(117);
-
 	var Parse = __webpack_require__(5).Parse;
 
 	module.exports = Backbone.View.extend({
-	  events: {
-	    'click .add-food': 'onClickAddFood',
-	//    'click li': 'onClickFood',
-	    'click #btn-healthy': 'onClickHealthy',
-	    'click #btn-not-healthy': 'onClickNotHealthy'
 
+	  events: {
+	    'submit form': 'onClickSignup'
 	  },
-	  className: 'food',
 
 	  render: function () {
+	    if (Parse.User.current()) {
+	      window.location = "/foods";
+	    }
 	    var self = this;
 
-	    if (!this.food) {
-	      var food = Parse.Object.extend('food');
-
-	      (new Parse.Query(food))
-	        .find()
-	        .then(function(data){
-	          self.food = _.invoke(data, 'toJSON');
-	          console.log(self.food);
-	          self.render();
-	        });
-	      return this;
-	    }
-
-	    var data = {
-	      food: _.map(self.food, function (food, index) {
-	        food.zIndex = index;
-	        food.left = index * 5 + 'px';
-	        food.top = index * 5 + 'px';
-	        return food;
-	      })
-	    };
-
-	    this.foodProfile = new FoodProfileView({
-
-	    }).render();
-
-	    this.$el.html(
-	      tpl(data)
+	   this.$el.html(
+	      tpl()
 	    );
 
 	    //jQuery stuff goes here
@@ -38444,173 +38414,33 @@
 	    return this;
 	  },
 
-	  onClickAddFood: function () {
-	    console.log('a food is added');
-	  },
-	  onClickFood: function (e) {
-
-	    console.log($(e.target).data('id'));
-
-	    var Cats = Parse.Object.extend('Cats');
-
-	    new Cats({
-	      name: 'Harry'
-	    }).save().then(function () {
-	        //saved
-	        console.log("saved");
-	      }).catch(function (err) {
-	        //error
-	        console.log("error");
+	  onClickSignup: function(e) {
+	    console.log('Signup');
+	    var user = new Parse.User();
+	    var $email = $('[name="email"]').val();
+	    var username = $email;
+	    var email = $email;
+	    var password = $('[name="password"]').val();
+	    var classname = $('[name="classname"]').val();
+	    user.set("username", username);
+	    user.set("email", username);
+	    user.set("password", password);
+	    user.set("classname", classname);
+	    user.save().then(function() {
+	      Parse.User.logIn(username, password).then(function() {
+	        window.location="/foods"
 	      });
-	    $(e.target).remove();
-	  },
-	  onClickHealthy: function (e) {
-
-	//    console.log($(e.target).data('id'));
-	//    console.log($('ul li:last-of-type[z-index]').data('id'));
-	//    console.log($('ul li:last-of-type'));
-	//    console.log($('ul li:last-of-type[z-index]'));
-	//    console.log($('ul li:last-child'));
-	//    console.log($('ul li:last-child').data('id'));
-	//    console.log($('li:last'));
-	    console.log($('.food-item:last'));
-	    console.log($('.food-item:last').data('id'));
-
-	    var Cats = Parse.Object.extend('Cats');
-
-	    $('.food-item:last').remove();
-
-	    new Cats({
-	      name: 'Healthy Harry'
-	    }).save().then(function () {
-	        //saved
-	        console.log("saved");
-	      }).catch(function (err) {
-	        //error
-	        console.log("error");
-	      });
-	  },
-	  onClickNotHealthy: function (e) {
-	;
-	    console.log($('.food-item:last').data('id'));
-
-	    var Cats = Parse.Object.extend('Cats');
-
-	    $('.food-item:last').remove();
-
-	    new Cats({
-	      name: 'Unhealthy Harry'
-	    }).save().then(function () {
-	        //saved
-	        console.log("saved");
-	      }).catch(function (err) {
-	        //error
-	        console.log("error");
-	      });
-	  }
-
-	});
-
-/***/ },
-/* 96 */
-/***/ function(module, exports, __webpack_require__) {
-
-	//var tpl = require('../templates/cats.hbs');
-	//
-	//module.exports = Backbone.View.extend({
-	//  render: function (state) {
-	//    if (!state) state = 'loaded';
-	//    if (state === 'loading') {
-	//      setTimeout(function() {
-	//          this.render('loaded', [{
-	//            name:'Felix'
-	//          }, {
-	//            name: 'Buttons'
-	//          }
-	//          ])
-	//        }
-	//      )
-	//    }
-	//    if (!state) state = 'loaded';
-	//
-	//
-	//    //put other possible states here
-	//
-	//    this.$el.html(tpl({
-	//      is_loaded: state === 'loaded'
-	//    }));
-	//
-	//    //jQuery stuff goes here
-	//
-	//    return this;
-	//  }
-	//});
-
-	var tpl = __webpack_require__(97);
-	var _ = __webpack_require__(4);
-
-	var CatsProfileView = __webpack_require__(117);
-
-	var Parse = __webpack_require__(5).Parse;
-
-	module.exports = Backbone.View.extend({
-	  events: {
-	    'click .add-food': 'onClickAddCat',
-	    'click li': 'onClickCat'
-
-	  },
-	  className: 'food',
-
-	  render: function () {
-	    var self = this;
-
-	    if (!this.food) {
-	      var food = Parse.Object.extend('food');
-
-	      (new Parse.Query(food))
-	        .find()
-	        .then(function(data){
-	          self.food = _.invoke(data, 'toJSON');
-	          console.log(self.food);
-	          self.render();
-	        });
-	      return this;
-	    }
-
-	    var data = {
-	      food: _.map(self.food, function (food, index) {
-	        food.zIndex = index;
-	        food.left = index * 5 + 'px';
-	        food.top = index * 5 + 'px';
-	        return food;
-	      })
-	    };
-
-	    this.catsProfile = new CatsProfileView({
-
-	    }).render();
-
-	    this.$el.html(
-	      tpl(data)
+	      }
 	    );
 
-	    //jQuery stuff goes here
-
-	    return this;
-	  },
-
-	  onClickAddCat: function () {
-	    console.log('a cat is added');
-	  },
-	  onClickCat: function (e) {
-
-	    console.log($(e.target).data('id'));
-	    $(e.target).remove();
+	    e.preventDefault();
+	    return false;
 	  }
 
 	});
 
 /***/ },
+/* 96 */,
 /* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -39858,6 +39688,15 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Handlebars = __webpack_require__(98);
+	module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+	    return "<form action=\"\">\n  Email: <input type=\"text\" name=\"email\" />\n  Password: <input type=\"text\" name=\"password\" />\n  Class: <input type=\"text\" name=\"classname\" />\n  <button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>\n</form>";
+	},"useData":true});
+
+/***/ },
+/* 120 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Handlebars = __webpack_require__(98);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
 	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -39879,6 +39718,140 @@
 	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
 	    + "</ul>\n<div>\n<button class=\"btn btn-success\" id=\"btn-healthy\">Healthy</button>\n<button class=\"btn btn-danger\" id=\"btn-not-healthy\">Not</button>\n</div>";
 	},"useData":true});
+
+/***/ },
+/* 121 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var tpl = __webpack_require__(120);
+	var _ = __webpack_require__(4);
+
+	var FoodProfileView = __webpack_require__(117);
+
+	var Parse = __webpack_require__(5).Parse;
+
+	module.exports = Backbone.View.extend({
+	  events: {
+	    'click .add-food': 'onClickAddFood',
+	//    'click li': 'onClickFood',
+	    'click #btn-healthy': 'onClickHealthy',
+	    'click #btn-not-healthy': 'onClickNotHealthy'
+
+	  },
+	  className: 'food',
+
+	  render: function () {
+	    var user = Parse.User.current();
+	    console.log(user);
+	    var self = this;
+
+	    if (!this.food) {
+	      var food = Parse.Object.extend('food');
+
+	      (new Parse.Query(food))
+	        .find()
+	        .then(function(data){
+	          self.food = _.invoke(data, 'toJSON');
+	          console.log(self.food);
+	          self.render();
+	        });
+	      return this;
+	    }
+
+	    var data = {
+	      food: _.map(self.food, function (food, index) {
+	        food.zIndex = index;
+	        food.left = index * 5 + 'px';
+	        food.top = index * 5 + 'px';
+	        return food;
+	      })
+	    };
+
+	    this.foodProfile = new FoodProfileView({
+
+	    }).render();
+
+	    this.$el.html(
+	      tpl(data)
+	    );
+
+	    //jQuery stuff goes here
+
+	    return this;
+	  },
+
+	  onClickAddFood: function () {
+	    console.log('a food is added');
+	  },
+	  onClickFood: function (e) {
+
+	    console.log($(e.target).data('id'));
+
+	    var Cats = Parse.Object.extend('Cats');
+
+	    new Cats({
+	      name: 'Harry'
+	    }).save().then(function () {
+	        //saved
+	        console.log("saved");
+	      }).catch(function (err) {
+	        //error
+	        console.log("error");
+	      });
+	    $(e.target).remove();
+	  },
+	  onClickHealthy: function (e) {
+
+	//    console.log($(e.target).data('id'));
+	//    console.log($('ul li:last-of-type[z-index]').data('id'));
+	//    console.log($('ul li:last-of-type'));
+	//    console.log($('ul li:last-of-type[z-index]'));
+	//    console.log($('ul li:last-child'));
+	//    console.log($('ul li:last-child').data('id'));
+	//    console.log($('li:last'));
+	    console.log($('.food-item:last'));
+	    console.log($('.food-item:last').zIndex());
+	    foodID = $('.food-item:last').data('id');
+	    var user = Parse.User.current();
+
+	    var userFoodChoices = Parse.Object.extend('user_food_choices');
+	    var food = Parse.Object.extend('food');
+
+	    $('.food-item:last').remove();
+
+	    new userFoodChoices({
+	      food: new food({objectId: foodID}),
+	      user: user,
+	      healthy: true
+	    }).save().then(function () {
+	        //saved
+	        console.log("saved");
+	      }).fail(function (err) {
+	        //error
+	        console.log("error");
+	      });
+	  },
+	  onClickNotHealthy: function (e) {
+
+	    var user = Parse.User.current();
+	    console.log($('.food-item:last').data('id'));
+
+	    var Cats = Parse.Object.extend('Cats');
+
+	    $('.food-item:last').remove();
+
+	    new Cats({
+	      name: 'Unhealthy Harry'
+	    }).save().then(function () {
+	        //saved
+	        console.log("saved");
+	      }).catch(function (err) {
+	        //error
+	        console.log("error");
+	      });
+	  }
+
+	});
 
 /***/ }
 /******/ ]);
