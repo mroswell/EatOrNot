@@ -29,8 +29,9 @@ module.exports = Backbone.View.extend({
   onClickSignup: function(e) {
     console.log('Signup');
     var user = new Parse.User();
-    var email = username = $('#register-form input[name="email"]').val();
-    var password = $('#register-form input[name="password"]').val();
+    var $regInputs = $('#register-form input');
+    var email = username = $regInputs.val();
+    var password = $regInputs.val();
     var classname = $('[name="classname"]').val();
     user.set("username", username);
     user.set("email", email);
