@@ -38396,7 +38396,9 @@
 	module.exports = Backbone.View.extend({
 
 	  events: {
-	    'submit form': 'onClickSignup'
+	    'submit form': 'onClickSignup',
+	    'click #login-form-link': 'onClickLogin',
+	    'click #register-form-link': 'onClickRegister'
 	  },
 
 	  render: function () {
@@ -38434,27 +38436,23 @@
 
 	    e.preventDefault();
 	    return false;
-	  }
+	  },
 
-	});
-
-	$(function() {
-
-	  $('#login-form-link').click(function(e) {
-	    $("#login-form").delay(100).fadeIn(100);
-	    $("#register-form").fadeOut(100);
+	  onClickLogin: function(e) {
+	    $("#login-form").delay(50).fadeIn(50);
+	    $("#register-form").fadeOut(50);
 	    $('#register-form-link').removeClass('active');
-	    $(this).addClass('active');
+	    $('#login-form-link').addClass('active');
 	    e.preventDefault();
-	  });
-	  $('#register-form-link').click(function(e) {
-	    $("#register-form").delay(100).fadeIn(100);
-	    $("#login-form").fadeOut(100);
-	    $('#login-form-link').removeClass('active');
-	    $(this).addClass('active');
-	    e.preventDefault();
-	  });
+	  },
 
+	  onClickRegister: function(e) {
+	    $("#register-form").delay(50).fadeIn(50);
+	    $("#login-form").fadeOut(500);
+	    $('#login-form-link').removeClass('active');
+	    $('#register-form-link').addClass('active');
+	    e.preventDefault();
+	  }
 	});
 
 /***/ },
@@ -39707,7 +39705,7 @@
 
 	var Handlebars = __webpack_require__(98);
 	module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    return "<!--<form action=\"\">-->\n  <!--Email: <input type=\"text\" name=\"email\" />-->\n  <!--Password: <input type=\"text\" name=\"password\" />-->\n  <!--Class: <input type=\"text\" name=\"classname\" />-->\n  <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n<!--</form>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-md-5 col-md-offset-3\">\n      <div class=\"panel panel-login\">\n        <div class=\"panel-heading\">\n          <div class=\"row\">\n            <div class=\"col-xs-6\">\n              <a href=\"#\" id=\"login-form-link\">Login</a>\n            </div>\n            <div class=\"col-xs-6\">\n              <a href=\"#\" class=\"active\" id=\"register-form-link\">Register</a>\n            </div>\n          </div>\n          <hr>\n        </div>\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"col-lg-12\">\n              <form id=\"login-form\" role=\"form\" style=\"display: none;\">\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"username\" id=\"username\" tabindex=\"1\" class=\"form-control\" placeholder=\"Username\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group text-center\">\n                  <input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">\n                  <label for=\"remember\"> Remember Me</label>\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\">\n                    </div>\n                  </div>\n                </div>\n              </form>\n              <form id=\"register-form\" role=\"form\" style=\"display: block;\">\n                <div class=\"form-group\">\n                  <input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"classname\" id=\"classname\" tabindex=\"2\" class=\"form-control\" placeholder=\"Enter Channel\">\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\">\n                      <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n                    </div>\n                  </div>\n                </div>\n              </form>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>";
+	    return "<!--<form action=\"\">-->\n  <!--Email: <input type=\"text\" name=\"email\" />-->\n  <!--Password: <input type=\"text\" name=\"password\" />-->\n  <!--Class: <input type=\"text\" name=\"classname\" />-->\n  <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n<!--</form>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-md-5 col-md-offset-3\">\n      <div class=\"panel panel-login\">\n        <div class=\"panel-heading\">\n          <div class=\"row\">\n            <div class=\"col-xs-6\">\n              <a href=\"#\" id=\"login-form-link\">Login</a>\n            </div>\n            <div class=\"col-xs-6\">\n              <a href=\"#\" class=\"active\" id=\"register-form-link\">Register</a>\n            </div>\n          </div>\n          <hr>\n        </div>\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"col-lg-12\">\n              <form id=\"login-form\" role=\"form\" style=\"display: none;\">\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <!--<div class=\"form-group text-center\">-->\n                  <!--<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">-->\n                  <!--<label for=\"remember\"> Remember Me</label>-->\n                <!--</div>-->\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\">\n                    </div>\n                  </div>\n                </div>\n              </form>\n              <form id=\"register-form\" role=\"form\" style=\"display: block;\">\n                <div class=\"form-group\">\n                  <input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"classname\" id=\"classname\" tabindex=\"2\" class=\"form-control\" placeholder=\"Enter Channel\">\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\">\n                      <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n                    </div>\n                  </div>\n                </div>\n              </form>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>";
 	},"useData":true});
 
 /***/ },

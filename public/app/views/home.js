@@ -6,7 +6,9 @@ var Parse = require('parse').Parse;
 module.exports = Backbone.View.extend({
 
   events: {
-    'submit form': 'onClickSignup'
+    'submit form': 'onClickSignup',
+    'click #login-form-link': 'onClickLogin',
+    'click #register-form-link': 'onClickRegister'
   },
 
   render: function () {
@@ -44,25 +46,21 @@ module.exports = Backbone.View.extend({
 
     e.preventDefault();
     return false;
-  }
+  },
 
-});
-
-$(function() {
-
-  $('#login-form-link').click(function(e) {
-    $("#login-form").delay(100).fadeIn(100);
-    $("#register-form").fadeOut(100);
+  onClickLogin: function(e) {
+    $("#login-form").delay(50).fadeIn(50);
+    $("#register-form").fadeOut(50);
     $('#register-form-link').removeClass('active');
-    $(this).addClass('active');
+    $('#login-form-link').addClass('active');
     e.preventDefault();
-  });
-  $('#register-form-link').click(function(e) {
-    $("#register-form").delay(100).fadeIn(100);
-    $("#login-form").fadeOut(100);
-    $('#login-form-link').removeClass('active');
-    $(this).addClass('active');
-    e.preventDefault();
-  });
+  },
 
+  onClickRegister: function(e) {
+    $("#register-form").delay(50).fadeIn(50);
+    $("#login-form").fadeOut(500);
+    $('#login-form-link').removeClass('active');
+    $('#register-form-link').addClass('active');
+    e.preventDefault();
+  }
 });
