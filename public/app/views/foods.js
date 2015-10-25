@@ -10,7 +10,9 @@ module.exports = Backbone.View.extend({
     'click .add-food': 'onClickAddFood',
 //    'click li': 'onClickFood',
     'click #btn-healthy': 'onClickHealthy',
-    'click #btn-not-healthy': 'onClickNotHealthy'
+    'click #btn-not-healthy': 'onClickNotHealthy',
+    'click .logout': 'onClickLogout'
+
 
   },
   className: 'food',
@@ -76,54 +78,50 @@ module.exports = Backbone.View.extend({
     $(e.target).remove();
   },
   onClickHealthy: function (e) {
+    var bool = true;
+    var $topFoodItem = $('.food-item:last');
+    var foodID = $topFoodItem.data('id');
 
-//    console.log($(e.target).data('id'));
-//    console.log($('ul li:last-of-type[z-index]').data('id'));
-//    console.log($('ul li:last-of-type'));
-//    console.log($('ul li:last-of-type[z-index]'));
-//    console.log($('ul li:last-child'));
-//    console.log($('ul li:last-child').data('id'));
-//    console.log($('li:last'));
-    console.log($('.food-item:last'));
-    console.log($('.food-item:last').zIndex());
-    foodID = $('.food-item:last').data('id');
-    var user = Parse.User.current();
+    $topFoodItem.remove();
 
-    var userFoodChoices = Parse.Object.extend('user_food_choices');
-    var food = Parse.Object.extend('food');
-
-    $('.food-item:last').remove();
-
-    new userFoodChoices({
-      food: new food({objectId: foodID}),
-      user: user,
-      healthy: true
-    }).save().then(function () {
-        //saved
-        console.log("saved");
-      }).fail(function (err) {
-        //error
-        console.log("error");
-      });
+    this.createUserFoodChoice(bool, foodID);
   },
   onClickNotHealthy: function (e) {
+    var bool = false;
+    var $topFoodItem = $('.food-item:last');
+    var foodID = $topFoodItem.data('id');
 
-    var user = Parse.User.current();
-    console.log($('.food-item:last').data('id'));
+    $topFoodItem.remove();
 
-    var Cats = Parse.Object.extend('Cats');
+    this.createUserFoodChoice(bool, foodID);
+  },
 
-    $('.food-item:last').remove();
+  createUserFoodChoice: function(bool, foodID) {
 
-    new Cats({
-      name: 'Unhealthy Harry'
-    }).save().then(function () {
-        //saved
-        console.log("saved");
-      }).catch(function (err) {
-        //error
-        console.log("error");
-      });
+  var user = Parse.User.current();
+  var userFoodChoices = Parse.Object.extend('user_food_choices');
+  var food = Parse.Object.extend('food');
+
+  new userFoodChoices({
+    food: new food({objectId: foodID}),
+    user: user,
+    healthy: bool
+  }).save().then(function () {
+      //saved
+      console.log("saved");
+    }).fail(function (err) {
+      //error
+      console.log("error");
+    });
+  },
+
+  onClickLogout: function(e) {
+    Parse.User.logOut().then(function() {
+      console.log('logged out');
+    });
+
+    e.preventDefault();
+    return false;
   }
 
 });
