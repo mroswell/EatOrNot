@@ -66,7 +66,7 @@
 	//var config = require('./config');
 	var Router = __webpack_require__(94);
 
-	var containerTpl = __webpack_require__(118);
+	var containerTpl = __webpack_require__(119);
 
 	var app = {
 		init: function () {
@@ -38365,7 +38365,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var HomeView = __webpack_require__(95);
-	var FoodsView = __webpack_require__(121);
+	var FoodsView = __webpack_require__(96);
 
 	module.exports = Backbone.Router.extend({
 		routes: {
@@ -38388,7 +38388,7 @@
 /* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(119);
+	var tpl = __webpack_require__(120);
 	var _ = __webpack_require__(4);
 
 	var Parse = __webpack_require__(5).Parse;
@@ -38419,13 +38419,11 @@
 	  onClickSignup: function(e) {
 	    console.log('Signup');
 	    var user = new Parse.User();
-	    var $email = $('[name="email"]').val();
-	    var username = $email;
-	    var email = $email;
-	    var password = $('[name="password"]').val();
+	    var email = username = $('#register-form input[name="email"]').val();
+	    var password = $('#register-form input[name="password"]').val();
 	    var classname = $('[name="classname"]').val();
 	    user.set("username", username);
-	    user.set("email", username);
+	    user.set("email", email);
 	    user.set("password", password);
 	    user.set("classname", classname);
 	    user.save().then(function() {
@@ -38456,17 +38454,146 @@
 	});
 
 /***/ },
-/* 96 */,
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var tpl = __webpack_require__(97);
+	var _ = __webpack_require__(4);
+
+	var FoodProfileView = __webpack_require__(117);
+
+	var Parse = __webpack_require__(5).Parse;
+
+	module.exports = Backbone.View.extend({
+	  events: {
+	    'click .add-food': 'onClickAddFood',
+	//    'click li': 'onClickFood',
+	    'click #btn-healthy': 'onClickHealthy',
+	    'click #btn-not-healthy': 'onClickNotHealthy',
+	    'click .logout': 'onClickLogout'
+
+
+	  },
+	  className: 'food',
+
+	  render: function () {
+	    var user = Parse.User.current();
+	    console.log(user);
+	    var self = this;
+
+	    if (!this.food) {
+	      var food = Parse.Object.extend('food');
+
+	      (new Parse.Query(food))
+	        .find()
+	        .then(function(data){
+	          self.food = _.invoke(data, 'toJSON');
+	          console.log(self.food);
+	          self.render();
+	        });
+	      return this;
+	    }
+
+	    var data = {
+	      food: _.map(self.food, function (food, index) {
+	        food.zIndex = index;
+	        food.left = index * 5 + 'px';
+	        food.top = index * 5 + 'px';
+	        return food;
+	      })
+	    };
+
+	    this.foodProfile = new FoodProfileView({
+
+	    }).render();
+
+	    this.$el.html(
+	      tpl(data)
+	    );
+
+	    //jQuery stuff goes here
+
+	    return this;
+	  },
+
+	  onClickAddFood: function () {
+	    console.log('a food is added');
+	  },
+	  onClickFood: function (e) {
+
+	    console.log($(e.target).data('id'));
+
+	    var Cats = Parse.Object.extend('Cats');
+
+	    new Cats({
+	      name: 'Harry'
+	    }).save().then(function () {
+	        //saved
+	        console.log("saved");
+	      }).catch(function (err) {
+	        //error
+	        console.log("error");
+	      });
+	    $(e.target).remove();
+	  },
+	  onClickHealthy: function (e) {
+	    var bool = true;
+	    var $topFoodItem = $('.food-item:last');
+	    var foodID = $topFoodItem.data('id');
+
+	    $topFoodItem.remove();
+
+	    this.createUserFoodChoice(bool, foodID);
+	  },
+	  onClickNotHealthy: function (e) {
+	    var bool = false;
+	    var $topFoodItem = $('.food-item:last');
+	    var foodID = $topFoodItem.data('id');
+
+	    $topFoodItem.remove();
+
+	    this.createUserFoodChoice(bool, foodID);
+	  },
+
+	  createUserFoodChoice: function(bool, foodID) {
+
+	  var user = Parse.User.current();
+	  var userFoodChoices = Parse.Object.extend('user_food_choices');
+	  var food = Parse.Object.extend('food');
+
+	  new userFoodChoices({
+	    food: new food({objectId: foodID}),
+	    user: user,
+	    healthy: bool
+	  }).save().then(function () {
+	      //saved
+	      console.log("saved");
+	    }).fail(function (err) {
+	      //error
+	      console.log("error");
+	    });
+	  },
+
+	  onClickLogout: function(e) {
+	    Parse.User.logOut().then(function() {
+	      console.log('logged out');
+	    });
+
+	    e.preventDefault();
+	    return false;
+	  }
+
+	});
+
+/***/ },
 /* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Handlebars = __webpack_require__(98);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-	    return "  Loading Cats\n";
-	},"3":function(container,depth0,helpers,partials,data) {
 	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-	  return "    <li style=\"z-index: "
+	  return "    <li class='food-item' style=\"z-index: "
 	    + alias4(((helper = (helper = helpers.zIndex || (depth0 != null ? depth0.zIndex : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zIndex","hash":{},"data":data}) : helper)))
 	    + "; position: absolute; top: "
 	    + alias4(((helper = (helper = helpers.top || (depth0 != null ? depth0.top : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"top","hash":{},"data":data}) : helper)))
@@ -38478,12 +38605,11 @@
 	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
 	    + "</li>\n";
 	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    var stack1, alias1=depth0 != null ? depth0 : {};
+	    var stack1;
 
-	  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_loading : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "\n<ul>\n"
-	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "</ul>\n\n<button class=\"add-cat\">Add A Cat</button>\n";
+	  return "<ul>\n"
+	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "</ul>\n<div>\n<button class=\"btn btn-success\" id=\"btn-healthy\">Healthy</button>\n<button class=\"btn btn-danger\" id=\"btn-not-healthy\">Not</button>\n</div>\n<a href=\"#\" class=\"logout\">Logout</a>\n";
 	},"useData":true});
 
 /***/ },
@@ -39665,7 +39791,7 @@
 /* 117 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(97);
+	var tpl = __webpack_require__(118);
 	var _ = __webpack_require__(4);
 
 	module.exports = Backbone.View.extend({
@@ -39676,6 +39802,36 @@
 
 /***/ },
 /* 118 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Handlebars = __webpack_require__(98);
+	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+	    return "  Loading Cats\n";
+	},"3":function(container,depth0,helpers,partials,data) {
+	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+	  return "    <li style=\"z-index: "
+	    + alias4(((helper = (helper = helpers.zIndex || (depth0 != null ? depth0.zIndex : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zIndex","hash":{},"data":data}) : helper)))
+	    + "; position: absolute; top: "
+	    + alias4(((helper = (helper = helpers.top || (depth0 != null ? depth0.top : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"top","hash":{},"data":data}) : helper)))
+	    + "; left: "
+	    + alias4(((helper = (helper = helpers.left || (depth0 != null ? depth0.left : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"left","hash":{},"data":data}) : helper)))
+	    + "\" data-id="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + ">"
+	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
+	    + "</li>\n";
+	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+	    var stack1, alias1=depth0 != null ? depth0 : {};
+
+	  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.is_loading : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "\n<ul>\n"
+	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "</ul>\n\n<button class=\"add-cat\">Add A Cat</button>\n";
+	},"useData":true});
+
+/***/ },
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Handlebars = __webpack_require__(98);
@@ -39700,172 +39856,13 @@
 	},"useData":true});
 
 /***/ },
-/* 119 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Handlebars = __webpack_require__(98);
 	module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
 	    return "<!--<form action=\"\">-->\n  <!--Email: <input type=\"text\" name=\"email\" />-->\n  <!--Password: <input type=\"text\" name=\"password\" />-->\n  <!--Class: <input type=\"text\" name=\"classname\" />-->\n  <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n<!--</form>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-md-5 col-md-offset-3\">\n      <div class=\"panel panel-login\">\n        <div class=\"panel-heading\">\n          <div class=\"row\">\n            <div class=\"col-xs-6\">\n              <a href=\"#\" id=\"login-form-link\">Login</a>\n            </div>\n            <div class=\"col-xs-6\">\n              <a href=\"#\" class=\"active\" id=\"register-form-link\">Register</a>\n            </div>\n          </div>\n          <hr>\n        </div>\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"col-lg-12\">\n              <form id=\"login-form\" role=\"form\" style=\"display: none;\">\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <!--<div class=\"form-group text-center\">-->\n                  <!--<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">-->\n                  <!--<label for=\"remember\"> Remember Me</label>-->\n                <!--</div>-->\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\">\n                    </div>\n                  </div>\n                </div>\n              </form>\n              <form id=\"register-form\" role=\"form\" style=\"display: block;\">\n                <div class=\"form-group\">\n                  <input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"classname\" id=\"classname\" tabindex=\"2\" class=\"form-control\" placeholder=\"Enter Channel\">\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\">\n                      <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n                    </div>\n                  </div>\n                </div>\n              </form>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>";
 	},"useData":true});
-
-/***/ },
-/* 120 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Handlebars = __webpack_require__(98);
-	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
-
-	  return "    <li class='food-item' style=\"z-index: "
-	    + alias4(((helper = (helper = helpers.zIndex || (depth0 != null ? depth0.zIndex : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zIndex","hash":{},"data":data}) : helper)))
-	    + "; position: absolute; top: "
-	    + alias4(((helper = (helper = helpers.top || (depth0 != null ? depth0.top : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"top","hash":{},"data":data}) : helper)))
-	    + "; left: "
-	    + alias4(((helper = (helper = helpers.left || (depth0 != null ? depth0.left : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"left","hash":{},"data":data}) : helper)))
-	    + "\" data-id="
-	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
-	    + ">"
-	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
-	    + "</li>\n";
-	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    var stack1;
-
-	  return "<ul>\n"
-	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "</ul>\n<div>\n<button class=\"btn btn-success\" id=\"btn-healthy\">Healthy</button>\n<button class=\"btn btn-danger\" id=\"btn-not-healthy\">Not</button>\n</div>\n<a href=\"#\" class=\"logout\">Logout</a>\n";
-	},"useData":true});
-
-/***/ },
-/* 121 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var tpl = __webpack_require__(120);
-	var _ = __webpack_require__(4);
-
-	var FoodProfileView = __webpack_require__(117);
-
-	var Parse = __webpack_require__(5).Parse;
-
-	module.exports = Backbone.View.extend({
-	  events: {
-	    'click .add-food': 'onClickAddFood',
-	//    'click li': 'onClickFood',
-	    'click #btn-healthy': 'onClickHealthy',
-	    'click #btn-not-healthy': 'onClickNotHealthy',
-	    'click .logout': 'onClickLogout'
-
-
-	  },
-	  className: 'food',
-
-	  render: function () {
-	    var user = Parse.User.current();
-	    console.log(user);
-	    var self = this;
-
-	    if (!this.food) {
-	      var food = Parse.Object.extend('food');
-
-	      (new Parse.Query(food))
-	        .find()
-	        .then(function(data){
-	          self.food = _.invoke(data, 'toJSON');
-	          console.log(self.food);
-	          self.render();
-	        });
-	      return this;
-	    }
-
-	    var data = {
-	      food: _.map(self.food, function (food, index) {
-	        food.zIndex = index;
-	        food.left = index * 5 + 'px';
-	        food.top = index * 5 + 'px';
-	        return food;
-	      })
-	    };
-
-	    this.foodProfile = new FoodProfileView({
-
-	    }).render();
-
-	    this.$el.html(
-	      tpl(data)
-	    );
-
-	    //jQuery stuff goes here
-
-	    return this;
-	  },
-
-	  onClickAddFood: function () {
-	    console.log('a food is added');
-	  },
-	  onClickFood: function (e) {
-
-	    console.log($(e.target).data('id'));
-
-	    var Cats = Parse.Object.extend('Cats');
-
-	    new Cats({
-	      name: 'Harry'
-	    }).save().then(function () {
-	        //saved
-	        console.log("saved");
-	      }).catch(function (err) {
-	        //error
-	        console.log("error");
-	      });
-	    $(e.target).remove();
-	  },
-	  onClickHealthy: function (e) {
-	    var bool = true;
-	    var $topFoodItem = $('.food-item:last');
-	    var foodID = $topFoodItem.data('id');
-
-	    $topFoodItem.remove();
-
-	    this.createUserFoodChoice(bool, foodID);
-	  },
-	  onClickNotHealthy: function (e) {
-	    var bool = false;
-	    var $topFoodItem = $('.food-item:last');
-	    var foodID = $topFoodItem.data('id');
-
-	    $topFoodItem.remove();
-
-	    this.createUserFoodChoice(bool, foodID);
-	  },
-
-	  createUserFoodChoice: function(bool, foodID) {
-
-	  var user = Parse.User.current();
-	  var userFoodChoices = Parse.Object.extend('user_food_choices');
-	  var food = Parse.Object.extend('food');
-
-	  new userFoodChoices({
-	    food: new food({objectId: foodID}),
-	    user: user,
-	    healthy: bool
-	  }).save().then(function () {
-	      //saved
-	      console.log("saved");
-	    }).fail(function (err) {
-	      //error
-	      console.log("error");
-	    });
-	  },
-
-	  onClickLogout: function(e) {
-	    Parse.User.logOut().then(function() {
-	      console.log('logged out');
-	    });
-
-	    e.preventDefault();
-	    return false;
-	  }
-
-	});
 
 /***/ }
 /******/ ]);
