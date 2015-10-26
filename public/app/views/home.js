@@ -6,7 +6,8 @@ var Parse = require('parse').Parse;
 module.exports = Backbone.View.extend({
 
   events: {
-    'submit form': 'onClickSignup',
+    'submit #register-form': 'onSubmitSignup',
+    'submit #login-form': 'onSubmitLogin',
     'click #login-form-link': 'onClickLogin',
     'click #register-form-link': 'onClickRegister'
   },
@@ -26,7 +27,7 @@ module.exports = Backbone.View.extend({
     return this;
   },
 
-  onClickSignup: function(e) {
+  onSubmitSignup: function(e) {
     console.log('Signup');
     var user = new Parse.User();
     var $regInputs = $('#register-form input');
@@ -41,6 +42,20 @@ module.exports = Backbone.View.extend({
       Parse.User.logIn(username, password).then(function() {
         window.location="/foods"
       });
+    });
+
+    e.preventDefault();
+    return false;
+  },
+
+  onSubmitLogin: function(e) {
+    console.log('Signup');
+    var $loginInputs = $('#login-form input');
+    var email = username = $loginInputs.val();
+    var password = $loginInputs.val();
+    var classname = $('[name="classname"]').val();
+    Parse.User.logIn(username, password).then(function() {
+      window.location="/foods"
     });
 
     e.preventDefault();

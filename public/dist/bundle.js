@@ -66,7 +66,7 @@
 	//var config = require('./config');
 	var Router = __webpack_require__(94);
 
-	var containerTpl = __webpack_require__(119);
+	var containerTpl = __webpack_require__(120);
 
 	var app = {
 		init: function () {
@@ -38365,7 +38365,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var HomeView = __webpack_require__(95);
-	var FoodsView = __webpack_require__(96);
+	var FoodsView = __webpack_require__(116);
 
 	module.exports = Backbone.Router.extend({
 		routes: {
@@ -38388,7 +38388,7 @@
 /* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(120);
+	var tpl = __webpack_require__(96);
 	var _ = __webpack_require__(4);
 
 	var Parse = __webpack_require__(5).Parse;
@@ -38396,7 +38396,8 @@
 	module.exports = Backbone.View.extend({
 
 	  events: {
-	    'submit form': 'onClickSignup',
+	    'submit #register-form': 'onSubmitSignup',
+	    'submit #login-form': 'onSubmitLogin',
 	    'click #login-form-link': 'onClickLogin',
 	    'click #register-form-link': 'onClickRegister'
 	  },
@@ -38416,7 +38417,7 @@
 	    return this;
 	  },
 
-	  onClickSignup: function(e) {
+	  onSubmitSignup: function(e) {
 	    console.log('Signup');
 	    var user = new Parse.User();
 	    var $regInputs = $('#register-form input');
@@ -38431,6 +38432,20 @@
 	      Parse.User.logIn(username, password).then(function() {
 	        window.location="/foods"
 	      });
+	    });
+
+	    e.preventDefault();
+	    return false;
+	  },
+
+	  onSubmitLogin: function(e) {
+	    console.log('Signup');
+	    var $loginInputs = $('#login-form input');
+	    var email = username = $loginInputs.val();
+	    var password = $loginInputs.val();
+	    var classname = $('[name="classname"]').val();
+	    Parse.User.logIn(username, password).then(function() {
+	      window.location="/foods"
 	    });
 
 	    e.preventDefault();
@@ -38458,172 +38473,22 @@
 /* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(97);
-	var _ = __webpack_require__(4);
-
-	var FoodProfileView = __webpack_require__(117);
-
-	var Parse = __webpack_require__(5).Parse;
-
-	module.exports = Backbone.View.extend({
-	  events: {
-	    'click .add-food': 'onClickAddFood',
-	//    'click li': 'onClickFood',
-	    'click #btn-healthy': 'onClickHealthy',
-	    'click #btn-not-healthy': 'onClickNotHealthy',
-	    'click .logout': 'onClickLogout'
-
-
-	  },
-	  className: 'food',
-
-	  render: function () {
-	    var user = Parse.User.current();
-	    console.log(user);
-	    var self = this;
-
-	    if (!this.food) {
-	      var food = Parse.Object.extend('food');
-
-	      (new Parse.Query(food))
-	        .find()
-	        .then(function(data){
-	          self.food = _.invoke(data, 'toJSON');
-	          console.log(self.food);
-	          self.render();
-	        });
-	      return this;
-	    }
-
-	    var data = {
-	      food: _.map(self.food, function (food, index) {
-	        food.zIndex = index;
-	        food.left = index * 5 + 'px';
-	        food.top = index * 5 + 'px';
-	        return food;
-	      })
-	    };
-
-	    this.foodProfile = new FoodProfileView({
-
-	    }).render();
-
-	    this.$el.html(
-	      tpl(data)
-	    );
-
-	    //jQuery stuff goes here
-
-	    return this;
-	  },
-
-	  onClickAddFood: function () {
-	    console.log('a food is added');
-	  },
-	  onClickFood: function (e) {
-
-	    console.log($(e.target).data('id'));
-
-	    var Cats = Parse.Object.extend('Cats');
-
-	    new Cats({
-	      name: 'Harry'
-	    }).save().then(function () {
-	        //saved
-	        console.log("saved");
-	      }).catch(function (err) {
-	        //error
-	        console.log("error");
-	      });
-	    $(e.target).remove();
-	  },
-	  onClickHealthy: function (e) {
-	    var bool = true;
-	    var $topFoodItem = $('.food-item:last');
-	    var foodID = $topFoodItem.data('id');
-
-	    $topFoodItem.remove();
-
-	    this.createUserFoodChoice(bool, foodID);
-	  },
-	  onClickNotHealthy: function (e) {
-	    var bool = false;
-	    var $topFoodItem = $('.food-item:last');
-	    var foodID = $topFoodItem.data('id');
-
-	    $topFoodItem.remove();
-
-	    this.createUserFoodChoice(bool, foodID);
-	  },
-
-	  createUserFoodChoice: function(bool, foodID) {
-
-	  var user = Parse.User.current();
-	  var userFoodChoices = Parse.Object.extend('user_food_choices');
-	  var food = Parse.Object.extend('food');
-
-	  new userFoodChoices({
-	    food: new food({objectId: foodID}),
-	    user: user,
-	    healthy: bool
-	  }).save().then(function () {
-	      //saved
-	      console.log("saved");
-	    }).fail(function (err) {
-	      //error
-	      console.log("error");
-	    });
-	  },
-
-	  onClickLogout: function(e) {
-	    Parse.User.logOut().then(function() {
-	      console.log('logged out');
-	    });
-
-	    e.preventDefault();
-	    return false;
-	  }
-
-	});
+	var Handlebars = __webpack_require__(97);
+	module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+	    return "<!--<form action=\"\">-->\n  <!--Email: <input type=\"text\" name=\"email\" />-->\n  <!--Password: <input type=\"text\" name=\"password\" />-->\n  <!--Class: <input type=\"text\" name=\"classname\" />-->\n  <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n<!--</form>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-md-5 col-md-offset-3\">\n      <div class=\"panel panel-login\">\n        <div class=\"panel-heading\">\n          <div class=\"row\">\n            <div class=\"col-xs-6\">\n              <a href=\"#\" id=\"login-form-link\">Login</a>\n            </div>\n            <div class=\"col-xs-6\">\n              <a href=\"#\" class=\"active\" id=\"register-form-link\">Register</a>\n            </div>\n          </div>\n          <hr>\n        </div>\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"col-lg-12\">\n              <form id=\"login-form\" role=\"form\" style=\"display: none;\">\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <!--<div class=\"form-group text-center\">-->\n                  <!--<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">-->\n                  <!--<label for=\"remember\"> Remember Me</label>-->\n                <!--</div>-->\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\">\n                    </div>\n                  </div>\n                </div>\n              </form>\n              <form id=\"register-form\" role=\"form\" style=\"display: block;\">\n                <div class=\"form-group\">\n                  <input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"classname\" id=\"classname\" tabindex=\"2\" class=\"form-control\" placeholder=\"Enter Channel\">\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\">\n                      <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n                    </div>\n                  </div>\n                </div>\n              </form>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>";
+	},"useData":true});
 
 /***/ },
 /* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Handlebars = __webpack_require__(98);
-	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+	// Create a simple path alias to allow browserify to resolve
+	// the runtime on a supported path.
+	module.exports = __webpack_require__(98)['default'];
 
-	  return "    <li class='food-item' style=\"z-index: "
-	    + alias4(((helper = (helper = helpers.zIndex || (depth0 != null ? depth0.zIndex : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zIndex","hash":{},"data":data}) : helper)))
-	    + "; position: absolute; top: "
-	    + alias4(((helper = (helper = helpers.top || (depth0 != null ? depth0.top : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"top","hash":{},"data":data}) : helper)))
-	    + "; left: "
-	    + alias4(((helper = (helper = helpers.left || (depth0 != null ? depth0.left : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"left","hash":{},"data":data}) : helper)))
-	    + "\" data-id="
-	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
-	    + ">"
-	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
-	    + "</li>\n";
-	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    var stack1;
-
-	  return "<ul>\n"
-	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-	    + "</ul>\n<div>\n<button class=\"btn btn-success\" id=\"btn-healthy\">Healthy</button>\n<button class=\"btn btn-danger\" id=\"btn-not-healthy\">Not</button>\n</div>\n<a href=\"#\" class=\"logout\">Logout</a>\n";
-	},"useData":true});
 
 /***/ },
 /* 98 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Create a simple path alias to allow browserify to resolve
-	// the runtime on a supported path.
-	module.exports = __webpack_require__(99)['default'];
-
-
-/***/ },
-/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38637,30 +38502,30 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-	var _handlebarsBase = __webpack_require__(100);
+	var _handlebarsBase = __webpack_require__(99);
 
 	// Each of these augment the Handlebars object. No need to setup here.
 	// (This is done to easily share code between commonjs and browse envs)
 
 	var base = _interopRequireWildcard(_handlebarsBase);
 
-	var _handlebarsSafeString = __webpack_require__(114);
+	var _handlebarsSafeString = __webpack_require__(113);
 
 	var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-	var _handlebarsException = __webpack_require__(102);
+	var _handlebarsException = __webpack_require__(101);
 
 	var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
-	var _handlebarsUtils = __webpack_require__(101);
+	var _handlebarsUtils = __webpack_require__(100);
 
 	var Utils = _interopRequireWildcard(_handlebarsUtils);
 
-	var _handlebarsRuntime = __webpack_require__(115);
+	var _handlebarsRuntime = __webpack_require__(114);
 
 	var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-	var _handlebarsNoConflict = __webpack_require__(116);
+	var _handlebarsNoConflict = __webpack_require__(115);
 
 	// For compatibility and usage outside of module systems, make the Handlebars object a namespace
 
@@ -38696,7 +38561,7 @@
 
 
 /***/ },
-/* 100 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38707,17 +38572,17 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
-	var _exception = __webpack_require__(102);
+	var _exception = __webpack_require__(101);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
-	var _helpers = __webpack_require__(103);
+	var _helpers = __webpack_require__(102);
 
-	var _decorators = __webpack_require__(111);
+	var _decorators = __webpack_require__(110);
 
-	var _logger = __webpack_require__(113);
+	var _logger = __webpack_require__(112);
 
 	var _logger2 = _interopRequireDefault(_logger);
 
@@ -38806,7 +38671,7 @@
 
 
 /***/ },
-/* 101 */
+/* 100 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38936,7 +38801,7 @@
 
 
 /***/ },
-/* 102 */
+/* 101 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38982,7 +38847,7 @@
 
 
 /***/ },
-/* 103 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38993,31 +38858,31 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _helpersBlockHelperMissing = __webpack_require__(104);
+	var _helpersBlockHelperMissing = __webpack_require__(103);
 
 	var _helpersBlockHelperMissing2 = _interopRequireDefault(_helpersBlockHelperMissing);
 
-	var _helpersEach = __webpack_require__(105);
+	var _helpersEach = __webpack_require__(104);
 
 	var _helpersEach2 = _interopRequireDefault(_helpersEach);
 
-	var _helpersHelperMissing = __webpack_require__(106);
+	var _helpersHelperMissing = __webpack_require__(105);
 
 	var _helpersHelperMissing2 = _interopRequireDefault(_helpersHelperMissing);
 
-	var _helpersIf = __webpack_require__(107);
+	var _helpersIf = __webpack_require__(106);
 
 	var _helpersIf2 = _interopRequireDefault(_helpersIf);
 
-	var _helpersLog = __webpack_require__(108);
+	var _helpersLog = __webpack_require__(107);
 
 	var _helpersLog2 = _interopRequireDefault(_helpersLog);
 
-	var _helpersLookup = __webpack_require__(109);
+	var _helpersLookup = __webpack_require__(108);
 
 	var _helpersLookup2 = _interopRequireDefault(_helpersLookup);
 
-	var _helpersWith = __webpack_require__(110);
+	var _helpersWith = __webpack_require__(109);
 
 	var _helpersWith2 = _interopRequireDefault(_helpersWith);
 
@@ -39034,14 +38899,14 @@
 
 
 /***/ },
-/* 104 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('blockHelperMissing', function (context, options) {
@@ -39079,7 +38944,7 @@
 
 
 /***/ },
-/* 105 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39089,9 +38954,9 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
-	var _exception = __webpack_require__(102);
+	var _exception = __webpack_require__(101);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
@@ -39179,7 +39044,7 @@
 
 
 /***/ },
-/* 106 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39189,7 +39054,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _exception = __webpack_require__(102);
+	var _exception = __webpack_require__(101);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
@@ -39210,14 +39075,14 @@
 
 
 /***/ },
-/* 107 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('if', function (conditional, options) {
@@ -39245,7 +39110,7 @@
 
 
 /***/ },
-/* 108 */
+/* 107 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -39277,7 +39142,7 @@
 
 
 /***/ },
-/* 109 */
+/* 108 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -39295,14 +39160,14 @@
 
 
 /***/ },
-/* 110 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	exports['default'] = function (instance) {
 	  instance.registerHelper('with', function (context, options) {
@@ -39334,7 +39199,7 @@
 
 
 /***/ },
-/* 111 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39345,7 +39210,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _decoratorsInline = __webpack_require__(112);
+	var _decoratorsInline = __webpack_require__(111);
 
 	var _decoratorsInline2 = _interopRequireDefault(_decoratorsInline);
 
@@ -39356,14 +39221,14 @@
 
 
 /***/ },
-/* 112 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	exports['default'] = function (instance) {
 	  instance.registerDecorator('inline', function (fn, props, container, options) {
@@ -39391,14 +39256,14 @@
 
 
 /***/ },
-/* 113 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	var logger = {
 	  methodMap: ['debug', 'info', 'warn', 'error'],
@@ -39444,7 +39309,7 @@
 
 
 /***/ },
-/* 114 */
+/* 113 */
 /***/ function(module, exports) {
 
 	// Build out our basic SafeString type
@@ -39465,7 +39330,7 @@
 
 
 /***/ },
-/* 115 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39485,15 +39350,15 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-	var _utils = __webpack_require__(101);
+	var _utils = __webpack_require__(100);
 
 	var Utils = _interopRequireWildcard(_utils);
 
-	var _exception = __webpack_require__(102);
+	var _exception = __webpack_require__(101);
 
 	var _exception2 = _interopRequireDefault(_exception);
 
-	var _base = __webpack_require__(100);
+	var _base = __webpack_require__(99);
 
 	function checkRevision(compilerInfo) {
 	  var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -39763,7 +39628,7 @@
 
 
 /***/ },
-/* 116 */
+/* 115 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/* global window */
@@ -39789,10 +39654,169 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
+/* 116 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var tpl = __webpack_require__(117);
+	var _ = __webpack_require__(4);
+
+	var FoodProfileView = __webpack_require__(118);
+
+	var Parse = __webpack_require__(5).Parse;
+
+	module.exports = Backbone.View.extend({
+	  events: {
+	    'click .add-food': 'onClickAddFood',
+	//    'click li': 'onClickFood',
+	    'click #btn-healthy': 'onClickHealthy',
+	    'click #btn-not-healthy': 'onClickNotHealthy',
+	    'click .logout': 'onClickLogout'
+
+
+	  },
+	  className: 'food',
+
+	  render: function () {
+	    var user = Parse.User.current();
+	    console.log(user);
+	    var self = this;
+
+	    if (!this.food) {
+	      var food = Parse.Object.extend('food');
+
+	      (new Parse.Query(food))
+	        .find()
+	        .then(function(data){
+	          self.food = _.invoke(data, 'toJSON');
+	          console.log(self.food);
+	          self.render();
+	        });
+	      return this;
+	    }
+
+	    var data = {
+	      food: _.map(self.food, function (food, index) {
+	        food.zIndex = index;
+	        food.left = index * 5 + 'px';
+	        food.top = index * 5 + 'px';
+	        return food;
+	      })
+	    };
+
+	    this.foodProfile = new FoodProfileView({
+
+	    }).render();
+
+	    this.$el.html(
+	      tpl(data)
+	    );
+
+	    //jQuery stuff goes here
+
+	    return this;
+	  },
+
+	  onClickAddFood: function () {
+	    console.log('a food is added');
+	  },
+	  onClickFood: function (e) {
+
+	    console.log($(e.target).data('id'));
+
+	    var Cats = Parse.Object.extend('Cats');
+
+	    new Cats({
+	      name: 'Harry'
+	    }).save().then(function () {
+	        //saved
+	        console.log("saved");
+	      }).catch(function (err) {
+	        //error
+	        console.log("error");
+	      });
+	    $(e.target).remove();
+	  },
+	  onClickHealthy: function (e) {
+	    var bool = true;
+	    var $topFoodItem = $('.food-item:last');
+	    var foodID = $topFoodItem.data('id');
+
+	    $topFoodItem.remove();
+
+	    this.createUserFoodChoice(bool, foodID);
+	  },
+	  onClickNotHealthy: function (e) {
+	    var bool = false;
+	    var $topFoodItem = $('.food-item:last');
+	    var foodID = $topFoodItem.data('id');
+
+	    $topFoodItem.remove();
+
+	    this.createUserFoodChoice(bool, foodID);
+	  },
+
+	  createUserFoodChoice: function(bool, foodID) {
+
+	  var user = Parse.User.current();
+	  var userFoodChoices = Parse.Object.extend('user_food_choices');
+	  var food = Parse.Object.extend('food');
+
+	  new userFoodChoices({
+	    food: new food({objectId: foodID}),
+	    user: user,
+	    healthy: bool
+	  }).save().then(function () {
+	      //saved
+	      console.log("saved");
+	    }).fail(function (err) {
+	      //error
+	      console.log("error");
+	    });
+	  },
+
+	  onClickLogout: function(e) {
+	    Parse.User.logOut().then(function() {
+	      console.log('logged out');
+	    });
+
+	    e.preventDefault();
+	    return false;
+	  }
+
+	});
+
+/***/ },
 /* 117 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var tpl = __webpack_require__(118);
+	var Handlebars = __webpack_require__(97);
+	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+	  return "    <li class='food-item' style=\"z-index: "
+	    + alias4(((helper = (helper = helpers.zIndex || (depth0 != null ? depth0.zIndex : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zIndex","hash":{},"data":data}) : helper)))
+	    + "; position: absolute; top: "
+	    + alias4(((helper = (helper = helpers.top || (depth0 != null ? depth0.top : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"top","hash":{},"data":data}) : helper)))
+	    + "; left: "
+	    + alias4(((helper = (helper = helpers.left || (depth0 != null ? depth0.left : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"left","hash":{},"data":data}) : helper)))
+	    + "\" data-id="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + ">"
+	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
+	    + "</li>\n";
+	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+	    var stack1;
+
+	  return "<ul>\n"
+	    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.food : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "</ul>\n<div>\n<button class=\"btn btn-success\" id=\"btn-healthy\">Healthy</button>\n<button class=\"btn btn-danger\" id=\"btn-not-healthy\">Not</button>\n</div>\n<a href=\"#\" class=\"logout\">Logout</a>\n";
+	},"useData":true});
+
+/***/ },
+/* 118 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var tpl = __webpack_require__(119);
 	var _ = __webpack_require__(4);
 
 	module.exports = Backbone.View.extend({
@@ -39802,10 +39826,10 @@
 	})
 
 /***/ },
-/* 118 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Handlebars = __webpack_require__(98);
+	var Handlebars = __webpack_require__(97);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
 	    return "  Loading Cats\n";
 	},"3":function(container,depth0,helpers,partials,data) {
@@ -39832,10 +39856,10 @@
 	},"useData":true});
 
 /***/ },
-/* 119 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Handlebars = __webpack_require__(98);
+	var Handlebars = __webpack_require__(97);
 	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
 	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -39854,15 +39878,6 @@
 	    + "       </ul>\n	  </div>\n	</nav>\n\n	<div class=\"main\">\n\n	</div>\n\n	<div class=\"well\">\n	"
 	    + alias4(((helper = (helper = helpers.footer || (depth0 != null ? depth0.footer : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"footer","hash":{},"data":data}) : helper)))
 	    + "\n	</div>\n</div>";
-	},"useData":true});
-
-/***/ },
-/* 120 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Handlebars = __webpack_require__(98);
-	module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-	    return "<!--<form action=\"\">-->\n  <!--Email: <input type=\"text\" name=\"email\" />-->\n  <!--Password: <input type=\"text\" name=\"password\" />-->\n  <!--Class: <input type=\"text\" name=\"classname\" />-->\n  <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n<!--</form>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-md-5 col-md-offset-3\">\n      <div class=\"panel panel-login\">\n        <div class=\"panel-heading\">\n          <div class=\"row\">\n            <div class=\"col-xs-6\">\n              <a href=\"#\" id=\"login-form-link\">Login</a>\n            </div>\n            <div class=\"col-xs-6\">\n              <a href=\"#\" class=\"active\" id=\"register-form-link\">Register</a>\n            </div>\n          </div>\n          <hr>\n        </div>\n        <div class=\"panel-body\">\n          <div class=\"row\">\n            <div class=\"col-lg-12\">\n              <form id=\"login-form\" role=\"form\" style=\"display: none;\">\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <!--<div class=\"form-group text-center\">-->\n                  <!--<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">-->\n                  <!--<label for=\"remember\"> Remember Me</label>-->\n                <!--</div>-->\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\">\n                    </div>\n                  </div>\n                </div>\n              </form>\n              <form id=\"register-form\" role=\"form\" style=\"display: block;\">\n                <div class=\"form-group\">\n                  <input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" value=\"\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\">\n                </div>\n                <div class=\"form-group\">\n                  <input type=\"text\" name=\"classname\" id=\"classname\" tabindex=\"2\" class=\"form-control\" placeholder=\"Enter Channel\">\n                </div>\n                <div class=\"form-group\">\n                  <div class=\"row\">\n                    <div class=\"col-sm-6 col-sm-offset-3\">\n                      <input type=\"submit\" name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\">\n                      <!--<button class=\"btn btn-success\" id=\"btn-signup\">Sign Up</button>-->\n                    </div>\n                  </div>\n                </div>\n              </form>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>";
 	},"useData":true});
 
 /***/ }
