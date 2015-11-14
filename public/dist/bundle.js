@@ -66,7 +66,7 @@
 	//var config = require('./config');
 	var Router = __webpack_require__(94);
 
-	var containerTpl = __webpack_require__(120);
+	var containerTpl = __webpack_require__(122);
 
 	var app = {
 		init: function () {
@@ -76,22 +76,6 @@
 	      // JS key
 	      'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
 	    );
-
-	//    var Cats = Parse.Object.extend('Cats');
-	//    (new Parse.Query(Cats))
-	//      .get('ZCXIAG78d4')
-	//      .then(_.bind(function(data){
-	//        console.log(data.toJSON());
-	//      }));
-
-	//    var food = Parse.Object.extend('food');
-	//    (new Parse.Query(food))
-	//      .get('ZCXIAG78d4')
-	//      .then(function(data){
-	//        console.log(data.toJSON());
-	//        self.cats = data.toJSON();
-	//      });
-
 
 	    $('body').append(containerTpl({
 				site_name: 'Eat or Not',
@@ -38366,6 +38350,7 @@
 
 	var HomeView = __webpack_require__(95);
 	var FoodsView = __webpack_require__(116);
+	var MyFoodsView = __webpack_require__(120);
 
 	module.exports = Backbone.Router.extend({
 		routes: {
@@ -38374,6 +38359,9 @@
 			},
 	    'foods': function () {
 	      appendView(new FoodsView().render());
+	    },
+	    'my-foods': function () {
+	      appendView(new MyFoodsView().render());
 	    }
 		}
 	});
@@ -38383,6 +38371,7 @@
 			.empty()
 			.append(view.$el);
 	}
+
 
 /***/ },
 /* 95 */
@@ -39678,7 +39667,7 @@
 
 	  render: function () {
 	    var user = Parse.User.current();
-	    console.log(user);
+	    //console.log(user);
 	    var self = this;
 
 	    if (!this.food) {
@@ -39688,17 +39677,18 @@
 	        .find()
 	        .then(function(data){
 	          self.food = _.invoke(data, 'toJSON');
-	          console.log(self.food);
+	         // console.log(self.food);
 	          self.render();
 	        });
+
 	      return this;
 	    }
 
 	    var data = {
 	      food: _.map(self.food, function (food, index) {
 	        food.zIndex = index;
-	        food.left = index * 5 + 'px';
-	        food.top = index * 5 + 'px';
+	        food.left = index * 1 + 'px';
+	        food.top = index * 1 + 'px';
 	        return food;
 	      })
 	    };
@@ -39857,6 +39847,103 @@
 
 /***/ },
 /* 120 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var tpl = __webpack_require__(121);
+	var _ = __webpack_require__(4);
+
+	var Parse = __webpack_require__(5).Parse;
+
+	module.exports = Backbone.View.extend({
+	  events: {
+	    'click .add-food': 'onClickAddFood',
+	//    'click li': 'onClickFood',
+	//    'click #btn-healthy': 'onClickHealthy',
+	//    'click #btn-not-healthy': 'onClickNotHealthy',
+	    'click .logout': 'onClickLogout',
+	    'click #myFood': 'loadMyFood'
+
+
+	  },
+	  className: 'my-food',
+
+	  render: function () {
+	    var user = Parse.User.current();
+	    var self = this;
+
+	    if (!this.foodchoices) {
+	      var userFoodChoice = Parse.Object.extend('user_food_choices');
+	      var user = Parse.User.current();
+	      var query = new Parse.Query(userFoodChoice)
+	        .equalTo("user", user)
+	        .include(["food"])
+	        .find()
+	        .then(function (data) {
+	          //self.foodchoices = _.invoke(data, 'toJSON');
+	          self.foodchoices = _.map(data, function (foodchoice) {
+	            foodchoice = foodchoice.toJSON();
+	            if(foodchoice.food.toJSON) {
+	            foodchoice.food = foodchoice.food.toJSON();
+	            }
+
+	            return foodchoice;
+	          })
+	          self.render();
+	        });
+	        return this;
+	    }
+
+	    console.log(self.foodchoices);
+
+	    var data = {
+	      healthyfoods: _.where(self.foodchoices, {healthy: true}),
+	      unhealthyfoods: _.where(self.foodchoices, {healthy: false})
+	    };
+
+	    this.$el.html(
+	      tpl(data)
+	    );
+	  }
+	});
+
+
+/***/ },
+/* 121 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Handlebars = __webpack_require__(97);
+	module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+	  return "      <input type=\"checkbox\" class=\"healthy\" name=\"myfood-item\" data-id="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + " value="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + "/>"
+	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
+	    + "<br>\n";
+	},"3":function(container,depth0,helpers,partials,data) {
+	    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+	  return "      <input type=\"checkbox\" class=\"unhealthy\" name=\"myfood-item\" data-id="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + " value="
+	    + alias4(((helper = (helper = helpers.objectId || (depth0 != null ? depth0.objectId : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"objectId","hash":{},"data":data}) : helper)))
+	    + "\n          />"
+	    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
+	    + "<br>\n";
+	},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+	    var stack1, alias1=depth0 != null ? depth0 : {};
+
+	  return "Testing.\n<form action=\"\">\n  <fieldset id=\"left\">\n"
+	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.healthyfoods : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "  </fieldset>\n  <fieldset class=\"right\">\n"
+	    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.unhealthyfoods : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+	    + "  </fieldset>\n</form>\n<div>\n  <button class=\"btn btn-success\" id=\"#myFood\">myFood</button>\n</div>";
+	},"useData":true});
+
+/***/ },
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Handlebars = __webpack_require__(97);

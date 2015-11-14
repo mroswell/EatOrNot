@@ -1,5 +1,6 @@
 var HomeView = require('./views/home');
 var FoodsView = require('./views/foods');
+var MyFoodsView = require('./views/my-foods');
 
 module.exports = Backbone.Router.extend({
 	routes: {
@@ -8,6 +9,9 @@ module.exports = Backbone.Router.extend({
 		},
     'foods': function () {
       appendView(new FoodsView().render());
+    },
+    'my-foods': function () {
+      appendView(new MyFoodsView().render());
     }
 	}
 });

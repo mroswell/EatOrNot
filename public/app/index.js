@@ -31,22 +31,6 @@ var app = {
       'hikE9HYfNVQAdGlXez9Zxld0a6Q3dIhFblh4nsb7'
     );
 
-//    var Cats = Parse.Object.extend('Cats');
-//    (new Parse.Query(Cats))
-//      .get('ZCXIAG78d4')
-//      .then(_.bind(function(data){
-//        console.log(data.toJSON());
-//      }));
-
-//    var food = Parse.Object.extend('food');
-//    (new Parse.Query(food))
-//      .get('ZCXIAG78d4')
-//      .then(function(data){
-//        console.log(data.toJSON());
-//        self.cats = data.toJSON();
-//      });
-
-
     $('body').append(containerTpl({
 			site_name: 'Eat or Not',
 			routes: [{

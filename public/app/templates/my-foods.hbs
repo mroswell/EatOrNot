@@ -1,0 +1,17 @@
+Testing.
+<form action="">
+  <fieldset id="left">
+    {{#each healthyfoods}}
+      <input type="checkbox" class="healthy" name="myfood-item" data-id={{objectId}} value={{objectId}}/>{{name}}<br>
+    {{/each}}
+  </fieldset>
+  <fieldset class="right">
+    {{#each unhealthyfoods}}
+      <input type="checkbox" class="unhealthy" name="myfood-item" data-id={{objectId}} value={{objectId}}
+          />{{name}}<br>
+    {{/each}}
+  </fieldset>
+</form>
+<div>
+  <button class="btn btn-success" id="#myFood">myFood</button>
+</div>

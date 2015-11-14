@@ -19,7 +19,7 @@ module.exports = Backbone.View.extend({
 
   render: function () {
     var user = Parse.User.current();
-    console.log(user);
+    //console.log(user);
     var self = this;
 
     if (!this.food) {
@@ -29,17 +29,18 @@ module.exports = Backbone.View.extend({
         .find()
         .then(function(data){
           self.food = _.invoke(data, 'toJSON');
-          console.log(self.food);
+         // console.log(self.food);
           self.render();
         });
+
       return this;
     }
 
     var data = {
       food: _.map(self.food, function (food, index) {
         food.zIndex = index;
-        food.left = index * 5 + 'px';
-        food.top = index * 5 + 'px';
+        food.left = index * 1 + 'px';
+        food.top = index * 1 + 'px';
         return food;
       })
     };
